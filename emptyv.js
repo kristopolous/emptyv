@@ -231,7 +231,7 @@ function main() {
       "vid" + ix, // id
       "400",      // width
       "300",      // height
-      "8",        // version (the flv2 player (flash 8) has ad-free vevo, so we use the old player)
+      "9",        // [false] version (the flv2 player (flash 8) has ad-free vevo, so we use the old player)
       null,       // express install swf url (we assume you have the flash player)
       null,       // flash vars 
       {allowScriptAccess: "always"}, // params
