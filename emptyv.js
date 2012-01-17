@@ -20,7 +20,7 @@ var
   YTLOADTIME_sec = 6,
 
   // The inter-video gap is the admission that we don't
-  // want to transition EXACTLY at the end of one and
+  // want to transition EXACTLY at the end of one video and
   // the beginning of another, but instead want an acceptable
   // gap in between the two.
   INTERVIDEOGAP_ms = 2000,
@@ -63,7 +63,7 @@ var
 
   _next = 1,
   _nextFlag = true,
-  _runtime = _.reduce(_duration, function(a, b) { return a + b[RUNTIME] }, 0);
+  _runtime = _.reduce(_duration, function(a, b) { return a + b[RUNTIME] + INTERVIDEOGAP_ms / 1000 }, 0);
 
 function updateytplayer(){
   // If we have the player loaded
@@ -121,7 +121,7 @@ function findOffset() {
 
     lapse > _duration[index][RUNTIME];
 
-    lapse -= _duration[index][RUNTIME],
+    lapse -= (_duration[index][RUNTIME] + INTERVIDEOGAP_ms / 1000),
     index = (index + 1) % _duration.length
   );
 
