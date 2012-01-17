@@ -13,6 +13,14 @@ var
   // basis
   VOLUME = 4,
 
+  // The year of release
+  YEAR = 5,
+
+  // The artist
+  ARTIST = 6,
+
+  NAME = 7,
+
   // The offset addition was after some toying around and 
   // seeint how long the player took to load. This seemed
   // to work ok; we really want the drift to be as close
@@ -86,7 +94,11 @@ function updateytplayer(){
 // what is detected, probably in findOffset
 function setQuality(direction) {
   if(direction) {
-    var newLevel = Math.max(_currentLevel + direction, 0);
+    var 
+      newLevel = Math.min(
+        Math.max(_currentLevel + direction, 0),
+        LEVELS.length
+      );
     if(newLevel != _currentLevel) {
       console.log("Setting playback rate to ", LEVELS[_currentLevel]);
     }
@@ -104,6 +116,10 @@ function setQuality(direction) {
 
     // Then we set it
     _player[_active].setPlaybackQuality(word);
+  } else {
+    _currentLevel = _.last(_player[_active].getAvailableQualityLevels());
+    _player[_active].setPlaybackQuality(_currentLevel);
+    _currentLevel = _.indexOf(LEVELS, _currentLevel);
   }
 }
 
@@ -172,6 +188,10 @@ function findOffset() {
   // that we aren't just constantly cycling through
   // two quality settings, pausing the video annoyingly
   // every time we cycle up or down.
+  if(_lagCounter < -10) {
+    setQuality(+1);
+    _lagCounter += 10;
+  } 
 }
 
 function onYouTubePlayerReady(playerId) {
