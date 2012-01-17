@@ -198,6 +198,7 @@ function onYouTubePlayerReady(playerId) {
   _player[ parseInt(playerId.substr(-1)) ] = document.getElementById(playerId);
 
   if(++_loaded == 2) {
+
     findOffset();
     setInterval(findOffset, PRELOAD_ms * 2);
     setInterval(updateytplayer, 250);
@@ -257,8 +258,18 @@ function main() {
       "9",        // [false] version (the flv2 player (flash 8) has ad-free vevo, so we use the old player)
       null,       // express install swf url (we assume you have the flash player)
       null,       // flash vars 
-      {allowScriptAccess: "always"}, // params
-      {id: 'player-' + ix},          // attributes
+
+      {
+        allowScriptAccess: "always"
+      }, // params
+
+      // This little hack forces our small mt80s logo to the bottom left so 
+      // the user can click on it at any time.
+      {
+        wmode: "transparent", 
+        id: 'player-' + ix
+      }, // attributes
+
       new Function()                 // yt doesn't do the callbackfunction
     );
   }
