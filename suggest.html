@@ -1,36 +1,30 @@
 <!doctype html>
 <html><head>
-<title>Feedback</title>
+<title>About mt80s.com</title>
 <link rel=stylesheet href=style.css>
 </head>
 <body>
 <div>
-<h1>Report A Dead Song</h1>
-<p>Did you just see blank-ness for 3 minutes or so? Yeah, sorry about that, tell me what the song was and I'll get right on it</p>
-
-<form method=post action=processing.php name=processing>
-  <input id=song>
-  <input type=submit value="He's Dead, Jim">
-</form>
-
+<h1>About</h1>
+<p>mt80s.com plays videos from third-party sources like youtube and metacafe in a preprogrammed sequence. The purpose is to emulate people's perception of the programming of MTV from the 80s so that they feel like they are watching the station in its beloved, but unfortunately abandoned, format.
+</p>
+<h4>Note</h4>
+<p>mt80s.com is not affiliated with MTV, Inc. If you feel that mt80s.com is infringing on any rights you hold, please leave a comment in the <a href=#section_comment>comments section</a></p>
 </div>
 <div>
-<h1>Suggest A Song</h1>
-<p>Here's some general guidelines to be thematically consistent with the vision of the project:
+<h1>Suggest</h1>
+<p>Some guidelines to be thematically consistent are:
 <ul>
-  <li><b>Every Song Must Have a Video from the era of the song!</b>. So Morrissey doing "Hand In Glove" in 2009 is awesome, really; but it doesn't belong here. Additionally, TOTP (top of the pops, a british 80s show), is discouraged; it's not mt80s enough.</li>
-  <li>The ideal years are between 1980 and 1985, but much earlier songs like David Bowies' Space Oddity (1969) are acceptable; 1989 is pushing it, unless it is stylistically old and "thought" to be from the 80s. 
-  <em>For instance, Depeche Mode's Personal Jesus and The B-52's Love Shack both "belong" in the 80s although they are both from 1989.</em>
+  <li><b>Every Song Must Have a Video from the era of the song!</b>. TOTP (Top of The Pops, a British 80s Show) is discouraged.</li>
+  <li>The ideal years are between 1980 and 1986, but much earlier songs like David Bowies' Space Oddity (1969) are great.
   </li>
-  <li>The priority of genres are as follows:
+  <li>The priority of genres,
     <ol>
-      <li> New-wave or Alternative Rock
-      <li> General Pop (think Go Gos)
-      <li> Metal or Punk
-      <li> Electro
-      <li> Pre-Gangsta Rap and Hip-Hop (NWA is thematically inconsistent)
-      <li> Italo Disco or EuroPop
-      <li> Interviews with musicians (Such as the drummer from U2)
+      <li> New-wave, Alternative Rock, and General Pop
+      <li> Metal and Punk
+      <li> Electro, Pre-Gangsta Rap, and Hip-Hop
+      <li> Non-English Language equivalencies of the stuff above
+      <li> Interviews with musicians
     </ol>
   </li>
 </ul>
@@ -40,25 +34,57 @@ As you type in the artist and song, there will be a result below that
 will show you whether it's been added already or not.
 </p>
 
-<h2>Notes</h2>
-<ol>
+<h4>Notes</h4>
+<ul>
   <li>The Cure has audio muted in the US (240p will play it), so unfortunately, they are out until I can get around to coding a feature that will force a quality on muted tracks like this.</li>
-</ol>
+</ul>
 
-<form method=post action=processing.php name=processing>
+<form method=post action=processing.php?type=suggest name=processing>
   <span>
     Artist Name
-    <input id=artist>
+    <input name=artist id=artist>
   </span>
   <span>
     Track Title
-    <input id=title>
+    <input name=title id=title>
   </span>
   <span>
     Any Notes For Me
-    <textarea id=notes></textarea>
+    <textarea name=notes id=notes></textarea>
   </span>
 </form>
+</div>
+<h1>Report A Dead Song</h1>
+<p>Did you just see blank-ness for 3 minutes or so? Yeah, sorry about that, tell me what the song was and I'll get right on it</p>
+
+<form method=post action=processing.php?type=dead name=processing>
+  <input name=song id=song>
+  <input type=submit value="He's Dead, Jim">
+</form>
+
+</div>
+<div>
+<a name=section_comment></a>
+<h1>Leave a Comment</h1>
+<p>If you want to leave a general comment that isn't a song suggestion or a dead link, please type away below</p>
+
+<form method=post action=processing.php?type=comment name=processing>
+  <span>
+    Your Name
+    <input name=name id=name>
+  </span>
+
+  <span>
+    Your Email Address
+    <input name=email id=email>
+  </span>
+
+  <span>
+    Your Comment
+    <textarea name=comment id=comment></textarea>
+  </span>
+</form>
+
 </div>
 </body>
 </html>
