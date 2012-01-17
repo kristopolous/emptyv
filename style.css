@@ -1,0 +1,36 @@
+@import url("/format/styles/shCore.css");
+@import url("/format/styles/shThemeDefault.css");
+body{font-family:Helvetica;margin:10px 0px 0 70px;width:700px}
+img{display:block;margin:5px;padding:3px}
+li{line-height:1.75em;margin-top:.5em;max-width:400px}
+ul{width:60%}
+q{width:450px;margin:10px;display:block;line-height:1.65em;background:#eef;padding:15px;font-size:0.9em}
+q:before{content:""}
+q:after{content:""}
+cite a{color:#99c}
+p{line-height:1.75em;width:80%}
+tt{display:block;margin:10px;font-weight:bold}
+h1,h2,h3,h4,h5,h6,b{color:brown}
+h1{width:auto;margin:30px -15px 10px}
+h2{margin-bottom:0px}
+h3{margin:0;font-size:0.8em;font-weight:normal;}
+h4{margin:0;font-size:1.1em;font-weight:bold;}
+h5{margin:0;font-size:1em;font-weight:bold;}
+h6{font-size:0.95em;margin:10px 0 -15px 0}
+h4{margin-top:40px}
+pre.error{background:#ecc;font-weight:bold;border:0;padding:10px}
+pre.normal{width:auto;display:inline-block;white-space:pre;background:#cec;display:block;padding:15px;margin:10px;padding-top:0;margin-bottom:40px;line-height:1.35em}
+.emp{color:#000;background:#cec}
+.copy{color:#aaa;font-size:0.9em;display:block;text-align:center}
+.secret{color:silver;font-weight:bold}
+.secret a{color:lightblue}
+.secret a:visited{color:pink}
+.header{position:absolute;top:0;left:0;background:#ddd;display:block;width:100%;padding:5px 0;text-indent:5px}
+.header a{color:#555;font-weight:bold}
+
+a img{float:left;margin-left:-35px}
+.break{display:block;margin:3em 0 1em 0;margin-left:220px}
+cite:before{content:"-- "}
+cite{text-align:right;margin:5px -5px -10px 0;display:block;font-weight:bold;color:#bbb;font-family:Palatino Linotype, Book Antiqua3, Palatino6, serif}
+span{display:block;margin:10px}
+span input, span textarea{display:block}
