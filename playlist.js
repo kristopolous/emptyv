@@ -191,7 +191,7 @@ var  _duration = [
     ["dsUXAEzaC3Q", 260, 0, 0, 100, 1987, "Michael Jackson", "Beat It"], //(vevo)
     ["e3W6yf6c-FA", 304, 0, 0, 100, 1982, "Duran Duran", "Rio"], //(vevo)
     ["ePIImGMjn_8", 277, 0, 0, 100, 1981, "Romeo Void", "Never Say Never"], //(vh1 logo) (no ytad) (title)
-    ["eabefjsJsAQ", 279, 0, 0, 100, 1983, "Re-Flex", "The Politics Of Dancing"], //(clean) (no ytad) (no title)
+ // ["eabefjsJsAQ", 279, 0, 0, 100, 1983, "Re-Flex", "The Politics Of Dancing"], //(clean) (no ytad) (no title) (( not loading ))
     ["egDJc1HhiZ4", 230, 0, 0, 100, 1984, "INXS", "Original Sin"], //(clean) (no ytad) (no title)
     ["ejorQVy3m8E", 277, 0, 0, 100, 1988, "Midnight Oil", "Beds Are Burning"], //(vevo)
     ["eomxwZcrvlY", 225, 0, 0, 100, 1986, "The Cover Girls", "Show Me"], //(logo) (no ytad) (no title)
