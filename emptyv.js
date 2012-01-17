@@ -19,7 +19,7 @@ var
   // The artist
   ARTIST = 6,
 
-  NAME = 7,
+  TITLE = 7,
 
   // The offset addition was after some toying around and 
   // seeint how long the player took to load. This seemed
@@ -220,6 +220,8 @@ function transition(offset) {
   setTimeout(function(){
     // After the PRELOAD_msl interval, then we stop the playing video
     _player[_active].stopVideo();
+
+    document.title = "80s | " + _duration[_index][ARTIST] + " - " + _duration[_index][TITLE];
 
     // Toggle the player pointers
     _active = (_active + 1) % 2;
