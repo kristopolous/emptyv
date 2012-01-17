@@ -201,6 +201,7 @@ function onYouTubePlayerReady(playerId) {
     findOffset();
     setInterval(findOffset, PRELOAD_ms + 500);
     setInterval(updateytplayer, 250);
+    _player[_next].setVolume(100);
   }
 }
 
