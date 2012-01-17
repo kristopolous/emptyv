@@ -1,1 +1,1 @@
-[demo](http://qaa.ath.cx/80s)
+This is the code for [mt80s.com](http://mt80s.com).

@@ -89,7 +89,7 @@ var  _duration = [
     ["LHcP4MWABGY", 247, 0, 0, 100], // 1984 U2, Pride (In the Name Of Love) (vevo)
     ["LTYvjrM6djo", 202, 0, 0, 100], // 1984 David Bowie, Blue Jean (vevo)
     ["LV0eTlLU31k", 215, 0, 0, 100], // 1987 Latin Fire, Fancy (huge title) (no ytad) (title) (( bad quality ))
-    ["Ldyx3KHOFXw", 229, 0, 0, 100], // 1979 Gary Numan, Cars (clean) (ytad) (no title)
+ // ["Ldyx3KHOFXw", 229, 0, 0, 100], // 1979 Gary Numan, Cars (clean) (ytad) (no title) (( embedding disabled ))
     ["LoF_a0-7xVQ", 257, 0, 0, 100], // 1983 Suicidal Tendencies, Institutionalized (clean) (ytad) (no title)
     ["Lp2qcCrdBLA", 225, 0, 0, 100], // 1986 Modern Talking, Brother Louie (vevo)
     ["Lr0xJBsVbZY", 256, 0, 0, 100], // 1984 Jennifer Rush, The Power of Love (clean) (no ytad) (no title)
