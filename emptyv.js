@@ -160,7 +160,7 @@ function findOffset() {
 
     // If we have drifted more than xxx seconds from our destination offset
     // then we will shift forward
-  } else if ( Math.abs( _player[_active].getCurrentTime() - lapse) > 10) {
+  } else if ( lapse - _player[_active].getCurrentTime() > 13) {
 
     // This is also the opportunity to see if we are laggy.
     // We give our lagCounter 2 points here (and we always take
@@ -177,7 +177,7 @@ function findOffset() {
 
     // We don't trust seeking to be insanely accurate so we throw an offset
     // on to it to avoid some kind of weird seeking loop.
-    _player[_active].seekTo(lapse + YTLOADTIME_sec);
+    _player[_active].seekTo(lapse + YTLOADTIME_sec * 5 / 3);
   } 
 
   _lagCounter--;
