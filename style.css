@@ -15,24 +15,21 @@ h4{margin:0;font-size:1.1em;font-weight:bold;}
 h5{margin:0;font-size:1em;font-weight:bold;}
 h6{font-size:0.95em;margin:10px 0 -15px 0}
 h4{margin-top:40px}
-pre.error{background:#ecc;font-weight:bold;border:0;padding:10px}
-pre.normal{width:auto;display:inline-block;white-space:pre;background:#cec;display:block;padding:15px;margin:10px;padding-top:0;margin-bottom:40px;line-height:1.35em}
 .emp{color:#000;background:#cec}
 .copy{color:#aaa;font-size:0.9em;display:block;text-align:center}
-.header{position:absolute;top:0;left:0;background:#ddd;display:block;width:100%;padding:5px 0;text-indent:5px}
-.header a{color:#555;font-weight:bold;text-shadow:1px 0px 4px #300}
 a img{float:left;margin-left:-35px}
 .break{display:block;margin:3em 0 1em 0;margin-left:220px}
-.section{margin-left:35px;width:700px;display:none}
+.section{margin-left:35px;display:none}
 .section.sel{display:block}
 span{display:block;margin:10px 0}
 table{border-spacing:1}
 table{background:tan}
 th,td{background:white;padding:3px 6px}
 th{background:tan}
+#processing span{width:200px}
 span input, span textarea{display:block;font-size:1.1em;width:190px;margin-bottom:1em}
-#header{background:brown;display:block;width:100%;margin:0}
-#header a{display:inline-block;font-size:2em;padding:1em;color:#fff;text-decoration:none}
+#header{background:brown;font-size:2em;display:block;margin:0;height:3em;margin-top:0.15em;padding-left:0.25em}
+#header a{display:inline-block;padding:1em;color:#fff;text-decoration:none;margin-top:-0.05em}
 a.sel{background:maroon}
 i{font-size:0.75em;font-style:normal;color:#555}
-/*form span{margin:0 0 20px}*/
+td a{color:blue;text-decoration:underline;cursor:pointer}
