@@ -171,7 +171,6 @@ var _duration = [
 ["yt:_JDBu3tRm1E", 146, 0, 0, 100, 1976, "Ramones", "Blitzkrieg Bop", "clean"],
 ["yt:_QtJh7Akb7s", 285, 0, 0, 100, 1981, "Rush", "Tom Sawyer", "clean"],
 ["yt:_SDvb3cjPQg", 208, 0, 0, 100, 1985, "Toy Dolls", "James Bond Lives Down our Street", "clean"],
-["yt:_U5HpeA_WSo", 212, 0, 0, 100, 1984, "The Smiths", "How Soon is Now?", "clean badtitle"],
 ["yt:_UXtort76gY", 239, 0, 0, 100, 1983, "Berlin", "The Metro", "almostclean title"],
 ["yt:_r0n9Dv6XnY", 219, 0, 0, 100, 1985, "Baltimora", "Tarzan Boy", "mtv2 logo title"],
 ["yt:_w4Xulsjo5I", 223, 0, 0, 100, 1982, "Falco", "Der Kommissar", "no logo title"],
