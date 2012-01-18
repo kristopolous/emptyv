@@ -51,7 +51,7 @@ var _duration = [
 ["yt:CK3uf5V0pDA", 225, 2, 0, 100, 1982, "The Pretenders", "Back on the Chain Gang", "clean"],
 ["yt:CMThz7eQ6K0", 230, 0, 0, 100, 1980, "David Bowie", "Ashes to Ashes", "vevo"],
 ["yt:CdqoNKCCt7A", 260, 0, 0, 100, 1985, "Simple Minds", "Don't You (Forget About Me)", "vevo"],
-["yt:D68kmFzSh_o", 229, 0, 0, 100, 1969, "David Bowie", "Major Tom", "clean"],
+["yt:D67kmFzSh_o", 229, 0, 0, 100, 1969, "David Bowie", "Major Tom", "clean"],
 ["yt:D6zBjYIyz-0", 233, 0, 0, 100, 1983, "Real Life", "Send Me An Angel", "two lines ytad"],
 ["yt:DYp2LGKOF_M", 194, 0, 0, 100, 1985, "The Smiths", "The Boy With The Thorn In His Side", "clean"],
 ["yt:D_Bj8wrXslk", 229, 0, 0, 100, 1986, "The Pretenders", "Don't Get Me Wrong", "ytad"],
