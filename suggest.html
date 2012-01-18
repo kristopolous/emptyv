@@ -20,6 +20,7 @@
 </div>
 
 <div class=section id=suggest>
+<span style=display:inline-block;width:50%;vertical-align:top>
 <h1>Suggest A Song</h1>
 <ul>
   <li><b>Every Song Must Have a Video from the era of the song!</b></li>
@@ -30,8 +31,11 @@
 <p>
 As you type in the artist and song, you will see if it's been added already.
 </p>
+</span>
+<span style=display:inline-block;width:30% id=embedder>
+</span>
 
-<form method=post action=processing.php?type=suggest name=processing>
+<form method=post id=processing action=processing.php?type=suggest name=processing>
   <span style=display:inline-block;width:35%;vertical-align:top>
   <span>
     Artist Name

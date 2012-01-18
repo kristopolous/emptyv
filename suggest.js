@@ -3,6 +3,10 @@ var
     .insert(DB.objectify(["id", "length", "start", "end", "volume", "year", "artist", "title"], _duration));
 //    .insert(DB.objectify(["ytid", "year", "artist", "title", "reason"], _bad));
 //
+function embedder(id){
+  $("#embedder").html('<object width="325" height="250"><param name="movie" value="http://www.youtube.com/v/' + id + '?version=3&amp;hl=en_GB&amp;autoplay=1"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/' + id + '?version=3&amp;hl=en_GB&amp;autoplay=1" type="application/x-shockwave-flash" width="325" height="250" allowscriptaccess="always" allowfullscreen="true"></embed></object>');
+}
+
 function search(){
   var 
     rows = [],
@@ -17,7 +21,7 @@ function search(){
       rows.push([
         '<td>' + res[0] + '</td>',
         '<td>',
-          '<a target=_blank href=http://youtube.com/watch?v=' + res[2].split(':')[1] + '>',
+          '<a onclick=embedder("' + res[2].split(':')[1] + '")>',
             res[1],
           '</a>',
         '</td>',
@@ -58,6 +62,7 @@ var on = {
 };
 
 $(function(){
+  search();
   $("#artist, #title").keyup(search);
 
   if(document.location.hash.length == 0) {
