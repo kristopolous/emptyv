@@ -131,7 +131,6 @@ var _duration = [
 ["ST86JM1RPl0", 191, 0, 0, 100, 1985, "Tears For Fears", "Everybody Wants To Rule The World"], //clean ytad (bad title)
 ["SbzYn48qJxU", 264, 0, 0, 100, 1983, "The Bongos", "Numbers With Wings"], //clean ytad 
 ["Se-QYEgAU8E", 244, 0, 0, 100, 1988, "Kon Kan", "I Beg Your Pardon"], // clean 
-["U7DFsBcVMDA", 272, 0, 0, 100, 1981, "Rush", "Tom Sawyer"], // clean 
 ["UBnF7et1plA", 218, 0, 0, 100, 1984, "Go-Gos", "Head Over Heels"], //logo title)
 ["UCtWkFbW0Us", 170, 0, 0, 100, 1983, "Haysi Fantayzee", "Shiny Shiny"], //clean 
 ["UPuXvpkOLmM", 276, 0, 0, 100, 1988, "Information Society", "What's on your mind"], // clean ytad 
@@ -303,6 +302,7 @@ _bad = [
 ["TDzkAmwCo6Y", 1989, "Gloria Estefan", "Dr. Beat", WRONG],
 ["TMZi25Pq3T8", 1986, "N.W.A.", "Straight Outta Compton", WRONG],
 ["Wo4pdhKL4b4", 1985, "Falco", "Rock Me Amadeus", POOR],
+["U7DFsBcVMDA", 1981, "Rush", "Tom Sawyer", EMBED],
 ["bIr0yrKeR40", 1982, "Bizzy & Co", "Take a Chance", POOR], 
 ["eSMeUPFjQHc", 1994, "Erasure", "Always", WRONG],
 ["g0XLKcMoXRE", 1988, "Van Halen", "Hot for Teacher", MISSING],
