@@ -6,6 +6,7 @@ WRONG = 4,    // Inappropriate (too late, wrong style)
 MISSING = 5,  // Not found
 _bad = [
 ["Xbt30UnzRWw", 1981, "Devo", "Whip it", EMBED],
+["yt:xNnAvTTaJjM", 1983, "Talking Heads", "Burning Down The House", EMBED],
 ["-VCqAjYO3NM", 1986, "Pet Shop Boys", "Suburbia", BAD],
 ["XfNLORw7r_M", 1981, "DAF", "Der Rauber und der Prinz", BAD],
 ["rSaC-YbSDpo", 1982, "Madonna", "Borderline", EMBED],

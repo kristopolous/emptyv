@@ -3,17 +3,23 @@
 <title>About mt80s.com</title>
 <link rel=stylesheet href=style.css>
 </head>
-<body>
+<body><div id=header>
+  <a href=#about>About</a>
+  <a href=#suggest>Suggest</a>
+  <a href=#dead>Dead Song</a>
+  <a href=#contact>Contact</a>
+</div>
 <div>
+<div class=section id=about>
 <h1>About</h1>
 <p>mt80s.com streams videos from third-party US based websites in a preprogrammed sequence. The content is intended to be thematically similar to people's perception of MTV's programming from the 1980s.
 </p>
 <h4>Note</h4>
-<p>mt80s.com is not affiliated with MTV, Inc. If you feel that mt80s.com is infringing on any rights you hold, please leave a comment in the <a href=#section_comment>comments section</a>. mt80s.com is an <a href=https://github.com/kristopolous/emptyv>open source</a> project, go there for licensing details of the code.</p>
+<p>mt80s.com is not affiliated with MTV, Inc. If you feel that mt80s.com is infringing on any rights you hold, please use the <a href=#contact>contact</a> form. mt80s.com is an <a href=https://github.com/kristopolous/emptyv>open source</a> project, go there for licensing details of the code.</p>
 </div>
-<div>
-<h1>Suggest</h1>
-<p>Some guidelines to be thematically consistent are:
+
+<div class=section id=suggest>
+<h1>Suggest A Song</h1>
 <ul>
   <li><b>Every Song Must Have a Video from the era of the song!</b></li>
   <li>The ideal years are between 1969 and 1989.</li>
@@ -21,12 +27,11 @@
 </ul>
 
 <p>
-As you type in the artist and song, there will be a result below that
-will show you whether it's been added already or not.
+As you type in the artist and song, you will see if it's been added already.
 </p>
 
 <form method=post action=processing.php?type=suggest name=processing>
-  <span style=display:inline-block;width:30%;vertical-align:top>
+  <span style=display:inline-block;width:35%;vertical-align:top>
   <span>
     Artist Name
     <input name=artist id=artist>
@@ -36,16 +41,17 @@ will show you whether it's been added already or not.
     <input name=title id=title>
   </span>
   <span>
-    Any Notes For Me
+    Additional Notes <i>(leave an email address here to be notified of your suggestions' status)</i>
     <textarea name=notes id=notes></textarea>
   </span>
   <input type=submit value="Send it Off">
 </span>
-  <span style=display:inline-block;width:50%;vertical-align:top>
+  <span style=display:inline-block;width:60%;vertical-align:top>
     <div id=results></div>
   </span>
 </form>
 </div>
+<div class=section id=dead>
 <h1>Report A Dead Song</h1>
 <p>Did you just see blank-ness for 3 minutes or so? Yeah, sorry about that, tell me what the song was and I'll get right on it</p>
 
@@ -55,8 +61,7 @@ will show you whether it's been added already or not.
 </form>
 
 </div>
-<div>
-<a name=section_comment></a>
+<div class=section id=contact>
 <h1>Leave a Comment</h1>
 <p>If you want to leave a general comment that isn't a song suggestion or a dead link, please type away below</p>
 
@@ -77,6 +82,8 @@ will show you whether it's been added already or not.
   </span>
   <input type=submit value="Submit Comment">
 </form>
+</div>
+</div>
 <script src=underscore-min.js></script>
 <script src=db.min.js></script>
 <script src=playlist.js></script>
@@ -84,6 +91,5 @@ will show you whether it's been added already or not.
 <script src=jquery-1.7.1.min.js></script>
 <script src=suggest.js></script>
 
-</div>
 </body>
 </html>

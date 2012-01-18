@@ -1,7 +1,6 @@
-body{font-family:Helvetica;margin:10px 0px 0 70px;width:700px}
+body{font-family:Helvetica;padding:0;margin:0}
 img{display:block;margin:5px;padding:3px}
-li{line-height:1.75em;margin-top:.5em;max-width:400px}
-ul{width:60%}
+li{line-height:1.75em;margin-top:.5em;max-width:600px}
 q{width:450px;margin:10px;display:block;line-height:1.65em;background:#eef;padding:15px;font-size:0.9em}
 q:before{content:""}
 q:after{content:""}
@@ -9,7 +8,7 @@ cite a{color:#99c}
 p{line-height:1.75em;width:80%}
 tt{display:block;margin:10px;font-weight:bold}
 h1,h2,h3,h4,h5,h6,b{color:brown}
-h1{width:auto;margin:30px -15px 10px}
+h1{width:auto;margin:20px -15px 10px}
 h2{margin-bottom:0px}
 h3{margin:0;font-size:0.8em;font-weight:normal;}
 h4{margin:0;font-size:1.1em;font-weight:bold;}
@@ -24,8 +23,16 @@ pre.normal{width:auto;display:inline-block;white-space:pre;background:#cec;displ
 .header a{color:#555;font-weight:bold}
 a img{float:left;margin-left:-35px}
 .break{display:block;margin:3em 0 1em 0;margin-left:220px}
-span{display:block;margin:10px}
-table{border-spacing:0}
-th{background:#cec}
-th,td{border:1px solid silver;padding:3px 6px}
-span input, span textarea{display:block}
+.section{margin-left:35px;width:700px;display:none}
+.section.sel{display:block}
+span{display:block;margin:10px 0}
+table{border-spacing:1}
+table{background:tan}
+th,td{background:white;padding:3px 6px}
+th{background:tan}
+span input, span textarea{display:block;font-size:1.1em;width:190px;margin-bottom:1em}
+#header{background:brown;display:block;width:100%;margin:0}
+#header a{display:inline-block;font-size:2em;padding:1em;color:#fff;text-decoration:none}
+a.sel{background:maroon}
+i{font-size:0.75em;font-style:normal;color:#555}
+/*form span{margin:0 0 20px}*/

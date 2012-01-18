@@ -286,7 +286,6 @@ var _duration = [
 ["yt:x1U1Ue_5kq8", 232, 0, 0, 100, 1985, "Killing Joke", "80s", "vevo"],
 ["yt:xG3yGdQYwqg", 298, 0, 0, 100, 1984, "Julie Brown", "Homecoming Queen's got a gun", "clean"],
 ["yt:xLb9jPuDS9Y", 183, 0, 0, 100, 1985, "Yello", "Oh Yeah", "logo ytad"],
-["yt:xNnAvTTaJjM", 203, 0, 0, 100, 1983, "Talking Heads", "Burning Down The House", "logo badtitle"],
 ["yt:xTzMeDiv-7U", 227, 0, 0, 100, 1984, "The Fixx", "Less Cities, More Moving People", "vevo"],
 ["yt:xrzX8rIwZUw", 230, 0, 0, 100, 1984, "Shannon", "Give me Tonight", "clean title"],
 ["yt:y4CyNvEfWoE", 215, 0, 0, 100, 1982, "Toni Basil", "Mickey", "vh1 logo"],
