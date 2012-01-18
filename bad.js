@@ -9,6 +9,7 @@ _bad = [
 ["yt:xNnAvTTaJjM", 1983, "Talking Heads", "Burning Down The House", EMBED],
 ["-VCqAjYO3NM", 1986, "Pet Shop Boys", "Suburbia", BAD],
 ["XfNLORw7r_M", 1981, "DAF", "Der Rauber und der Prinz", BAD],
+["yt:I-9NEFalsjE", 1977, "Peter Gabriel", "Solsbury Hill", EMBED],
 ["rSaC-YbSDpo", 1982, "Madonna", "Borderline", EMBED],
 ["0974cze7e_A", 1979, "Baccara", "Body Talk clean", BAD],
 ["eabefjsJsAQ", 1983, "Re-Flex", "The Politics Of Dancing", EMBED], 
