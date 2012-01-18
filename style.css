@@ -27,5 +27,5 @@ a img{float:left;margin-left:-35px}
 span{display:block;margin:10px}
 table{border-spacing:0}
 th{background:#cec}
-td{border:1px solid silver;padding:3px 6px}
+th,td{border:1px solid silver;padding:3px 6px}
 span input, span textarea{display:block}

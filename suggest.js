@@ -13,14 +13,15 @@ function search(){
     mydb.find({
       artist: mydb.like(artist),
       title: mydb.like(title),
-    }).select('artist','title','id').sort('artist').each(function(res){
+    }).select('artist','title','id','year').sort('artist').each(function(res){
       rows.push([
         '<td>' + res[0] + '</td>',
         '<td>',
-          '<a target=_blank href=http://youtube.com/watch?v=' + res[2] + '>',
+          '<a target=_blank href=http://youtube.com/watch?v=' + res[2].split(':')[1] + '>',
             res[1],
           '</a>',
-        '</td>'
+        '</td>',
+        '<td>' + res[3] + '</td>'
       ].join(''));
       
     });
@@ -30,6 +31,7 @@ function search(){
            '<tr>',
              '<th>Artist</th>',
              '<th>Title</th>',
+             '<th>Year</th>',
            '</tr>',
          '</thead>',
          '<tbody>',
