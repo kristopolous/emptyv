@@ -18,7 +18,6 @@ _bad = [
 ["Q_30vrkg8Xo", 1983, "Jacksons", "Can You Feel It", POOR], 
 ["TDzkAmwCo6Y", 1989, "Gloria Estefan", "Dr. Beat", WRONG],
 ["TMZi25Pq3T8", 1986, "N.W.A.", "Straight Outta Compton", WRONG],
-["Wo4pdhKL4b4", 1985, "Falco", "Rock Me Amadeus", POOR],
 ["bIr0yrKeR40", 1982, "Bizzy & Co", "Take a Chance", POOR], 
 ["eSMeUPFjQHc", 1994, "Erasure", "Always", WRONG],
 ["g0XLKcMoXRE", 1988, "Van Halen", "Hot for Teacher", MISSING],

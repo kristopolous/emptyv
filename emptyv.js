@@ -16,11 +16,11 @@ var
   // The year of release
   YEAR = 5,
 
-  // The artist
   ARTIST = 6,
 
   TITLE = 7,
 
+  NOTES = 8,
   // The offset addition was after some toying around and 
   // seeint how long the player took to load. This seemed
   // to work ok; we really want the drift to be as close
@@ -231,7 +231,13 @@ function transition(offset) {
   console.log(id);
 
   // Load the next video prior to actually switching over
-  _player[_next].loadVideoById(id, offset + YTLOADTIME_sec);
+  var 
+    proto = id.split(':')[0],
+    uuid = id.split(':')[1];
+
+  if(proto == 'yt') {
+    _player[_next].loadVideoById(uuid, offset + YTLOADTIME_sec);
+  }
 
   // Set the volume to 0 and start playing it, thus preloading it.
   _player[_next].setVolume(0);
