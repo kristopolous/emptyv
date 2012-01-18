@@ -265,6 +265,7 @@ var _duration = [
 ["vSME53nL8tg", 215, 0, 0, 100, 1985, "INXS", "What You Need", "clean"],
 ["vWz9VN40nCA", 224, 0, 0, 100, 1981, "Olivia Newton-John", "Physical", "vevo"],
 ["w-NshzYK9y0", 223, 0, 0, 100, 1983, "Van Halen", "Panama", "clean"],
+["wlq0lYB3iSM", 242, 0, 0, 100, 1983, "Van Halen", "Jump", "clean ytad"],
 ["wFaIhDLb_NE", 215, 0, 0, 100, 1981, "Soft Cell", "Bed Sitter", "clean ytad"],
 ["wccHFyWaoiU", 245, 0, 0, 100, 1985, "Fancy", "Chinese Eyes", "clean"],
 ["whSYTSXm8wo", 185, 0, 0, 100, 1980, "The Jam", "Going Underground", "clean ytad"],

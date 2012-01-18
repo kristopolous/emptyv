@@ -7,6 +7,7 @@ MISSING = 5,  // Not found
 _bad = [
 ["Xbt30UnzRWw", 1981, "Devo", "Whip it", EMBED],
 ["XfNLORw7r_M", 1981, "DAF", "Der Rauber und der Prinz", BAD],
+["rSaC-YbSDpo", 1982, "Madonna", "Borderline", EMBED],
 ["0974cze7e_A", 1979, "Baccara", "Body Talk clean", BAD],
 ["eabefjsJsAQ", 1983, "Re-Flex", "The Politics Of Dancing", EMBED], 
 ["2sCkVe31fwo", 1988, "Taste of sugar", "HMM", POOR],
