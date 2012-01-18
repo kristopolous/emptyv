@@ -27,12 +27,6 @@ var
   // to 0 as possible.
   YTLOADTIME_sec = 6,
 
-  // The inter-video gap is the admission that we don't
-  // want to transition EXACTLY at the end of one video and
-  // the beginning of another, but instead want an acceptable
-  // gap in between the two.
-  INTERVIDEOGAP_ms = 2000,
-
   // According to the docs: "The player does not request 
   // the FLV until playVideo() or seekTo() is called.". In
   // order to combat this, we have to pre-load the video
@@ -55,6 +49,7 @@ var
   _lagCounter = 0,
 
   _index = -1,
+  _lastLoaded,
 
   // The epoch time is based off the system time AND the users
   // local clock.  This makes sure that separate clock drifts
@@ -70,10 +65,8 @@ var
   // And their associated references
   _player = [],
 
-  _playCount = 0,
   _next = 1,
-  _nextFlag = true,
-  _runtime = _.reduce(_duration, function(a, b) { return a + b[RUNTIME] + INTERVIDEOGAP_ms / 1000 }, 0);
+  _runtime = _.reduce(_duration, function(a, b) { return a + b[RUNTIME] }, 0);
 
 function toTime(sec) {
   return [
@@ -83,22 +76,6 @@ function toTime(sec) {
   ].join(':');
 }
   
-function updateytplayer(){
-  // If we have the player loaded
-  if (    _player[_active].getCurrentTime() 
-
-      // And the current time is near the end of the video (taking the stop offset into consideration)
-      && (_player[_active].getDuration() - _player[_active].getCurrentTime() < (4 + _duration[_index][STOP])) 
-
-      // And we haven't transitioned yet, then we do so.
-      && (_nextFlag === true)
-    ) {
-
-    _index = (_index + 1) % _duration.length;
-    transition();
-  }
-}
-
 // This sets the quality of the video along with
 // supporting going down or up a notch based on
 // what is detected, probably in findOffset
@@ -133,18 +110,7 @@ function setQuality(direction) {
   }
 }
 
-setInterval(function(){
-  if(_index > -1) {
-    document.title = _duration[_index][ARTIST] + " - " + _duration[_index][TITLE] + " | " + toTime(+(new Date() / 1000) - _start);
-  }
-}, 800);
-
 function findOffset() {
-  // This is the transitioning mechanics.
-  if ( ! _nextFlag ) {
-    return;
-  }
-
   var 
     now = +(new Date() / 1000),
     lapse = (now - _epoch) % _runtime;
@@ -153,10 +119,9 @@ function findOffset() {
 
     lapse > _duration[index][RUNTIME];
 
-    lapse -= (_duration[index][RUNTIME] + INTERVIDEOGAP_ms / 1000),
+    lapse -= _duration[index][RUNTIME],
     index = (index + 1) % _duration.length
   );
-
 
   // If the duration has a starting offset, then 
   // we put that here...
@@ -166,18 +131,25 @@ function findOffset() {
     console.log("DRIFT >>", _player[_active].getCurrentTime() - lapse);
   }
 
-  if (index != _index) {
-    console.log("Transitioning");
+  if(_index > -1) {
+    document.title = _duration[_index][ARTIST] + " - " + _duration[_index][TITLE] + " | " + toTime(+(new Date() / 1000) - _start);
+  }
+
+  if (_duration[index][RUNTIME] - _player[_active].getCurrentTime() < 10) {
+    _index = (index + 1) % _duration.length;
+    transition(0);
+  } else if (_index == -1) {
     _index = index;
 
     // Since we increment in the transition (sloppy, kiddo), then
     // we need to offset from that here.  That function should
     // probably be broken up better than it is currently.
     transition(lapse);
+  }
 
-    // If we have drifted more than xxx seconds from our destination offset
-    // then we will shift forward
-  } else if (lapse - _player[_active].getCurrentTime() > 18) {
+  // If we have drifted more than xxx seconds from our destination offset
+  // then we will shift forward
+  if (_player[_active].index == index && lapse - _player[_active].getCurrentTime() > 18) {
 
     // This is also the opportunity to see if we are laggy.
     // We give our lagCounter 2 points here (and we always take
@@ -215,33 +187,42 @@ function findOffset() {
 }
 
 function onYouTubePlayerReady(playerId) {
-  _player[ parseInt(playerId.substr(-1)) ] = document.getElementById(playerId);
+  var id = parseInt(playerId.substr(-1));
+  _player[ id ] = document.getElementById(playerId);
 
   if(++_loaded == 2) {
-
     findOffset();
-    setInterval(findOffset, PRELOAD_ms * 2);
-    setInterval(updateytplayer, 250);
+    setInterval(findOffset, 500);
+  }
+}
+
+function remainingTime() {
+  if(_player[_active] && _player[_active].getDuration && 'index' in _player[_active]) {
+    return Math.max(0,
+      _player[_active].getDuration() - 
+      _duration[_player[_active].index][STOP] - 
+      _player[_active].getCurrentTime()
+    );
+  } else {
+    return 0;
   }
 }
 
 function transition(offset) {
-  var id = _duration[_index][ID];
-  _nextFlag = false;
-  console.log(id);
-
+  if(_index == _lastLoaded) {
+    return;
+  }
+  _lastLoaded = _index;
   // Load the next video prior to actually switching over
   var 
+    id = _duration[_index][ID],
     proto = id.split(':')[0],
     uuid = id.split(':')[1];
 
-  if(proto == 'yt') {
-    _player[_next].loadVideoById(uuid, offset + YTLOADTIME_sec);
-  }
+  console.log(id);
 
-  // Set the volume to 0 and start playing it, thus preloading it.
-  _player[_next].setVolume(0);
-  _player[_next].playVideo();
+  _player[_next].loadVideoById(uuid);
+  _player[_next].pauseVideo();
 
   setTimeout(function(){
     // After the PRELOAD_msl interval, then we stop the playing video
@@ -257,15 +238,14 @@ function transition(offset) {
 
     // Crank up the volume to the computed normalization
     // level.
+    _player[_active].playVideo();
+    _player[_active].index = _index;
     _player[_active].setVolume(_duration[_index][VOLUME]);
     setQuality();
-
-    _nextFlag = true;
-  }, _playCount ? PRELOAD_ms : 0);
-  _playCount++;
+  }, remainingTime() * 1000);
 }
 
-function main() {
+(function(){
   // Load two players to be transitioned between at a nominal
   // resolution ... this is irrelevant as quality will be 
   // managed in a more sophisticated manner than size of screen.
@@ -297,4 +277,4 @@ function main() {
       new Function()                 // yt doesn't do the callbackfunction
     );
   }
-}
+})();

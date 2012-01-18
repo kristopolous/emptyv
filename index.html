@@ -4,6 +4,18 @@
 body{background:#000}
 #about{position:fixed;bottom:0;left:0;z-index:20;opacity:0.7}
 </style>
+</head>
+<body>
+<div id=vid0></div>
+<div id=vid1></div>
+<a id=about target=_blank title="about mt80s.com" href=suggest.html><img src=mt80s_logo_animated.gif></a>
+</body>
+<script src=underscore-min.js></script>
+<script src=time.php></script>
+<script src=playlist.js></script>
+<script src=swfobject.js></script>
+<script src=mt80s.js></script>
+</html>
 <!-- for some reason, this seems to be quite particular -->
 <script>
 var _gaq = _gaq || [];
@@ -16,15 +28,3 @@ _gaq.push(['_trackPageview']);
   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 })();
 </script>
-</head>
-<body onload=main()>
-<div id=vid0></div>
-<div id=vid1></div>
-<a id=about target=_blank title="about mt80s.com" href=suggest.html><img src=mt80s_logo_animated.gif></a>
-</body>
-<script src=swfobject.js></script>
-<script src=underscore-min.js></script>
-<script src=time.php></script>
-<script src=playlist.js></script>
-<script src=emptyv.js></script>
-</html>
