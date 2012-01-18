@@ -69,6 +69,7 @@ var
   // And their associated references
   _player = [],
 
+  _playCount = 0,
   _next = 1,
   _nextFlag = true,
   _runtime = _.reduce(_duration, function(a, b) { return a + b[RUNTIME] + INTERVIDEOGAP_ms / 1000 }, 0);
@@ -100,7 +101,7 @@ function setQuality(direction) {
         LEVELS.length
       );
     if(newLevel != _currentLevel) {
-      console.log("Setting playback rate to ", LEVELS[_currentLevel]);
+      console.log("Setting playback rate to " + LEVELS[_currentLevel]);
     }
     _currentLevel = newLevel;
   }
@@ -160,7 +161,7 @@ function findOffset() {
 
     // If we have drifted more than xxx seconds from our destination offset
     // then we will shift forward
-  } else if ( lapse - _player[_active].getCurrentTime() > 18) {
+  } else if (lapse - _player[_active].getCurrentTime() > 18) {
 
     // This is also the opportunity to see if we are laggy.
     // We give our lagCounter 2 points here (and we always take
@@ -188,10 +189,13 @@ function findOffset() {
   // that we aren't just constantly cycling through
   // two quality settings, pausing the video annoyingly
   // every time we cycle up or down.
+  /*
+   * This is buggy
   if(_lagCounter < -10) {
     setQuality(+1);
     _lagCounter += 10;
   } 
+  */
 }
 
 function onYouTubePlayerReady(playerId) {
@@ -202,7 +206,6 @@ function onYouTubePlayerReady(playerId) {
     findOffset();
     setInterval(findOffset, PRELOAD_ms * 2);
     setInterval(updateytplayer, 250);
-    _player[_next].setVolume(100);
   }
 }
 
@@ -222,7 +225,7 @@ function transition(offset) {
     // After the PRELOAD_msl interval, then we stop the playing video
     _player[_active].stopVideo();
 
-    document.title = "80s | " + _duration[_index][ARTIST] + " - " + _duration[_index][TITLE];
+    document.title = _duration[_index][ARTIST] + " - " + _duration[_index][TITLE];
 
     // Toggle the player pointers
     _active = (_active + 1) % 2;
@@ -238,7 +241,8 @@ function transition(offset) {
     setQuality();
 
     _nextFlag = true;
-  }, PRELOAD_ms);
+  }, _playCount ? PRELOAD_ms : 0);
+  _playCount++;
 }
 
 function main() {
@@ -274,3 +278,14 @@ function main() {
     );
   }
 }
+setTimeout(function(){
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-28399789-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+}, 500);
