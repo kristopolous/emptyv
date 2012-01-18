@@ -237,6 +237,7 @@ var _duration = [
 ["n7t7cGwN7_0", 200, 0, 0, 100, 1980, "B-52's", "Private Idaho"], //(rage logo) title
 ["nmoHQ2DC3zo", 218, 0, 0, 100, 1984, "General Public", "Tenderness"], //(vh1 logo) title
 ["oEh5pWjcWCg", 159, 0, 0, 100, 1981, "Soft Cell", "Tainted Love"], //clean 
+["_QtJh7Akb7s", 285, 0, 0, 100, 1981, "Rush", "Tom Sawyer"], // clean
 ["oOg5VxrRTi0", 222, 0, 0, 100, 1982, "Duran Duran", "Hungry Like The Wolf"], //vevo
 ["p3j2NYZ8FKs", 236, 0, 0, 100, 1985, "Pet Shop Boys", "West End Girls"], //vevo
 ["p5PQnngPX00", 196, 0, 0, 100, 1980, "The Ramones", "We Want The Airwaves"], //clean 
@@ -302,7 +303,6 @@ _bad = [
 ["TDzkAmwCo6Y", 1989, "Gloria Estefan", "Dr. Beat", WRONG],
 ["TMZi25Pq3T8", 1986, "N.W.A.", "Straight Outta Compton", WRONG],
 ["Wo4pdhKL4b4", 1985, "Falco", "Rock Me Amadeus", POOR],
-["U7DFsBcVMDA", 1981, "Rush", "Tom Sawyer", EMBED],
 ["bIr0yrKeR40", 1982, "Bizzy & Co", "Take a Chance", POOR], 
 ["eSMeUPFjQHc", 1994, "Erasure", "Always", WRONG],
 ["g0XLKcMoXRE", 1988, "Van Halen", "Hot for Teacher", MISSING],
