@@ -48,6 +48,8 @@ var
   _currentLevel = 0,
   _lagCounter = 0,
 
+  _muted = false,
+
   _index = -1,
   _lastLoaded,
 
@@ -76,6 +78,18 @@ function toTime(sec) {
   ].join(':');
 }
   
+function mutetoggle(el){
+  _muted = !_muted;
+  if(_muted) {
+    el.src = "mute_on_32.png";
+    _player[_active].setVolume(0);
+  } else {
+    el.src = "mute_off_32.png";
+    // bug
+    _player[_active].setVolume(100);
+  }
+}
+
 // This sets the quality of the video along with
 // supporting going down or up a notch based on
 // what is detected, probably in findOffset
@@ -240,7 +254,11 @@ function transition(offset) {
     // level.
     _player[_active].playVideo();
     _player[_active].index = _index;
-    _player[_active].setVolume(_duration[_index][VOLUME]);
+    if(_muted) {
+      _player[_active].setVolume(0);
+    } else {
+      _player[_active].setVolume(_duration[_index][VOLUME]);
+    }
     setQuality();
   }, remainingTime() * 1000);
 }
