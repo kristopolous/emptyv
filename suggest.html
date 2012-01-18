@@ -20,14 +20,13 @@
   <li>Interviews and non-english language songs are welcome.</li>
 </ul>
 
-<!--
 <p>
 As you type in the artist and song, there will be a result below that
 will show you whether it's been added already or not.
 </p>
--->
 
 <form method=post action=processing.php?type=suggest name=processing>
+  <span style=display:inline-block;width:30%;vertical-align:top>
   <span>
     Artist Name
     <input name=artist id=artist>
@@ -41,6 +40,10 @@ will show you whether it's been added already or not.
     <textarea name=notes id=notes></textarea>
   </span>
   <input type=submit value="Send it Off">
+</span>
+  <span style=display:inline-block;width:50%;vertical-align:top>
+    <div id=results></div>
+  </span>
 </form>
 </div>
 <h1>Report A Dead Song</h1>
@@ -78,6 +81,7 @@ will show you whether it's been added already or not.
 <script src=db.min.js></script>
 <script src=playlist.js></script>
 <script src=bad.js></script>
+<script src=jquery-1.7.1.min.js></script>
 <script src=suggest.js></script>
 
 </div>
