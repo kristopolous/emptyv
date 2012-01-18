@@ -61,6 +61,7 @@ var
   // are *about* the same ... minus the TTL latency incurred by
   // the emit from the server of course (which we assume to be fairly
   // constant).
+  _start = +(new Date() / 1000),
   _epoch = 1325138061 + ( +(new Date() / 1000) - _referenceTime ),
 
   // How many of the YT players are loaded
@@ -74,6 +75,14 @@ var
   _nextFlag = true,
   _runtime = _.reduce(_duration, function(a, b) { return a + b[RUNTIME] + INTERVIDEOGAP_ms / 1000 }, 0);
 
+function toTime(sec) {
+  return [
+    (sec / 3600).toFixed(0),
+    ((sec / 60).toFixed(0) % 60 + 100).toString().substr(1),
+    ((sec.toFixed(0) % 60) + 100).toString().substr(1)
+  ].join(':');
+}
+  
 function updateytplayer(){
   // If we have the player loaded
   if (    _player[_active].getCurrentTime() 
@@ -124,6 +133,12 @@ function setQuality(direction) {
   }
 }
 
+setInterval(function(){
+  if(_index > -1) {
+    document.title = _duration[_index][ARTIST] + " - " + _duration[_index][TITLE] + " | " + toTime(+(new Date() / 1000) - _start);
+  }
+}, 800);
+
 function findOffset() {
   // This is the transitioning mechanics.
   if ( ! _nextFlag ) {
@@ -141,6 +156,7 @@ function findOffset() {
     lapse -= (_duration[index][RUNTIME] + INTERVIDEOGAP_ms / 1000),
     index = (index + 1) % _duration.length
   );
+
 
   // If the duration has a starting offset, then 
   // we put that here...
@@ -224,8 +240,6 @@ function transition(offset) {
   setTimeout(function(){
     // After the PRELOAD_msl interval, then we stop the playing video
     _player[_active].stopVideo();
-
-    document.title = _duration[_index][ARTIST] + " - " + _duration[_index][TITLE];
 
     // Toggle the player pointers
     _active = (_active + 1) % 2;
