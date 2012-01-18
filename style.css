@@ -20,7 +20,7 @@ pre.normal{width:auto;display:inline-block;white-space:pre;background:#cec;displ
 .emp{color:#000;background:#cec}
 .copy{color:#aaa;font-size:0.9em;display:block;text-align:center}
 .header{position:absolute;top:0;left:0;background:#ddd;display:block;width:100%;padding:5px 0;text-indent:5px}
-.header a{color:#555;font-weight:bold}
+.header a{color:#555;font-weight:bold;text-shadow:1px 0px 4px #300}
 a img{float:left;margin-left:-35px}
 .break{display:block;margin:3em 0 1em 0;margin-left:220px}
 .section{margin-left:35px;width:700px;display:none}
