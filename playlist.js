@@ -194,6 +194,7 @@ var _duration = [
 ["yt:aNSRdXMMY-M", 209, 0, 0, 100, 1985, "Muriel Dacq", "Tropique", "clean badtitle"],
 ["yt:aQy5vKAaTuA", 226, 0, 0, 100, 1983, "Oingo Boingo", "Nothing Bad Ever Happens to Me", "almostclean ytad badtitle"],
 ["yt:aX1PwkgwsG0", 293, 0, 0, 100, 1984, "Echo & The Bunnymen", "The Killing Moon", "clean"],
+["yt:Z3OjiZS5GNc", 235, 0, 0, 100, 1981, "Moon Ray", "Comanchero", "clean"],
 ["yt:aeqCqxhxLtc", 216, 0, 0, 100, 1983, "Burning Sensations", "Belly of the Whale", "vh1 logo title"],
 ["yt:azr2ooLlfzQ", 272, 0, 0, 100, 1982, "Berlin", "Masquerade", "ytad logo"],
 ["yt:b9xBAtCsCTQ", 271, 0, 0, 100, 1983, "Trans-X", "Living on Video", "clean ytad"],
