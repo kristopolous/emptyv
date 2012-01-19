@@ -43,6 +43,7 @@ var _duration = [
 ["yt:7uEBuqkkQRk", 225, 0, 0, 100, 1986, "New Order", "Bizarre Love Triangle", "clean"],
 ["yt:7v2GDbEmjGE", 251, 0, 0, 100, 1980, "The Police", "De Do Do Do, De Da Da Da", "vevo"],
 ["yt:7wqxHThRgsA", 212, 2, 0, 100, 1986, "Nu Shooz", "Point of No Return", "clean"],
+["yt:2v8YragSIuI", 210, 0, 0, 100, 1986, "Exposé", "Point Of No Return", "vevo"],
 ["yt:826PTEuHKhE", 268, 0, 0, 100, 1986, "Tiffany", "I Think We're Alone Now", "clean"],
 ["yt:8SbUC-UaAxE", 548, 0, 0, 100, 1991, "Guns N' Roses", "November Rain", "vevo"],
 ["yt:8qrriKcwvlY", 201, 0, 0, 100, 1986, "Timbuk 3", "The Future's So Bright", "vevo"],
@@ -351,6 +352,10 @@ var _duration = [
 ["yt:zTUR1ohVZfQ", 118, 3, 0, 100, 1980, "Modernettes", "Barbra", "clean"],
 ["yt:zU9lv_WqK6k", 331, 0, 0, 100, 1986, "Genesis", "Land of Confusion", "clean"],
 ["yt:zaPskhuQWVI", 220, 0, 0, 100, 1984, "Den Harrow", "Mad Desire", "logo"],
+["yt:4yM9uVeVLNM", 214, 0, 0, 100, 1984, "John Rocca", "Once Upon A Time", "ytad clean"],
+["yt:Yv0rHDI0ujY", 302, 0, 0, 100, 1988, "Stevie B", "Spring Love", "clean ytad"],
+["yt:P5m8lj5DCtI", 238, 0, 0, 100, 1984, "Lisa Lisa & Cult Jam", "I Wonder If I Take You Home", "vevo"],
+["yt:ZzEo0z5q-XY", 233, 0, 0, 100, 1984, "John Rocca", "I Want It To Be Real", "clean"],
 ["yt:zeH2Um-yOrA", 188, 0, 0, 100, 1982, "Vanessa", "Upside Down", "clean"], 
 ["yt:zpiUEbxAMxk", 207, 0, 0, 100, 1985, "Danse Society", "Say It Again", "clean"],
 ["yt:zyUZRKNc8jk", 207, 0, 0, 100, 1987, "Mandy", "Positive Reaction", "clean badtitle"]
