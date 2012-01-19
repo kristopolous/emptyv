@@ -234,7 +234,7 @@ var _duration = [
 ["yt:k6zstmlOjLs", 250, 0, 0, 100, 1983, "Adam Ant", "Puss'N Boots", "vevo"],
 ["yt:kGnjrTkv1gs", 165, 0, 0, 100, 1983, "The Smiths", "This Charming Man", "clean"],
 ["yt:kOnde5c7OG8", 255, 0, 0, 100, 1982, "Roxy Music", "More Than This", "vevo"],
-["yt:kVdnqEyToqg", 242, 0, 0, 100, 1979, "The Knack", "My Sharona", "logo title"],
+["yt:Ded4MZVVAhE", 244, 0, 0, 100, 1979, "The Knack", "My Sharona", "logo title"],
 ["yt:kvDMlk3kSYg", 282, 0, 0, 100, 1978, "Boney M", "Rasputin", "clean"],
 ["yt:kwb9-OlQimc", 157, 0, 0, 100, 1982, "Culture Club", "I'll Tumble 4 Ya", "vevo"],
 ["yt:kykts8xH8q4", 233, 0, 0, 100, 1986, "Device", "Hanging On A Heart Attack", "clean"],
