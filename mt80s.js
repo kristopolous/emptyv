@@ -53,6 +53,8 @@ var
   _index = -1,
   _lastLoaded,
 
+  _seekTimeout = 0,
+
   // The epoch time is based off the system time AND the users
   // local clock.  This makes sure that separate clock drifts
   // are *about* the same ... minus the TTL latency incurred by
@@ -163,7 +165,11 @@ function findOffset() {
 
   // If we have drifted more than xxx seconds from our destination offset
   // then we will shift forward
-  if (_player[_active].index == index && lapse - _player[_active].getCurrentTime() > 18) {
+  if (
+    _player[_active].index == index && 
+    lapse - _player[_active].getCurrentTime() > 18 &&
+    now > _seekTimeout
+  ) {
 
     // This is also the opportunity to see if we are laggy.
     // We give our lagCounter 2 points here (and we always take
@@ -177,6 +183,9 @@ function findOffset() {
     }
 
     console.log("seeking", lapse, _player[_active].getCurrentTime());
+
+    // Make sure that we don't reseek too frequently.
+    _seekTimeout = now + YTLOADTIME_sec;
 
     // We don't trust seeking to be insanely accurate so we throw an offset
     // on to it to avoid some kind of weird seeking loop.

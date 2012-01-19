@@ -31,7 +31,21 @@ function search(){
     });
 
     if(rows.length == 0) {
-      $("#results").html("Nothing Found!");
+      var words = [];
+      if(artist.length > 0) {
+        words.push("artist <b>" + artist + "</b>");
+      }
+      if(title.length > 0) {
+        words.push("title <b>" + title + "</b>");
+      }
+     
+      $("#results").html("<p>" + [
+          "The",
+          words.join(" and "),
+          "is currently not in our playlist. :-("
+        ].join(" ") + "</p>" +
+        "<button onclick=document.getElementById('suggest-input').submit>Request It!</button>"
+      );
     } else {
       $("#results").html( [
           '<table>',
