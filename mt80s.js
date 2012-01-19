@@ -1,3 +1,4 @@
+// Constants {{
 var
   ID = 0,
 
@@ -21,6 +22,12 @@ var
   TITLE = 7,
 
   NOTES = 8,
+
+  // If there is a hash value (there should not be regularly)
+  // Then debugging output is turned on, whatever the hell that
+  // entails
+  DEBUG = location.hash.length > 0,
+
   // The offset addition was after some toying around and 
   // seeint how long the player took to load. This seemed
   // to work ok; we really want the drift to be as close
@@ -37,6 +44,25 @@ var
   // @ref: http://code.google.com/apis/youtube/flash_api_reference.html
   LEVELS = ["small", "medium", "large", "hd720", "hd1080", "highres"];
 
+// }} // Constants
+
+// Utils {{
+function getNow(offset) {
+  return +(new Date() / 1000) + (offset || 0);
+}
+
+function toTime(sec) {
+  return [
+    (sec / 3600).toFixed(0),
+    ((sec / 60).toFixed(0) % 60 + 100).toString().substr(1),
+    ((sec.toFixed(0) % 60) + 100).toString().substr(1)
+  ].join(':');
+}
+  
+// }} // Utils
+
+
+// Globals {{
 var 
   _active = 0,
 
@@ -54,14 +80,15 @@ var
   _lastLoaded,
 
   _seekTimeout = 0,
+  _qualityTimeout = 0,
 
   // The epoch time is based off the system time AND the users
   // local clock.  This makes sure that separate clock drifts
   // are *about* the same ... minus the TTL latency incurred by
   // the emit from the server of course (which we assume to be fairly
   // constant).
-  _start = +(new Date() / 1000),
-  _epoch = 1325138061 + ( +(new Date() / 1000) - _referenceTime ),
+  _start = getNow(),
+  _epoch = 1325138061 + ( _start - _referenceTime ),
 
   // How many of the YT players are loaded
   _loaded = 0,
@@ -71,15 +98,8 @@ var
 
   _next = 1,
   _runtime = _.reduce(_duration, function(a, b) { return a + b[RUNTIME] }, 0);
+// }} // Globals
 
-function toTime(sec) {
-  return [
-    (sec / 3600).toFixed(0),
-    ((sec / 60).toFixed(0) % 60 + 100).toString().substr(1),
-    ((sec.toFixed(0) % 60) + 100).toString().substr(1)
-  ].join(':');
-}
-  
 function mutetoggle(el){
   _muted = !_muted;
   if(_muted) {
@@ -96,39 +116,61 @@ function mutetoggle(el){
 // supporting going down or up a notch based on
 // what is detected, probably in findOffset
 function setQuality(direction) {
-  if(direction) {
-    var 
-      newLevel = Math.min(
-        Math.max(_currentLevel + direction, 0),
-        LEVELS.length
-      );
-    if(newLevel != _currentLevel) {
-      console.log("Setting playback rate to " + LEVELS[_currentLevel]);
-    }
-    _currentLevel = newLevel;
+  var 
+    newQualityIndex = _currentLevel,
+    newQualityWord,
+                    
+    activeAvailable = _player[_active].getAvailableQualityLevels(),
+    activeQualityWord = _player[_active].getPlaybackQuality();
+
+  // If no video is loaded, then go no further.
+  if(activeAvailable.length == 0) {
+    return;
   }
 
-  var word = LEVELS[_currentLevel];
+  // If the lapse has dropped and the direction is specific
+  if(direction && getNow() > _qualityTimeout) {
+    newQualityIndex = Math.min(
+      Math.max(_currentLevel + direction, 0),
+      LEVELS.length
+    );
 
-  // If this video supports the destination quality level
-  if ( _.indexOf(_player[_active].getAvailableQualityLevels(), word) > -1
+    // To make sure we don't cycle through the 
+    // quality levels too quickly, there's a cool-off
+    // time after a quality toggle.
+    //
+    // TODO: probably the higher quality video should
+    // be queued in another video container to avoid the
+    // lapse in playback, and then, when it's ready, should
+    // be swapped out for the lower quality video.
+    _qualityTimeout = getNow(+ YTLOADTIME_sec * 4);
+  }
 
-    // and it's not currently at it
-    && _player[_active].getPlaybackQuality() != word
-  ) {
+  // Now that we have the destination quality level, we need to see
+  // if the current video playing has this quality level.
+  newQualityWord = LEVELS[newQualityIndex];
 
-    // Then we set it
-    _player[_active].setPlaybackQuality(word);
-  } else {
-    _currentLevel = _.last(_player[_active].getAvailableQualityLevels());
-    _player[_active].setPlaybackQuality(_currentLevel);
-    _currentLevel = _.indexOf(LEVELS, _currentLevel);
+  // If this video doesn't support the destination quality level
+  if ( _.indexOf(activeAvailable, newQualityWord) == -1) {
+    // Use the highest one available (the lower ones are always available)
+    // Get the word version of the highest quality available
+    newQualityWord = _.first(activeAvailable);
+  }
+
+  // If this new, supported quality isn't the current one set
+  if (newQualityWord != activeQualityWord) {
+    console.log("Quality: " + activeQualityWord + " => " + newQualityWord);
+
+    _player[_active].setPlaybackQuality(newQualityWord);
+
+    // And set it as the default
+    _currentLevel = _.indexOf(LEVELS, newQualityWord);
   }
 }
 
 function findOffset() {
   var 
-    now = +(new Date() / 1000),
+    now = getNow(),
     lapse = (now - _epoch) % _runtime;
 
   for (var index = 0;
@@ -143,12 +185,18 @@ function findOffset() {
   // we put that here...
   lapse += _duration[index][START];
 
-  if(_player[_active].getCurrentTime) {
-    console.log("DRIFT >>", _player[_active].getCurrentTime() - lapse);
-  }
-
   if(_index > -1) {
-    document.title = _duration[_index][ARTIST] + " - " + _duration[_index][TITLE] + " | " + toTime(+(new Date() / 1000) - _start);
+    document.title = _duration[_index][ARTIST] + " - " + _duration[_index][TITLE] + " | " + toTime(now - _start);
+    if(DEBUG) {
+      var drift = _player[_active].getCurrentTime() - lapse;
+      if(drift > 0) {
+        drift = "+" + drift.toFixed(3);
+      } else {
+        drift = drift.toFixed(3);
+      }
+
+      document.title += " " + drift;
+    }
   }
 
   if (_duration[index][RUNTIME] - _player[_active].getCurrentTime() < 10) {
@@ -163,50 +211,49 @@ function findOffset() {
     transition(lapse);
   }
 
-  // If we have drifted more than xxx seconds from our destination offset
-  // then we will shift forward
-  if (
-    _player[_active].index == index && 
-    lapse - _player[_active].getCurrentTime() > 18 &&
-    now > _seekTimeout
-  ) {
+  if (now > _seekTimeout) {
+    // If we have drifted more than xxx seconds from our destination offset
+    // then we will shift forward
+    if (
+      _player[_active].getCurrentTime() > 0 &&
+      _player[_active].index == index && 
+      lapse - _player[_active].getCurrentTime() > 18
+    ) {
 
-    // This is also the opportunity to see if we are laggy.
-    // We give our lagCounter 2 points here (and we always take
-    // 1 off when we go through this function)
-    _lagCounter = Math.max(_lagCounter + 1, 0);
+      // This is also the opportunity to see if we are laggy.
+      // We give our lagCounter 2 points here (and we always take
+      // 1 off when we go through this function)
+      _lagCounter = Math.max(_lagCounter + 1, 0);
 
-    // If the lagCounter is greater than 3, that means we've been
-    // lagging quite a bit, then we try to reduce our quality
-    if(_lagCounter > 3) {
-      setQuality(-1);
-    }
+      // If the lagCounter is greater than 3, that means we've been
+      // lagging quite a bit, then we try to reduce our quality
+      if(_lagCounter > 3) {
+        setQuality(-1);
+      }
 
-    console.log("seeking", lapse, _player[_active].getCurrentTime());
+      console.log("seeking", lapse, _player[_active].getCurrentTime());
 
-    // Make sure that we don't reseek too frequently.
-    _seekTimeout = now + YTLOADTIME_sec;
+      // Make sure that we don't reseek too frequently.
+      _seekTimeout = now + YTLOADTIME_sec;
 
-    // We don't trust seeking to be insanely accurate so we throw an offset
-    // on to it to avoid some kind of weird seeking loop.
-    _player[_active].seekTo(lapse + YTLOADTIME_sec * 7 / 3);
-  } 
+      // We don't trust seeking to be insanely accurate so we throw an offset
+      // on to it to avoid some kind of weird seeking loop.
+      _player[_active].seekTo(lapse + YTLOADTIME_sec * 7 / 3);
+    } 
 
-  _lagCounter--;
+    _lagCounter--;
 
-  // TODO: If our lagcounter is really low, then
-  // we have been good and can up the quality at
-  // this point; but have to be smart about it so
-  // that we aren't just constantly cycling through
-  // two quality settings, pausing the video annoyingly
-  // every time we cycle up or down.
-  /*
-   * This is buggy
-  if(_lagCounter < -10) {
-    setQuality(+1);
-    _lagCounter += 10;
-  } 
-  */
+    // TODO: If our lagcounter is really low, then
+    // we have been good and can up the quality at
+    // this point; but have to be smart about it so
+    // that we aren't just constantly cycling through
+    // two quality settings, pausing the video annoyingly
+    // every time we cycle up or down.
+    if(_lagCounter < -15) {
+      setQuality(+1);
+      _lagCounter += 15;
+    } 
+  }
 }
 
 function onYouTubePlayerReady(playerId) {
@@ -236,13 +283,14 @@ function transition(offset) {
     return;
   }
   _lastLoaded = _index;
+
   // Load the next video prior to actually switching over
   var 
     id = _duration[_index][ID],
     proto = id.split(':')[0],
     uuid = id.split(':')[1];
 
-  console.log(id);
+  console.log("Loading: ", id);
 
   _player[_next].loadVideoById(uuid);
   _player[_next].pauseVideo();
