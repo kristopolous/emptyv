@@ -390,7 +390,7 @@ function findOffset() {
       // we have been good and can up the quality at
       // this point
       if(_lagCounter < -LAG_THRESHHOLD) {
-        setQuality(+1);
+        //setQuality(+1);
         _lagCounter += LAG_THRESHHOLD;
       } 
     }
