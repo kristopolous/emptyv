@@ -77,6 +77,14 @@ function toTime(sec) {
     ((sec.toFixed(0) % 60) + 100).toString().substr(1)
   ].join(':');
 }
+
+function hide(player) {
+  document.getElementById("player-" + player).style.left = "-200%";
+}
+
+function show(player) {
+  document.getElementById("player-" + player).style.left = 0;
+}
   
 // }} // Utils
 
@@ -106,6 +114,9 @@ var
 
   _seekTimeout = 0,
 
+  _driftcounter = 0,
+  _drift,
+ 
   // The epoch time is based off the system time AND the users
   // local clock.  This makes sure that separate clock drifts
   // are *about* the same ... minus the TTL latency incurred by
@@ -143,12 +154,33 @@ function mutetoggle(el){
     el.src = "mute_off_32.png";
     var volume = 100;
 
-    if (index in _player[_active]) {
+    if ("index" in _player[_active]) {
       volume = _duration[_player[_active].index][VOLUME];
     }
-
     _player[_active].setVolume(volume);
   }
+}
+
+function secondarySwap(){
+  var swapInterval = setInterval(function(){
+    if (_playerById[_index].getCurrentTime()  < _player[EXTRA].getCurrentTime()) {
+
+      // Nows our time to shine
+      _playerById[_index].playVideo();
+      _playerById[_index].setVolume(_duration[_index][VOLUME]);
+     
+      // Bring the volume up of the higher quality player and mute the current
+      _player[EXTRA].setVolume(0);
+      _player[EXTRA].stopVideo();
+
+      // Show the higher quality and hide the current one
+      hide(EXTRA);
+      show(_active);
+
+      // And then clear the polling interval
+      clearInterval(swapInterval);
+    }
+  }, 10);
 }
 
 // This sets the quality of the video along with
@@ -192,7 +224,9 @@ function setQuality(direction) {
     console.log("Quality: " + activeQualityWord + " => " + newQualityWord);
 
     // If we are downsampling then just do it
-    if(true) { //direction < 0) {
+    if(direction < 0) {
+      // we also shuffle the placement forward to accomodate for the change over
+      _playerById[_index].seekTo(_playerById[_index].getCurrentTime() + YTLOADTIME_sec);
       _playerById[_index].setPlaybackQuality(newQualityWord);
 
       // If we are upsampling, then do it seemlessly.
@@ -204,53 +238,45 @@ function setQuality(direction) {
 
       // First, load the active video in the extra player,
       // setting the volume to 0
-      _player[EXTRA].loadVideoById(_duration[_index][ID].split(":")[1]) 
+      _player[EXTRA].loadVideoById(
+        _duration[_index][ID].split(":")[1], 
+        _playerById[_index].getCurrentTime() + YTLOADTIME_sec
+      );
 
       _player[EXTRA].setVolume(0);
+      _player[EXTRA].pauseVideo();
 
       // Set the playback quality of the extra video to the higher
       // quality
       _player[EXTRA].setPlaybackQuality(newQualityWord);
 
-      // By seeking to the current time subtracted from the load time, 
-      // then by the time this seeks, it should be eclipsed by the 
-      // active player.
-      _player[EXTRA].seekTo(_playerById[_index].getCurrentTime() - YTLOADTIME_sec / 2);
-      _player[EXTRA].playVideo();
-
       // Now poll the two time offsets and swap videos when they cross
       var swapInterval = setInterval(function(){
-        console.log(_player[EXTRA].getVideoBytesLoaded(), _player[EXTRA].getCurrentTime());
+
         if (
           (_player[EXTRA].getCurrentTime() > 0) &&
           (_playerById[_index].getCurrentTime() > _player[EXTRA].getCurrentTime())
         ) {
           // Nows our time to shine
-         
-          // Bring the volume up of the higher quality player and mute the current
-          _player[EXTRA].setVolume(_duration[_index][VOLUME]);
-          _playerById[_index].setVolume(0);
-
           // Start the higher quality player and stop the current one
           _player[EXTRA].playVideo();
-          _playerById[_index].stopVideo();
-
-          // Show the higher quality and hide the current one
-          document.getElementById("player-" + _active).style.visibility = 'hidden';
-          document.getElementById("player-" + EXTRA).style.visibility = 'visible';
-
-          // now set the active to the extra, this works because the next mechanics
-          // is based not on the previous next, but on the active; so there is no
-          // odd/even problem.
-          _active = EXTRA;
-
-          // Set up the index
-          _playerById[_index].index = _index;
+          var myplayer = _playerById[_index];
+          setTimeout(function(){
+            // Show the higher quality and hide the current one
+            hide(_active);
+            show(EXTRA);
+            // Bring the volume up of the higher quality player and mute the current
+            _player[EXTRA].setVolume(_duration[_index][VOLUME]);
+            myplayer.setVolume(0);
+            myplayer.seekTo(_player[EXTRA].getCurrentTime() + 1.5);
+            myplayer.setPlaybackQuality(newQualityWord);
+            secondarySwap();
+          }, 500);
 
           // And then clear the polling interval
           clearInterval(swapInterval);
         }
-      }, 100);
+      }, 10);
     }
 
     // And set it as the default
@@ -281,21 +307,33 @@ function findOffset() {
   lapse += _duration[_index][START];
 
   if(_index > -1) {
+
+    _drift = -1;
+    if(_index in _playerById) {
+      _drift = _playerById[_index].getCurrentTime() - lapse;
+    }
+
     document.title = _duration[_index][ARTIST] + " - " + _duration[_index][TITLE] + " | " + toTime(now - _start);
     if(DEBUG && _index in _playerById) {
-      var drift = _playerById[_index].getCurrentTime() - lapse;
-      if(drift > 0) {
-        drift = "+" + drift.toFixed(2);
+      var drift;
+      if(_drift > 0) {
+        drift = "+" + _drift.toFixed(2);
       } else {
-        drift = drift.toFixed(2);
+        drift = _drift.toFixed(2);
       }
 
-      document.title += " " + [
+      document.title = " " + [
         drift, 
         _lagCounter, 
         (_playerById[_index].getCurrentTime() - _duration[_index][RUNTIME]).toFixed(2),
         _index
       ].join('|');
+    }
+    
+    if(_drift > 3 && ++_driftcounter > 7) {
+      _playerById[_index].seekTo(_playerById[_index].getCurrentTime() - 3);
+    } else if (_drift < 3) {
+      _driftcounter = 0;
     }
   }
 
@@ -323,7 +361,7 @@ function findOffset() {
 
       // If we have been buffering for a while, 
       // then we will downsample and shift forward
-      if(_lagCounter > LAG_THRESHHOLD) {
+      if(_lagCounter > LAG_THRESHHOLD || drift < -YTLOADTIME_sec * 3) {
         setQuality(-1);
         _lagCounter -= LAG_THRESHHOLD;
 
@@ -331,7 +369,7 @@ function findOffset() {
 
         // We don't trust seeking to be insanely accurate so we throw an offset
         // on to it to avoid some kind of weird seeking loop.
-        _playerById[_index].seekTo(lapse + YTLOADTIME_sec * 7 / 3);
+        _playerById[_index].seekTo(lapse + YTLOADTIME_sec);
       }
 
       // If our lagcounter is really low, then
@@ -351,7 +389,7 @@ function onYouTubePlayerReady(playerId) {
 
   if(++_loaded === 3) {
     findOffset();
-    setInterval(findOffset, 500);
+    setInterval(findOffset, YTLOADTIME_sec * 1000 / 10);
   }
 }
 
@@ -390,9 +428,9 @@ function transition(index, offset) {
     // When you toggle the visibility, there is still an annoying spinner.
     // So to avoid this we just "move" the players off screen that aren't
     // being used.
-    document.getElementById("player-" + _active).style.left = "0%";
-    document.getElementById("player-" + _next).style.left = "-200%";
-    document.getElementById("player-" + EXTRA).style.left = "-200%";
+    show(_active);
+    hide(_next);
+    hide(EXTRA);
 
     // Crank up the volume to the computed normalization
     // level.
