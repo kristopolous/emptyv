@@ -49,7 +49,7 @@ var
   EXTRA = 2,
 
   // @ref: http://code.google.com/apis/youtube/flash_api_reference.html
-  LEVELS = ["small", "medium", "large", "hd720", "hd1080", "highres"];
+  LEVELS = ["small", "medium", "large"]; //, "hd720", "hd1080", "highres"];
 
 // }} // Constants
 
@@ -167,7 +167,9 @@ function secondarySwap(){
 
       // Nows our time to shine
       _playerById[_index].playVideo();
-      _playerById[_index].setVolume(_duration[_index][VOLUME]);
+      if(!_muted) {
+        _playerById[_index].setVolume(_duration[_index][VOLUME]);
+      }
      
       // Bring the volume up of the higher quality player and mute the current
       _player[EXTRA].setVolume(0);
@@ -265,8 +267,11 @@ function setQuality(direction) {
             // Show the higher quality and hide the current one
             hide(_active);
             show(EXTRA);
+
             // Bring the volume up of the higher quality player and mute the current
-            _player[EXTRA].setVolume(_duration[_index][VOLUME]);
+            if(!_muted) {
+              _player[EXTRA].setVolume(_duration[_index][VOLUME]);
+            }
             myplayer.setVolume(0);
             myplayer.seekTo(_player[EXTRA].getCurrentTime() + 1.5);
             myplayer.setPlaybackQuality(newQualityWord);
