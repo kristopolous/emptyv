@@ -124,7 +124,7 @@ var _duration = [
 ["yt:LV0eTlLU31k", 215, 0, 0, 100, 1987, "Latin Fire", "Fancy", "badtitle poor"],
 ["yt:LoF_a0-7xVQ", 257, 0, 0, 100, 1983, "Suicidal Tendencies", "Institutionalized", "clean ytad"],
 ["yt:Lp2qcCrdBLA", 225, 0, 0, 100, 1986, "Modern Talking", "Brother Louie", "vevo"],
-["yt:Lr0xJBsVbZY", 256, 0, 0, 100, 1984, "Jennifer Rush", "The Power of Love", "clean"],
+//["yt:Lr0xJBsVbZY", 256, 0, 0, 100, 1984, "Jennifer Rush", "The Power of Love", "clean"],
 ["yt:LuN6gs0AJls", 228, 0, 0, 100, 1982, "Modern English", "I Melt With You ", "clean ytad"],
 ["yt:M5NE1QHRSUs", 237, 0, 0, 100, 1983, "The Romantics", "Talking in your Sleep", "clean"],
 ["yt:MA5oz8b3UJM", 197, 0, 0, 100, 1983, "Pete Shelley", "Telephone Operator", "mtv2 logo title"],
