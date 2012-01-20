@@ -23,6 +23,8 @@ var
 
   NOTES = 8,
 
+  OFFSET = 9,
+
   // If there is a hash value (there should not be regularly)
   // Then debugging output is turned on, whatever the hell that
   // entails
@@ -56,6 +58,18 @@ function getNow(offset) {
   return +(new Date() / 1000) + (offset || 0);
 }
 
+function remainingTime() {
+  if(_player[_active] && _player[_active].getDuration && 'index' in _player[_active]) {
+    return Math.max(0,
+      _player[_active].getDuration() - 
+      _duration[_player[_active].index][STOP] - 
+      _player[_active].getCurrentTime()
+    );
+  } else {
+    return 0;
+  }
+}
+
 function toTime(sec) {
   return [
     (sec / 3600).toFixed(0),
@@ -75,7 +89,7 @@ var
   // in a direction (either up or down) based on how successful we can
   // combat drift (basically by playing without hitting a buffer interval)
   //
-  // We start at the lowest quality and then the skies the limit, I guess.
+  // We start at medium quality and then the skies the limit, I guess.
   _currentLevel = 0,
   
   // The lag counter is a token system that gets set by an interval.  If
@@ -91,7 +105,6 @@ var
   _lastLoaded,
 
   _seekTimeout = 0,
-  _qualityTimeout = 0,
 
   // The epoch time is based off the system time AND the users
   // local clock.  This makes sure that separate clock drifts
@@ -106,22 +119,35 @@ var
 
   // And their associated references
   _player = [],
+  _playerById = {},
 
   _lastTime = 0,
 
   _next = 1,
-  _runtime = _.reduce(_duration, function(a, b) { return a + b[RUNTIME] }, 0);
+  _runtime = 0;
+
+_.each(_duration, function(row) { 
+  row[OFFSET] = _runtime;
+  _runtime += row[RUNTIME];
+});
+
 // }} // Globals
 
 function mutetoggle(el){
   _muted = !_muted;
+
   if(_muted) {
     el.src = "mute_on_32.png";
     _player[_active].setVolume(0);
   } else {
     el.src = "mute_off_32.png";
-    // bug
-    _player[_active].setVolume(100);
+    var volume = 100;
+
+    if (index in _player[_active]) {
+      volume = _duration[_player[_active].index][VOLUME];
+    }
+
+    _player[_active].setVolume(volume);
   }
 }
 
@@ -133,25 +159,20 @@ function setQuality(direction) {
     newQualityIndex = _currentLevel,
     newQualityWord,
                     
-    activeAvailable = _player[_active].getAvailableQualityLevels(),
-    activeQualityWord = _player[_active].getPlaybackQuality();
+    activeAvailable = _playerById[_index].getAvailableQualityLevels(),
+    activeQualityWord = _playerById[_index].getPlaybackQuality();
 
   // If no video is loaded, then go no further.
-  if(activeAvailable.length == 0) {
+  if(activeAvailable.length === 0) {
     return;
   }
 
   // If the lapse has dropped and the direction is specific
-  if(direction && getNow() > _qualityTimeout) {
+  if(direction) {
     newQualityIndex = Math.min(
       Math.max(_currentLevel + direction, 0),
       LEVELS.length
     );
-
-    // To make sure we don't cycle through the 
-    // quality levels too quickly, there's a cool-off
-    // time after a quality toggle.
-    _qualityTimeout = getNow(+ YTLOADTIME_sec * 4);
   }
 
   // Now that we have the destination quality level, we need to see
@@ -159,34 +180,31 @@ function setQuality(direction) {
   newQualityWord = LEVELS[newQualityIndex];
 
   // If this video doesn't support the destination quality level
-  if ( _.indexOf(activeAvailable, newQualityWord) == -1) {
+  if ( _.indexOf(activeAvailable, newQualityWord) === -1) {
     // Use the highest one available (the lower ones are always available)
     // Get the word version of the highest quality available
     newQualityWord = _.first(activeAvailable);
   }
 
   // If this new, supported quality isn't the current one set
-  if (newQualityWord != activeQualityWord) {
+  if (newQualityWord !== activeQualityWord) {
 
     console.log("Quality: " + activeQualityWord + " => " + newQualityWord);
 
     // If we are downsampling then just do it
     if(true) { //direction < 0) {
-      _player[_active].setPlaybackQuality(newQualityWord);
+      _playerById[_index].setPlaybackQuality(newQualityWord);
 
       // If we are upsampling, then do it seemlessly.
     } else if( 
-      _player[_active].getDuration() - 
-      _duration[_player[_active].index][STOP] - 
-      _player[_active].getCurrentTime() > YTLOADTIME_sec * 2.5
+      _playerById[_index].getDuration() - 
+      _duration[_index][STOP] - 
+      _playerById[_index].getCurrentTime() > YTLOADTIME_sec * 2.5
     ) {
-
-      // Ug, still experimental
-      var index = _player[_active].index;
 
       // First, load the active video in the extra player,
       // setting the volume to 0
-      _player[EXTRA].loadVideoById(_duration[index][ID].split(":")[1]) 
+      _player[EXTRA].loadVideoById(_duration[_index][ID].split(":")[1]) 
 
       _player[EXTRA].setVolume(0);
 
@@ -194,9 +212,10 @@ function setQuality(direction) {
       // quality
       _player[EXTRA].setPlaybackQuality(newQualityWord);
 
-      // By seeking to the current time subtracted from the load time, then by the time this seeks
-      // It should be eclipsed by the active player
-      _player[EXTRA].seekTo(_player[_active].getCurrentTime() - YTLOADTIME_sec / 2);
+      // By seeking to the current time subtracted from the load time, 
+      // then by the time this seeks, it should be eclipsed by the 
+      // active player.
+      _player[EXTRA].seekTo(_playerById[_index].getCurrentTime() - YTLOADTIME_sec / 2);
       _player[EXTRA].playVideo();
 
       // Now poll the two time offsets and swap videos when they cross
@@ -204,17 +223,17 @@ function setQuality(direction) {
         console.log(_player[EXTRA].getVideoBytesLoaded(), _player[EXTRA].getCurrentTime());
         if (
           (_player[EXTRA].getCurrentTime() > 0) &&
-          (_player[_active].getCurrentTime() > _player[EXTRA].getCurrentTime())
+          (_playerById[_index].getCurrentTime() > _player[EXTRA].getCurrentTime())
         ) {
           // Nows our time to shine
          
           // Bring the volume up of the higher quality player and mute the current
-          _player[EXTRA].setVolume(_duration[index][VOLUME]);
-          _player[_active].setVolume(0);
+          _player[EXTRA].setVolume(_duration[_index][VOLUME]);
+          _playerById[_index].setVolume(0);
 
           // Start the higher quality player and stop the current one
           _player[EXTRA].playVideo();
-          _player[_active].stopVideo();
+          _playerById[_index].stopVideo();
 
           // Show the higher quality and hide the current one
           document.getElementById("player-" + _active).style.visibility = 'hidden';
@@ -226,7 +245,7 @@ function setQuality(direction) {
           _active = EXTRA;
 
           // Set up the index
-          _player[_active].index = _index;
+          _playerById[_index].index = _index;
 
           // And then clear the polling interval
           clearInterval(swapInterval);
@@ -242,83 +261,87 @@ function setQuality(direction) {
 function findOffset() {
   var 
     now = getNow(),
+    // This is where we should be
     lapse = (now - _epoch) % _runtime;
-
-  for (var index = 0;
-
-    lapse > _duration[index][RUNTIME];
-
-    lapse -= _duration[index][RUNTIME],
-    index = (index + 1) % _duration.length
-  );
+ 
+  if(_index === -1) {
+    for(
+      _index = 0; 
+      lapse > _duration[_index][OFFSET] + _duration[_index][RUNTIME];
+      _index++
+    ); 
+    lapse -= _duration[_index][OFFSET];
+    transition(_index, lapse);
+  } else {
+    lapse -= _duration[_index][OFFSET];
+  }
 
   // If the duration has a starting offset, then 
   // we put that here...
-  lapse += _duration[index][START];
+  lapse += _duration[_index][START];
 
   if(_index > -1) {
     document.title = _duration[_index][ARTIST] + " - " + _duration[_index][TITLE] + " | " + toTime(now - _start);
-    if(DEBUG) {
-      var drift = _player[_active].getCurrentTime() - lapse;
+    if(DEBUG && _index in _playerById) {
+      var drift = _playerById[_index].getCurrentTime() - lapse;
       if(drift > 0) {
-        drift = "+" + drift.toFixed(3);
+        drift = "+" + drift.toFixed(2);
       } else {
-        drift = drift.toFixed(3);
+        drift = drift.toFixed(2);
       }
 
-      document.title += " " + [drift, _lagCounter].join(' ');
+      document.title += " " + [
+        drift, 
+        _lagCounter, 
+        (_playerById[_index].getCurrentTime() - _duration[_index][RUNTIME]).toFixed(2),
+        _index
+      ].join('|');
     }
   }
 
-  if (_duration[index][RUNTIME] - _player[_active].getCurrentTime() < 10) {
-    _index = (index + 1) % _duration.length;
-    transition(0);
-  } else if (_index == -1) {
-    _index = index;
+  if ( _index in _playerById ) {
+    if (_duration[_index][RUNTIME] - lapse < YTLOADTIME_sec * 2) {
+      transition((_index + 1) % _duration.length, 0);
+    }
 
-    // Since we increment in the transition, then
-    // we need to offset from that here.  That function should
-    // probably be broken up better than it is currently.
-    transition(lapse);
-  }
-
-  if ( now > _seekTimeout &&
-      _player[_active].getCurrentTime() > 0 &&
-      _player[_active].index == index
+    if ( 
+      now > _seekTimeout &&
+      _playerById[_index].getCurrentTime() > 0
     ) {
 
-    if ( _lastTime == _player[_active].getCurrentTime() ) {
-      _lagCounter ++;
-    } else {
-      _lagCounter --;
+      if ( _lastTime === _playerById[_index].getCurrentTime() ) {
+        _lagCounter ++;
+      } else {
+        _lagCounter --;
+      }
+      _lastTime = _playerById[_index].getCurrentTime();
+
+      // Make sure that we don't reseek too frequently.
+      if(Math.abs(_lagCounter) > LAG_THRESHHOLD) {
+        _seekTimeout = now + YTLOADTIME_sec;
+      }
+
+      // If we have been buffering for a while, 
+      // then we will downsample and shift forward
+      if(_lagCounter > LAG_THRESHHOLD) {
+        setQuality(-1);
+        _lagCounter -= LAG_THRESHHOLD;
+
+        console.log("Seeking:", lapse, _playerById[_index].getCurrentTime());
+
+        // We don't trust seeking to be insanely accurate so we throw an offset
+        // on to it to avoid some kind of weird seeking loop.
+        _playerById[_index].seekTo(lapse + YTLOADTIME_sec * 7 / 3);
+      }
+
+      // If our lagcounter is really low, then
+      // we have been good and can up the quality at
+      // this point
+      if(_lagCounter < -LAG_THRESHHOLD) {
+        setQuality(+1);
+        _lagCounter += LAG_THRESHHOLD;
+      } 
     }
-    _lastTime = _player[_active].getCurrentTime();
-
-    // Make sure that we don't reseek too frequently.
-    if(Math.abs(_lagCounter) > LAG_THRESHHOLD) {
-      _seekTimeout = now + YTLOADTIME_sec;
-    }
-
-    // If we have been buffering for a while, 
-    // then we will downsample and shift forward
-    if(_lagCounter > LAG_THRESHHOLD) {
-      setQuality(-1);
-      _lagCounter -= LAG_THRESHHOLD;
-
-      console.log("seeking", lapse, _player[_active].getCurrentTime());
-
-      // We don't trust seeking to be insanely accurate so we throw an offset
-      // on to it to avoid some kind of weird seeking loop.
-      _player[_active].seekTo(lapse + YTLOADTIME_sec * 7 / 3);
-    }
-
-    // If our lagcounter is really low, then
-    // we have been good and can up the quality at
-    // this point
-    if(_lagCounter < -LAG_THRESHHOLD) {
-      setQuality(+1);
-      _lagCounter += LAG_THRESHHOLD;
-    } 
   }
 }
 
@@ -326,33 +349,21 @@ function onYouTubePlayerReady(playerId) {
   var id = parseInt(playerId.substr(-1));
   _player[ id ] = document.getElementById(playerId);
 
-  if(++_loaded == 3) {
+  if(++_loaded === 3) {
     findOffset();
     setInterval(findOffset, 500);
   }
 }
 
-function remainingTime() {
-  if(_player[_active] && _player[_active].getDuration && 'index' in _player[_active]) {
-    return Math.max(0,
-      _player[_active].getDuration() - 
-      _duration[_player[_active].index][STOP] - 
-      _player[_active].getCurrentTime()
-    );
-  } else {
-    return 0;
-  }
-}
-
-function transition(offset) {
-  if(_index == _lastLoaded) {
+function transition(index, offset) {
+  if(index === _lastLoaded) {
     return;
   }
-  _lastLoaded = _index;
+  _lastLoaded = index;
 
   // Load the next video prior to actually switching over
   var 
-    id = _duration[_index][ID],
+    id = _duration[index][ID],
     proto = id.split(':')[0],
     uuid = id.split(':')[1];
 
@@ -368,6 +379,9 @@ function transition(offset) {
 
     // After the PRELOAD_ms interval, then we stop the playing video
     _player[_active].stopVideo();
+    if("index" in _player[_active]) {
+      delete _playerById[_player[_active].index];
+    }
 
     // Toggle the player pointers
     _active = (_active + 1) % 2;
@@ -383,15 +397,17 @@ function transition(offset) {
     // Crank up the volume to the computed normalization
     // level.
     _player[_active].playVideo();
-    _player[_active].index = _index;
+    _player[_active].index = index;
+    _playerById[index] = _player[_active];
 
     // Make sure that we observe the volume settings.
     if(_muted) {
       _player[_active].setVolume(0);
     } else {
-      _player[_active].setVolume(_duration[_index][VOLUME]);
+      _player[_active].setVolume(_duration[index][VOLUME]);
     }
 
+    _index = index;
     setQuality();
   }, remainingTime() * 1000);
 }
