@@ -4,6 +4,13 @@ EMBED = 2,    // Not embeddable
 POOR = 3,     // Wrong video, bad quality, bad audio
 WRONG = 4,    // Inappropriate (too late, wrong style)
 MISSING = 5,  // Not found
+_words = {
+  1: "unspecified",
+  2: "license restriction",
+  3: "poor quality video",
+  4: "inappropriate",
+  5: "no video(s) available"
+},
 _bad = [
 ["Xbt30UnzRWw", 1981, "Devo", "Whip it", EMBED],
 ["yt:xNnAvTTaJjM", 1983, "Talking Heads", "Burning Down The House", EMBED],
@@ -14,6 +21,7 @@ _bad = [
 ["yt:_U5HpeA_WSo", 1984, "The Smiths", "How Soon is Now?", EMBED],
 ["0974cze7e_A", 1979, "Baccara", "Body Talk clean", BAD],
 ["eabefjsJsAQ", 1983, "Re-Flex", "The Politics Of Dancing", EMBED], 
+["yt:8tI1_KlO6xI", 1982, "Culture Club", "Time (Clock Of The Heart)", BAD],
 ["2sCkVe31fwo", 1988, "Taste of sugar", "HMM", POOR],
 ["6pKPNnk-JhE", 1983, "Midnight Oil", "Power And The Passion", BAD],
 ["DhX6DniAwGg", 1985, "Duran Duran", "White Lines", BAD],
@@ -24,6 +32,7 @@ _bad = [
 ["TMZi25Pq3T8", 1986, "N.W.A.", "Straight Outta Compton", WRONG],
 ["bIr0yrKeR40", 1982, "Bizzy & Co", "Take a Chance", POOR], 
 ["eSMeUPFjQHc", 1994, "Erasure", "Always", WRONG],
+["", "(all)", "Prince", "(all)", MISSING],
 ["g0XLKcMoXRE", 1988, "Van Halen", "Hot for Teacher", MISSING],
 ["vmOf3npKf9I", 1980, "Sparks", "Funny Face", BAD]
 ];
