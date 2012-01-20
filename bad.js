@@ -13,6 +13,7 @@ _words = {
 },
 _bad = [
 ["Xbt30UnzRWw", 1981, "Devo", "Whip it", EMBED],
+["yt:I5hnCb-93WY", 1980, "The Undertones", "My Perfect Cousin", EMBED],
 ["yt:xNnAvTTaJjM", 1983, "Talking Heads", "Burning Down The House", EMBED],
 ["-VCqAjYO3NM", 1986, "Pet Shop Boys", "Suburbia", BAD],
 ["XfNLORw7r_M", 1981, "DAF", "Der Rauber und der Prinz", BAD],

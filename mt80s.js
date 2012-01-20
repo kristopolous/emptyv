@@ -106,6 +106,9 @@ var
 
   _seekTimeout = 0,
 
+  _driftival,
+  _drift,
+ 
   // The epoch time is based off the system time AND the users
   // local clock.  This makes sure that separate clock drifts
   // are *about* the same ... minus the TTL latency incurred by
@@ -193,6 +196,8 @@ function setQuality(direction) {
 
     // If we are downsampling then just do it
     if(true) { //direction < 0) {
+      // we also shuffle the placement forward to accomodate for the change over
+      _playerById[_index].seekTo(_playerById[_index].getCurrentTime() + YTLOADTIME_sec);
       _playerById[_index].setPlaybackQuality(newQualityWord);
 
       // If we are upsampling, then do it seemlessly.
@@ -281,21 +286,46 @@ function findOffset() {
   lapse += _duration[_index][START];
 
   if(_index > -1) {
+
+    _drift = -1;
+    if(_index in _playerById) {
+      _drift = _playerById[_index].getCurrentTime() - lapse;
+    }
+
     document.title = _duration[_index][ARTIST] + " - " + _duration[_index][TITLE] + " | " + toTime(now - _start);
     if(DEBUG && _index in _playerById) {
-      var drift = _playerById[_index].getCurrentTime() - lapse;
-      if(drift > 0) {
-        drift = "+" + drift.toFixed(2);
+      var drift;
+      if(_drift > 0) {
+        drift = "+" + _drift.toFixed(2);
       } else {
-        drift = drift.toFixed(2);
+        drift = _drift.toFixed(2);
       }
 
-      document.title += " " + [
+      document.title = " " + [
         drift, 
         _lagCounter, 
         (_playerById[_index].getCurrentTime() - _duration[_index][RUNTIME]).toFixed(2),
         _index
       ].join('|');
+    }
+    
+    if(_drift > 3 && !_driftival) {
+      console.log("Doing the drift");
+      var toggle = 0;
+      _driftival = setInterval(function(){
+        if(toggle++ % 2) {
+          _playerById[_index].pauseVideo();
+        } else {
+          _playerById[_index].playVideo();
+        }
+        if(_drift < 3) {
+          console.log("Clearing the drift");
+          clearInterval(_driftival);
+          _driftival = 0;
+          _playerById[_index].playVideo();
+        }
+      }, 16.7777);
+      console.log(_driftival);
     }
   }
 

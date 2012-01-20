@@ -99,7 +99,6 @@ var _duration = [
 ["yt:HiAYmEvuUng", 198, 0, 0, 100, 1983, "Total Coelo", "Milk from Coconuts", "clean title"],
 ["yt:HjNTu8jdukA", 237, 0, 0, 100, 1988, "Slick Rick", "Childrens' Story", "vevo"],
 ["yt:I1wg1DNHbNU", 223, 0, 0, 100, 1981, "Talking Heads", "Once in a lifetime", "clean title"],
-["yt:I5hnCb-93WY", 155, 0, 0, 100, 1980, "The Undertones", "My Perfect Cousin", "clean ytad"],
 ["yt:IGVZOLV9SPo", 318, 0, 0, 100, 1983, "Pat Benatar", "Love Is A Battlefield", "vevo"],
 ["yt:IW-ftxIrhBc", 217, 0, 0, 100, 1984, "Depeche Mode", "People Are People", "clean"],
 ["yt:IcTP7YWPayU", 225, 0, 0, 100, 1984, "Eurythmics", "Sex Crime 1984", "clean"],
