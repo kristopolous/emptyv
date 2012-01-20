@@ -49,7 +49,7 @@ var
   EXTRA = 2,
 
   // @ref: http://code.google.com/apis/youtube/flash_api_reference.html
-  LEVELS = ["small", "medium", "large"]; //, "hd720", "hd1080", "highres"];
+  LEVELS = ["small", "medium"];//, "large"]; //, "hd720", "hd1080", "highres"];
 
 // }} // Constants
 
@@ -113,6 +113,7 @@ var
   _lastLoaded,
 
   _seekTimeout = 0,
+  _qualityTimeout = 0,
 
   _driftcounter = 0,
   _drift,
@@ -201,6 +202,11 @@ function setQuality(direction) {
     return;
   }
 
+  if(direction == -1) {
+    _qualityTimeout = 20 * YTLOADTIME_sec + getNow();
+  } else if (direction > 0 && getNow() < _qualityTimeout) {
+    return;
+  }
   // If the lapse has dropped and the direction is specific
   if(direction) {
     newQualityIndex = Math.min(
@@ -376,6 +382,7 @@ function findOffset() {
         // on to it to avoid some kind of weird seeking loop.
         _playerById[_index].seekTo(lapse + YTLOADTIME_sec);
       }
+
 
       // If our lagcounter is really low, then
       // we have been good and can up the quality at
