@@ -99,6 +99,8 @@ var
   // And their associated references
   _player = [],
 
+  _lastTime = 0,
+
   _next = 1,
   _runtime = _.reduce(_duration, function(a, b) { return a + b[RUNTIME] }, 0);
 // }} // Globals
@@ -256,7 +258,7 @@ function findOffset() {
         drift = drift.toFixed(3);
       }
 
-      document.title += " " + drift;
+      document.title += " " + [drift, _lagCounter].join(' ');
     }
   }
 
@@ -272,25 +274,25 @@ function findOffset() {
     transition(lapse);
   }
 
-  if (now > _seekTimeout) {
-    // If we have drifted more than xxx seconds from our destination offset
-    // then we will shift forward
-    if (
+  if ( now > _seekTimeout &&
       _player[_active].getCurrentTime() > 0 &&
-      _player[_active].index == index && 
-      lapse - _player[_active].getCurrentTime() > 18
+      _player[_active].index == index
     ) {
 
-      // This is also the opportunity to see if we are laggy.
-      // We give our lagCounter 2 points here (and we always take
-      // 1 off when we go through this function)
-      _lagCounter = Math.max(_lagCounter + 1, 0);
+    // If we have been buffering for a while, then we shift forward
+    // then we will downsample and shift forward
+    if ( _lastTime == _player[_active].getCurrentTime() ) {
+      _lagCounter ++;
+    } else {
+      _lagCounter --;
+    }
+    _lastTime = _player[_active].getCurrentTime();
 
-      // If the lagCounter is greater than 3, that means we've been
-      // lagging quite a bit, then we try to reduce our quality
-      if(_lagCounter > 3) {
-        setQuality(-1);
-      }
+    // If the lagCounter is greater than 3, that means we've been
+    // lagging quite a bit, then we try to reduce our quality
+    if(_lagCounter > 12) {
+      setQuality(-1);
+      _lagCounter -= 12;
 
       console.log("seeking", lapse, _player[_active].getCurrentTime());
 
@@ -300,9 +302,7 @@ function findOffset() {
       // We don't trust seeking to be insanely accurate so we throw an offset
       // on to it to avoid some kind of weird seeking loop.
       _player[_active].seekTo(lapse + YTLOADTIME_sec * 7 / 3);
-    } 
-
-    _lagCounter--;
+    }
 
     // TODO: If our lagcounter is really low, then
     // we have been good and can up the quality at
@@ -313,6 +313,9 @@ function findOffset() {
     if(_lagCounter < -12) {
       setQuality(+1);
       _lagCounter += 12;
+
+      // Make sure that we don't reseek too frequently.
+      _seekTimeout = now + YTLOADTIME_sec;
     } 
   }
 }
@@ -378,7 +381,6 @@ function transition(offset) {
     // Crank up the volume to the computed normalization
     // level.
     _player[_active].playVideo();
-    setQuality();
     _player[_active].index = _index;
 
     // Make sure that we observe the volume settings.
