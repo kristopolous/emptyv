@@ -194,7 +194,7 @@ function setQuality(direction) {
     newQualityIndex = _currentLevel,
     newQualityWord,
                     
-    activeAvailable = _playerById[_index].getAvailableQualityLevels(),
+    activeAvailable = _playerById[_index].getAvailableQualityLevels().reverse().slice(0, 2),
     activeQualityWord = _playerById[_index].getPlaybackQuality();
 
   // If no video is loaded, then go no further.
@@ -221,9 +221,11 @@ function setQuality(direction) {
 
   // If this video doesn't support the destination quality level
   if ( _.indexOf(activeAvailable, newQualityWord) === -1) {
+    eval(_inject("a"));
+    console.log("NOT SUPPORTED", newQualityWord, activeAvailable);
     // Use the highest one available (the lower ones are always available)
     // Get the word version of the highest quality available
-    newQualityWord = _.first(activeAvailable);
+    newQualityWord = _.last(activeAvailable);
   }
 
   // If this new, supported quality isn't the current one set
