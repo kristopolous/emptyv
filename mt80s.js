@@ -41,6 +41,8 @@ var
   // multiplied by 1000 because it's expressed in MS
   PRELOAD_ms = YTLOADTIME_sec * 1000,
 
+  LAG_THRESHHOLD = 12,
+
   // An extra player
   EXTRA = 2,
 
@@ -75,6 +77,12 @@ var
   //
   // We start at the lowest quality and then the skies the limit, I guess.
   _currentLevel = 0,
+  
+  // The lag counter is a token system that gets set by an interval.  If
+  // we accumulate a certain negative or positive balance, then we can exchange
+  // the negative or positive units for a quality shift. This makes sure that 
+  // we can prove the stability of any setting through successive incremental
+  // sampling
   _lagCounter = 0,
 
   _muted = false,
@@ -268,7 +276,7 @@ function findOffset() {
   } else if (_index == -1) {
     _index = index;
 
-    // Since we increment in the transition (sloppy, kiddo), then
+    // Since we increment in the transition, then
     // we need to offset from that here.  That function should
     // probably be broken up better than it is currently.
     transition(lapse);
@@ -279,8 +287,6 @@ function findOffset() {
       _player[_active].index == index
     ) {
 
-    // If we have been buffering for a while, then we shift forward
-    // then we will downsample and shift forward
     if ( _lastTime == _player[_active].getCurrentTime() ) {
       _lagCounter ++;
     } else {
@@ -288,34 +294,30 @@ function findOffset() {
     }
     _lastTime = _player[_active].getCurrentTime();
 
-    // If the lagCounter is greater than 3, that means we've been
-    // lagging quite a bit, then we try to reduce our quality
-    if(_lagCounter > 12) {
+    // Make sure that we don't reseek too frequently.
+    if(Math.abs(_lagCounter) > LAG_THRESHHOLD) {
+      _seekTimeout = now + YTLOADTIME_sec;
+    }
+
+    // If we have been buffering for a while, 
+    // then we will downsample and shift forward
+    if(_lagCounter > LAG_THRESHHOLD) {
       setQuality(-1);
-      _lagCounter -= 12;
+      _lagCounter -= LAG_THRESHHOLD;
 
       console.log("seeking", lapse, _player[_active].getCurrentTime());
-
-      // Make sure that we don't reseek too frequently.
-      _seekTimeout = now + YTLOADTIME_sec;
 
       // We don't trust seeking to be insanely accurate so we throw an offset
       // on to it to avoid some kind of weird seeking loop.
       _player[_active].seekTo(lapse + YTLOADTIME_sec * 7 / 3);
     }
 
-    // TODO: If our lagcounter is really low, then
+    // If our lagcounter is really low, then
     // we have been good and can up the quality at
-    // this point; but have to be smart about it so
-    // that we aren't just constantly cycling through
-    // two quality settings, pausing the video annoyingly
-    // every time we cycle up or down.
-    if(_lagCounter < -12) {
+    // this point
+    if(_lagCounter < -LAG_THRESHHOLD) {
       setQuality(+1);
-      _lagCounter += 12;
-
-      // Make sure that we don't reseek too frequently.
-      _seekTimeout = now + YTLOADTIME_sec;
+      _lagCounter += LAG_THRESHHOLD;
     } 
   }
 }
