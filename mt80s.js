@@ -32,7 +32,7 @@ var
   // seeint how long the player took to load. This seemed
   // to work ok; we really want the drift to be as close
   // to 0 as possible.
-  YTLOADTIME_sec = 6,
+  YTLOADTIME_sec = 5,
 
   // According to the docs: "The player does not request 
   // the FLV until playVideo() or seekTo() is called.". In
@@ -40,6 +40,9 @@ var
   // by some increment, we take that to be the YTLOADTIME,
   // multiplied by 1000 because it's expressed in MS
   PRELOAD_ms = YTLOADTIME_sec * 1000,
+
+  // An extra player
+  EXTRA = 2,
 
   // @ref: http://code.google.com/apis/youtube/flash_api_reference.html
   LEVELS = ["small", "medium", "large", "hd720", "hd1080", "highres"];
@@ -138,11 +141,6 @@ function setQuality(direction) {
     // To make sure we don't cycle through the 
     // quality levels too quickly, there's a cool-off
     // time after a quality toggle.
-    //
-    // TODO: probably the higher quality video should
-    // be queued in another video container to avoid the
-    // lapse in playback, and then, when it's ready, should
-    // be swapped out for the lower quality video.
     _qualityTimeout = getNow(+ YTLOADTIME_sec * 4);
   }
 
@@ -159,9 +157,72 @@ function setQuality(direction) {
 
   // If this new, supported quality isn't the current one set
   if (newQualityWord != activeQualityWord) {
+
     console.log("Quality: " + activeQualityWord + " => " + newQualityWord);
 
-    _player[_active].setPlaybackQuality(newQualityWord);
+    // If we are downsampling then just do it
+    if(true) { //direction < 0) {
+      _player[_active].setPlaybackQuality(newQualityWord);
+
+      // If we are upsampling, then do it seemlessly.
+    } else if( 
+      _player[_active].getDuration() - 
+      _duration[_player[_active].index][STOP] - 
+      _player[_active].getCurrentTime() > YTLOADTIME_sec * 2.5
+    ) {
+
+      // Ug, still experimental
+      var index = _player[_active].index;
+
+      // First, load the active video in the extra player,
+      // setting the volume to 0
+      _player[EXTRA].loadVideoById(_duration[index][ID].split(":")[1]) 
+
+      _player[EXTRA].setVolume(0);
+
+      // Set the playback quality of the extra video to the higher
+      // quality
+      _player[EXTRA].setPlaybackQuality(newQualityWord);
+
+      // By seeking to the current time subtracted from the load time, then by the time this seeks
+      // It should be eclipsed by the active player
+      _player[EXTRA].seekTo(_player[_active].getCurrentTime() - YTLOADTIME_sec / 2);
+      _player[EXTRA].playVideo();
+
+      // Now poll the two time offsets and swap videos when they cross
+      var swapInterval = setInterval(function(){
+        console.log(_player[EXTRA].getVideoBytesLoaded(), _player[EXTRA].getCurrentTime());
+        if (
+          (_player[EXTRA].getCurrentTime() > 0) &&
+          (_player[_active].getCurrentTime() > _player[EXTRA].getCurrentTime())
+        ) {
+          // Nows our time to shine
+         
+          // Bring the volume up of the higher quality player and mute the current
+          _player[EXTRA].setVolume(_duration[index][VOLUME]);
+          _player[_active].setVolume(0);
+
+          // Start the higher quality player and stop the current one
+          _player[EXTRA].playVideo();
+          _player[_active].stopVideo();
+
+          // Show the higher quality and hide the current one
+          document.getElementById("player-" + _active).style.visibility = 'hidden';
+          document.getElementById("player-" + EXTRA).style.visibility = 'visible';
+
+          // now set the active to the extra, this works because the next mechanics
+          // is based not on the previous next, but on the active; so there is no
+          // odd/even problem.
+          _active = EXTRA;
+
+          // Set up the index
+          _player[_active].index = _index;
+
+          // And then clear the polling interval
+          clearInterval(swapInterval);
+        }
+      }, 100);
+    }
 
     // And set it as the default
     _currentLevel = _.indexOf(LEVELS, newQualityWord);
@@ -249,9 +310,9 @@ function findOffset() {
     // that we aren't just constantly cycling through
     // two quality settings, pausing the video annoyingly
     // every time we cycle up or down.
-    if(_lagCounter < -15) {
+    if(_lagCounter < -12) {
       setQuality(+1);
-      _lagCounter += 15;
+      _lagCounter += 12;
     } 
   }
 }
@@ -260,7 +321,7 @@ function onYouTubePlayerReady(playerId) {
   var id = parseInt(playerId.substr(-1));
   _player[ id ] = document.getElementById(playerId);
 
-  if(++_loaded == 2) {
+  if(++_loaded == 3) {
     findOffset();
     setInterval(findOffset, 500);
   }
@@ -292,30 +353,41 @@ function transition(offset) {
 
   console.log("Loading: ", id);
 
-  _player[_next].loadVideoById(uuid);
+  // Offset mechanics are throughout, but placing it here
+  // make sure that on first load there isn't some brief beginning
+  // of video sequence then a seek.
+  _player[_next].loadVideoById(uuid, offset);
   _player[_next].pauseVideo();
 
   setTimeout(function(){
-    // After the PRELOAD_msl interval, then we stop the playing video
+
+    // After the PRELOAD_ms interval, then we stop the playing video
     _player[_active].stopVideo();
 
     // Toggle the player pointers
     _active = (_active + 1) % 2;
-    _next = (_next + 1) % 2;
+    _next = (_active + 1) % 2;
 
-    // And their visibility
-    document.getElementById("player-" + _active).style.visibility = 'visible';
-    document.getElementById("player-" + _next).style.visibility = 'hidden';
+    // When you toggle the visibility, there is still an annoying spinner.
+    // So to avoid this we just "move" the players off screen that aren't
+    // being used.
+    document.getElementById("player-" + _active).style.left = "0%";
+    document.getElementById("player-" + _next).style.left = "-200%";
+    document.getElementById("player-" + EXTRA).style.left = "-200%";
 
     // Crank up the volume to the computed normalization
     // level.
     _player[_active].playVideo();
+    setQuality();
     _player[_active].index = _index;
+
+    // Make sure that we observe the volume settings.
     if(_muted) {
       _player[_active].setVolume(0);
     } else {
       _player[_active].setVolume(_duration[_index][VOLUME]);
     }
+
     setQuality();
   }, remainingTime() * 1000);
 }
@@ -324,7 +396,7 @@ function transition(offset) {
   // Load two players to be transitioned between at a nominal
   // resolution ... this is irrelevant as quality will be 
   // managed in a more sophisticated manner than size of screen.
-  for(var ix = 0; ix < 2; ix++) {
+  for(var ix = 0; ix < 3; ix++) {
 
     swfobject.embedSWF("http://www.youtube.com/apiplayer?" + [
       "version=3",
