@@ -149,10 +149,10 @@ function mutetoggle(el){
   _muted = !_muted;
 
   if(_muted) {
-    el.src = "mute_on_32.png";
+    el.src = "images/mute_on_32.png";
     _player[_active].setVolume(0);
   } else {
-    el.src = "mute_off_32.png";
+    el.src = "images/mute_off_32.png";
     var volume = 100;
 
     if ("index" in _player[_active]) {

@@ -320,7 +320,7 @@ var _duration = [
 ["yt:nqh9pKPalWo", 236, 0, 0, 100, 1982, "Wish Key", "Orient Express", "logo"],
 ["yt:o1tj2zJ2Wvg", 275, 0, 0, 100, 1987, "Guns N' Roses", "Welcome To The Jungle", "vevo"],
 ["yt:oEh5pWjcWCg", 159, 0, 0, 100, 1981, "Soft Cell", "Tainted Love", "clean"],
-["yt:oIb9QUGjdIc", 251, 0, 0, 100, 1984, "Berlin", "No More Words", "vevo"],
+["yt:oIb9QUGjdIc", 247, 4, 0, 100, 1984, "Berlin", "No More Words", "vevo"],
 ["yt:oOg5VxrRTi0", 222, 0, 0, 100, 1982, "Duran Duran", "Hungry Like The Wolf", "vevo"],
 ["yt:oc-P8oDuS0Q", 228, 0, 0, 100, 1982, "Dexy's Midnight Runners", "Come On Eileen", "title logo"],
 ["yt:ofkzvM7Skxg", 240, 0, 0, 100, 1986, "The B-52s", "Rock Lobster", "clean ytad"],

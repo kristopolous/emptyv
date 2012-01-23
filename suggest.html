@@ -8,7 +8,7 @@
   <a href=#suggest>Suggest</a>
   <a href=#dead>Dead Song</a>
   <a href=#contact>Contact</a>
-  <img src=mt_100.png style=float:right;margin-top:10px>
+  <img src=images/mt_100.png style=float:right;margin-top:10px>
 </div>
 <div>
 <div class=section id=about>
@@ -35,7 +35,7 @@ As you type in the artist and song, you will see if it's been added already.
 <span style="display:inline-block;width:30%;padding:25px 25px 0 30px;margin-bottom:-10px" id=embedder>
 </span>
 
-<form method=post id=suggest-input action=processing.php?type=suggest name=processing>
+<form method=post id=suggest-input action=srv/processing.php?type=suggest name=processing>
   <span style=display:inline-block;width:244px;vertical-align:top>
   <span>
     Artist Name
@@ -60,7 +60,7 @@ As you type in the artist and song, you will see if it's been added already.
 <h1>Report A Dead Song</h1>
 <p>Did you just see blank-ness for 3 minutes or so? Yeah, sorry about that, tell me what the song was and I'll get right on it</p>
 
-<form method=post action=processing.php?type=dead name=processing>
+<form method=post action=srv/processing.php?type=dead name=processing>
   <input name=song id=song>
   <input type=submit value="He's Dead, Jim">
 </form>
@@ -70,7 +70,7 @@ As you type in the artist and song, you will see if it's been added already.
 <h1>Leave a Comment</h1>
 <p>If you want to leave a general comment that isn't a song suggestion or a dead link, please type away below</p>
 
-<form method=post action=processing.php?type=comment name=processing>
+<form method=post action=srv/processing.php?type=comment name=processing>
   <span>
     Your Name
     <input name=name id=name>
@@ -89,12 +89,13 @@ As you type in the artist and song, you will see if it's been added already.
 </form>
 </div>
 </div>
-<script src=underscore-min.js></script>
-<script src=db.min.js></script>
-<script src=playlist.js></script>
-<script src=bad.js></script>
-<script src=jquery-1.7.1.min.js></script>
-<script src=suggest.js></script>
+<script src=js/underscore-min.js></script>
+<script src=js/db.min.js></script>
+<script src=srv/time.php></script>
+<script src=js/playlist.js></script>
+<script src=js/bad.js></script>
+<script src=js/jquery-1.7.1.min.js></script>
+<script src=js/suggest.js></script>
 
 </body>
 </html>
