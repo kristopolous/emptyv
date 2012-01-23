@@ -10,3 +10,5 @@ Thanks to (alphabetically listed):
  * [swfobject](http://code.google.com/p/swfobject/)
  * [underscore](https://github.com/documentcloud/underscore)
  * [youtube-dl](https://github.com/rg3/youtube-dl)
+
+The todo list can be found in the [issues section](https://github.com/kristopolous/emptyv/issues).
