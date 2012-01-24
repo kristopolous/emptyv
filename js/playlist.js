@@ -221,7 +221,7 @@ var _duration = [
 ["yt:VJYfUS96f6w", 264, 0, 0, 100, 1989, "Rufus Chaka Khan", "Ain't Nobody", "ytad logo"],
 ["yt:VPgHbt0ODr4", 176, 0, 0, 100, 1980, "Adam and The Ants", "Stand and Deliver", "clean"],
 ["yt:VQzVHs4pn9A", 204, 0, 0, 100, 1983, "Yello", "I Love You", "clean ytad"],
-["yt:VdphvuyaV_I", 299, 0, 0, 100, 1983, "Billy Idol", "Rebel Yell", "vevo"],
+["yt:VdphvuyaV_I", 296, 0, 3, 100, 1983, "Billy Idol", "Rebel Yell", "vevo"],
 ["yt:W-NiJ9K4QKM", 201, 0, 0, 100, 1988, "C. C. Catch", "Backseat Of Your Cadillac", "clean"],
 ["yt:W0YdJ66fM_c", 198, 0, 0, 100, 1982, "Total Coelo", "Dracula's Tango", "clean"],
 ["yt:WANNqr-vcx0", 149, 0, 0, 100, 1967, "Jefferson Airplane", "White Rabbit", "clean"],

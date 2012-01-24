@@ -438,10 +438,10 @@ function flashChannel(){
 // consistent as possible. This is addressing issue 8
 function flashRequest() {
   var 
-    ix = 1250,
+    ix = 2250,
     body = "Log-in to the cyber request line!",
     interval,
-    period = body.length + 1500,
+    period = body.length + 2500,
     remaining,
     drawstart = period - body.length - 70,
     ival = setInterval(function(){
