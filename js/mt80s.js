@@ -354,8 +354,12 @@ function findOffset() {
   }
 
   if ( _index in _playerById ) {
+
     if (_duration[_index][RUNTIME] - lapse < YTLOADTIME_sec * 2) {
-      transition((_index + 1) % _duration.length, 0);
+      transition(
+        (_index + 1) % _duration.length, 
+        _duration[(_index + 1) % _duration.length][START]
+      );
     }
 
     if ( 
