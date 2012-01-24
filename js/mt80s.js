@@ -140,7 +140,7 @@ var
 
 _.each(_duration, function(row) { 
   row[OFFSET] = _runtime;
-  _runtime += row[RUNTIME] - 2;
+  _runtime += row[RUNTIME] - 3;
 });
 
 // }} // Globals
@@ -164,7 +164,7 @@ function mutetoggle(el){
 
 function secondarySwap(){
   var swapInterval = setInterval(function(){
-    if (_playerById[_index].getCurrentTime()  < _player[EXTRA].getCurrentTime()) {
+    if (_playerById[_index].getCurrentTime() < _player[EXTRA].getCurrentTime()) {
 
       // Nows our time to shine
       _playerById[_index].playVideo();
@@ -281,7 +281,7 @@ function setQuality(direction) {
               _player[EXTRA].setVolume(_duration[_index][VOLUME]);
             }
             myplayer.setVolume(0);
-            myplayer.seekTo(_player[EXTRA].getCurrentTime() + 1.5);
+            myplayer.seekTo(_player[EXTRA].getCurrentTime() + 3.5);
             myplayer.setPlaybackQuality(newQualityWord);
             secondarySwap();
           }, 500);
@@ -375,7 +375,7 @@ function findOffset() {
 
       // If we have been buffering for a while, 
       // then we will downsample and shift forward
-      if(_lagCounter > LAG_THRESHHOLD || 
+      if(_lagCounter > LAG_THRESHHOLD && 
         (drift < -YTLOADTIME_sec * 3 && _playerById[_index].getCurrentTime() > 0) 
         ) {
         setQuality(-1);
@@ -492,7 +492,7 @@ function transition(index, offset) {
     } else {
       _player[_next].setVolume(_duration[index][VOLUME]);
     }
-  }, Math.max((remainingTime() - 2) * 1000, 0));
+  }, Math.max((remainingTime() - 3) * 1000, 0));
 
   setTimeout(function(){
 

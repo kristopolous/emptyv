@@ -7,7 +7,7 @@ h1,h2,h3,h4,h5,h6,b{color:brown;margin:0}
 h1{width:auto;margin:30px -15px 10px}
 h2{margin-bottom:0px}
 h3{font-size:0.8em;font-weight:normal}
-h4{font-size:1.1em;font-weight:bold;margin-top:40px}
+h4{font-size:1.1em;font-weight:bold}
 h5{font-size:1em;font-weight:bold}
 h6{font-size:0.95em;margin:10px 0 -15px 0}
 .emp{color:#000;background:#cec}
@@ -17,9 +17,9 @@ a img{float:left;margin-left:-35px}
 .section{margin-left:45px;display:none}
 .section.sel{display:block}
 span{display:block;margin:10px 0}
-table{border-spacing:1;background:tan}
+table{border-spacing:1;background:#a44}
 th,td{background:white;padding:3px 6px}
-th{background:tan}
+th{background:#faa}
 #processing span{width:200px}
 span input, span textarea{display:block;font-size:1.1em;width:190px;margin-bottom:1em}
 #header{background:brown;font-size:2em;display:block;margin:0;height:3em;margin-top:0.15em;padding-left:0.25em}
