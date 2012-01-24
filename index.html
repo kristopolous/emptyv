@@ -5,10 +5,25 @@
 <style>
 #player-0,#player-1,#player-2{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 body{background:#000}
-#about{position:fixed;bottom:0;left:0;z-index:20;opacity:0.7}
 #mute{position:fixed;top:0;right:0;z-index:20;opacity:0.7;cursor:pointer;padding-left:10px}
 #mute:hover{background:white}
-#channel{text-align:center;width:100px;position:absolute;top:1em;left:1em;color:#8f8;font-family:"Lucida Console", Monaco, monospace;font-weight:bold;font-size:40px;z-index:10;line-height:0.85em}
+#channel{text-align:center;width:100px;position:absolute;top:1em;left:1em;color:#8f8;font-family:"Lucida Console", Monaco, monospace;font-weight:bold;font-size:40px;z-index:10;line-height:0.85em;opacity:0.6}
+a,a:visited{color:#FFF;
+text-decoration:none;
+font-style:italic
+}
+#request{
+text-align:center;
+font-family:"Lucida Console",Monaco,monospace;
+font-size: 28px;
+font-weight: bold;
+letter-spacing: 0;
+opacity:0.77;
+text-shadow:0px 0px 3px black;
+position: absolute;
+left:20%;
+display:block;
+z-index: 20}
 </style>
 </head>
 <body>
@@ -16,8 +31,8 @@ body{background:#000}
 <div id=vid1></div>
 <div id=vid2></div>
 <div id=channel>34<br>MTV</div>
-<a id=about target=_blank title="about mt80s.com" href=suggest.html#suggest><img src=images/mt80s_logo_animated.gif></a>
 <img title="Toggle Mute" onclick=mutetoggle(this) id=mute src=images/mute_off_32.png>
+<a id=request target=_blank href=suggest.html#suggest></a>
 </body>
 <script src=js/underscore-min.js></script>
 <script src=js/playlist.js></script>
