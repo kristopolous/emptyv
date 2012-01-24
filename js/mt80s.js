@@ -100,7 +100,7 @@ var
   // combat drift (basically by playing without hitting a buffer interval)
   //
   // We start at medium quality and then the skies the limit, I guess.
-  _currentLevel = 1,
+  _currentLevel = 2,
   
   // The lag counter is a token system that gets set by an interval.  If
   // we accumulate a certain negative or positive balance, then we can exchange
@@ -193,6 +193,8 @@ function secondarySwap(){
 // what is detected, probably in findOffset
 function setQuality(direction) {
   var 
+    supported = true,
+
     newQualityIndex = _currentLevel,
     newQualityWord,
                     
@@ -225,9 +227,13 @@ function setQuality(direction) {
   // If this video doesn't support the destination quality level
   if ( _.indexOf(activeAvailable, newQualityWord) === -1) {
     console.log("NOT SUPPORTED", newQualityWord, activeAvailable);
+
     // Use the highest one available (the lower ones are always available)
     // Get the word version of the highest quality available
     newQualityWord = _.last(activeAvailable);
+
+    // state that we are downsampling because of an incompatibility
+    supported = false;
   }
 
   // If this new, supported quality isn't the current one set
@@ -292,10 +298,14 @@ function setQuality(direction) {
           clearInterval(swapInterval);
         }
       }, 10);
-    }
 
-    // And set it as the default
-    _currentLevel = _.indexOf(LEVELS, newQualityWord);
+      // And sEt it as the default, but only if this isn't
+      // a forced down-sampling because of available quality
+      // limitations.
+      if(supported) {
+        _currentLevel = _.indexOf(LEVELS, newQualityWord);
+      }
+    } 
   }
 }
 
@@ -394,7 +404,6 @@ function findOffset() {
         // on to it to avoid some kind of weird seeking loop.
         _playerById[_index].seekTo(lapse + YTLOADTIME_sec);
       }
-
 
       // If our lagcounter is really low, then
       // we have been good and can up the quality at
