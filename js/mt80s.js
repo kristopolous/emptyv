@@ -140,7 +140,7 @@ var
 
 _.each(_duration, function(row) { 
   row[OFFSET] = _runtime;
-  _runtime += row[RUNTIME];
+  _runtime += row[RUNTIME] - 2;
 });
 
 // }} // Globals
@@ -203,7 +203,7 @@ function setQuality(direction) {
   }
 
   if(direction == -1) {
-    _qualityTimeout = 20 * YTLOADTIME_sec + getNow();
+    _qualityTimeout = 2 * YTLOADTIME_sec + getNow();
   } else if (direction > 0 && getNow() < _qualityTimeout) {
     return;
   }
@@ -338,6 +338,7 @@ function findOffset() {
       document.title = " " + [
         drift, 
         _lagCounter, 
+        _playerById[_index].getCurrentTime().toFixed(0),
         (_playerById[_index].getCurrentTime() - _duration[_index][RUNTIME]).toFixed(2),
         _index
       ].join('|');
@@ -374,7 +375,9 @@ function findOffset() {
 
       // If we have been buffering for a while, 
       // then we will downsample and shift forward
-      if(_lagCounter > LAG_THRESHHOLD || drift < -YTLOADTIME_sec * 3) {
+      if(_lagCounter > LAG_THRESHHOLD || 
+        (drift < -YTLOADTIME_sec * 3 && _playerById[_index].getCurrentTime() > 0) 
+        ) {
         setQuality(-1);
         _lagCounter -= LAG_THRESHHOLD;
 
@@ -477,7 +480,19 @@ function transition(index, offset) {
   // make sure that on first load there isn't some brief beginning
   // of video sequence then a seek.
   _player[_next].loadVideoById(uuid, offset);
-  _player[_next].pauseVideo();
+  _player[_next].setVolume(0);
+  _player[_next].playVideo();
+
+  setTimeout(function(){
+    _player[_next].seekTo(offset);
+    // Crank up the volume to the computed normalization
+    // level.
+    if(_muted) {
+      _player[_next].setVolume(0);
+    } else {
+      _player[_next].setVolume(_duration[index][VOLUME]);
+    }
+  }, Math.max((remainingTime() - 2) * 1000, 0));
 
   setTimeout(function(){
 
@@ -498,18 +513,8 @@ function transition(index, offset) {
     hide(_next);
     hide(EXTRA);
 
-    // Crank up the volume to the computed normalization
-    // level.
-    _player[_active].playVideo();
     _player[_active].index = index;
     _playerById[index] = _player[_active];
-
-    // Make sure that we observe the volume settings.
-    if(_muted) {
-      _player[_active].setVolume(0);
-    } else {
-      _player[_active].setVolume(_duration[index][VOLUME]);
-    }
 
     _index = index;
     setQuality();
