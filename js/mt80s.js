@@ -412,6 +412,28 @@ function flashChannel(){
     }, 1000);
 }
 
+function flashRequest() {
+  var 
+    ix = 400,
+    body = "Log-on to the cyber-request-line",
+    timeout = body.length + 600,
+    ival = setInterval(function(){
+      if(++ix % timeout > (timeout - body.length - 50)) {
+        var len = Math.min(timeout - (ix % timeout) - 42, body.length);
+        document.getElementById("request").innerHTML = body.slice(0, body.length - len) + "_";
+        if(timeout - (ix % timeout) < 32) {
+          if ((ix >> 2) % 2 == 0) { 
+            document.getElementById("request").style.visibility = "visible";
+          } else {
+            document.getElementById("request").style.visibility = "hidden";
+          }
+        }
+
+      } else if (ix % timeout == 0) {
+        document.getElementById("request").innerHTML = "";
+      }
+    }, 100);
+}
 
 function onYouTubePlayerReady(playerId) {
   var id = parseInt(playerId.substr(-1));
@@ -420,6 +442,7 @@ function onYouTubePlayerReady(playerId) {
   if(++_loaded === 3) {
     findOffset();
     flashChannel();
+    flashRequest();
     setInterval(findOffset, YTLOADTIME_sec * 1000 / 10);
   }
 }
