@@ -14,6 +14,8 @@ _words = {
 _bad = [
 ["yt:Xbt30UnzRWw", 1981, "Devo", "Whip it", EMBED],
 ["yt:I5hnCb-93WY", 1980, "The Undertones", "My Perfect Cousin", EMBED],
+["yt:qHYOXyy1ToI", 1980, "Joy Division", "Love Will Tear Us Apart", EMBED],
+["yt:826PTEuHKhE", 1986, "Tiffany", "I Think We're Alone Now", EMBED],
 ["yt:nmoHQ2DC3zo", 1984, "General Public", "Tenderness", EMBED],
 ["yt:mWgSgj3sJgo", 1983, "The Cure", "Love Cats", MISSING],
 ["yt:gMY4W0l4peY", 1986, "The Smiths", "Ask", MISSING],
