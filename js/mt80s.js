@@ -414,25 +414,25 @@ function flashChannel(){
 
 function flashRequest() {
   var 
-    ix = 550,
+    ix = 850,
     body = "Log-in to the cyber request line!",
     interval,
-    period = body.length + 800,
+    period = body.length + 1000,
     remaining,
-    drawstart = period - body.length - 80,
+    drawstart = period - body.length - 70,
     ival = setInterval(function(){
       ix++;
       interval = ix % period;
       if(interval > drawstart) {
         remaining = period - interval;
 
-        var len = Math.min(remaining - 72, body.length);
+        var len = Math.min(remaining - 62, body.length);
         document.getElementById("request").innerHTML = body.slice(0, body.length - len);
         if(len > 0) {
           document.getElementById("request").innerHTML += "_";
         }
 
-        if(remaining < 38) {
+        if(remaining < 28) {
           if ((interval >> 2) % 2 == 0) { 
             document.getElementById("request").style.visibility = "hidden";
           } else {
