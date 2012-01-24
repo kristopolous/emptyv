@@ -175,7 +175,7 @@ var _duration = [
 ["yt:Nm_QilrHkh8", 220, 0, 0, 100, 1986, "The Jets", "Crush on You", "clean"],
 ["yt:Nnpil_pRUiw", 283, 0, 0, 100, 1966, "The Beatles", "I am the Walrus", "clean"],
 ["yt:O1Q7Wj8IQTQ", 231, 0, 0, 100, 1984, "Ruins", "Fire", "clean"],
-["yt:O8PyqxPLUeA", 213, 0, 0, 100, 1983, "The Psychedelic Furs", "Love My Way", "clean ytad"],
+//["yt:O8PyqxPLUeA", 213, 0, 0, 100, 1983, "The Psychedelic Furs", "Love My Way", "clean ytad"],
 ["yt:OG3PnQ3tgzY", 273, 0, 0, 100, 1982, "Taco", "Puttin on the Ritz", "clean"],
 ["yt:Oak4_095Cug", 206, 0, 0, 100, 1982, "ABC", "The Look of Love", "clean ytad title"],
 ["yt:OkE3piTWME8", 207, 0, 0, 100, 1978, "Sylvester", "Can't Stop Dancing", "logo title"],
