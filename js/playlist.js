@@ -220,7 +220,7 @@ var _duration = [
 ["yt:WZ-1DYwaxrE", 230, 0, 0, 100, 1983, "Freez", "I.O.U", "clean"],
 ["yt:Wn9E5i7l-Eg", 257, 0, 0, 100, 1988, "Pet Shop Boys", "What Have I Done To Deserve This?", "vevo"],
 ["yt:X2LTL8KgKv8", 233, 0, 0, 100, 1983, "Corey Hart", "Sunglasses At Night", "vevo"],
-["yt:XS2YMu56vC0", 253, 0, 0, 100, 1985, "Tears For Fears", "Head over Heals", "clean ytad badtitle"],
+["yt:be0mRpzdAT4", 257, 5, 5, 100, 1985, "Tears For Fears", "Head over Heals", "clean ytad badtitle"],
 ["yt:XeJLZi0uyJw", 220, 0, 0, 100, 1984, "Sheila E.", "The Glamorous Life", "rage logo"],
 ["yt:Xuz94ZIPfJk", 298, 0, 0, 100, 1984, "Bronski Beat", "Smalltwon Boy", "mtv2 logo ytad title"],
 ["yt:YEZSpj5R5L4", 123, 0, 0, 100, 1981, "Sandii & The Sunsetz", "Alive", "mtv2 logo"],

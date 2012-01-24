@@ -397,12 +397,29 @@ function findOffset() {
   }
 }
 
+function flashChannel(){
+  var 
+    ix = 0,
+    ival = setInterval(function(){
+      if(++ix % 2 == 0) {
+        document.getElementById("channel").style.display = "none";
+        if(ix > 7) {
+          clearInterval(ival);
+        }
+      } else {
+        document.getElementById("channel").style.display = "block";
+      } 
+    }, 1000);
+}
+
+
 function onYouTubePlayerReady(playerId) {
   var id = parseInt(playerId.substr(-1));
   _player[ id ] = document.getElementById(playerId);
 
   if(++_loaded === 3) {
     findOffset();
+    flashChannel();
     setInterval(findOffset, YTLOADTIME_sec * 1000 / 10);
   }
 }
