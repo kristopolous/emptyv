@@ -384,7 +384,7 @@ function findOffset() {
       if(_lagCounter > LAG_THRESHHOLD && 
         (drift < -YTLOADTIME_sec * 3 && _playerById[_index].getCurrentTime() > 0) 
         ) {
-        console.log(_lagCounter, LAG_THRESHHOLD, drift, YTLOADTIME_sec, _index, playerByIs[_index].getCurrentTime());
+        console.log(_lagCounter, LAG_THRESHHOLD, drift, YTLOADTIME_sec, _index, playerById[_index].getCurrentTime());
         setQuality(-1);
         _lagCounter -= LAG_THRESHHOLD;
 
@@ -429,10 +429,10 @@ function flashChannel(){
 // consistent as possible. This is addressing issue 8
 function flashRequest() {
   var 
-    ix = 850,
+    ix = 1250,
     body = "Log-in to the cyber request line!",
     interval,
-    period = body.length + 1000,
+    period = body.length + 1500,
     remaining,
     drawstart = period - body.length - 70,
     ival = setInterval(function(){
