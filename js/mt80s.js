@@ -48,6 +48,8 @@ var
   // An extra player
   EXTRA = 2,
 
+  NEXTVIDEO_PRELOAD = 3,
+
   // @ref: http://code.google.com/apis/youtube/flash_api_reference.html
   LEVELS = ["small", "medium"];//, "large"]; //, "hd720", "hd1080", "highres"];
 
@@ -140,7 +142,7 @@ var
 
 _.each(_duration, function(row) { 
   row[OFFSET] = _runtime;
-  _runtime += row[RUNTIME] - 3;
+  _runtime += row[RUNTIME] - NEXTVIDEO_PRELOAD;
 });
 
 // }} // Globals
@@ -400,6 +402,8 @@ function findOffset() {
   }
 }
 
+// This is the 34 / MTV effect at the beginning (working towards fixing
+// issue #8)
 function flashChannel(){
   var 
     ix = 0,
@@ -415,6 +419,9 @@ function flashChannel(){
     }, 1000);
 }
 
+// This is the replacement to get to the reqest and legal part of the site
+// It's a gammification style operation and made to look as thematically
+// consistent as possible. This is addressing issue 8
 function flashRequest() {
   var 
     ix = 850,
@@ -492,7 +499,7 @@ function transition(index, offset) {
     } else {
       _player[_next].setVolume(_duration[index][VOLUME]);
     }
-  }, Math.max((remainingTime() - 3) * 1000, 0));
+  }, Math.max((remainingTime() - NEXTVIDEO_PRELOAD) * 1000, 0));
 
   setTimeout(function(){
 
