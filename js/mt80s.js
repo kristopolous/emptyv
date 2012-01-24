@@ -51,7 +51,7 @@ var
   NEXTVIDEO_PRELOAD = 3,
 
   // @ref: http://code.google.com/apis/youtube/flash_api_reference.html
-  LEVELS = ["small", "medium"];//, "large"]; //, "hd720", "hd1080", "highres"];
+  LEVELS = ["small", "medium", "large"]; //, "hd720", "hd1080", "highres"];
 
 // }} // Constants
 
@@ -100,7 +100,7 @@ var
   // combat drift (basically by playing without hitting a buffer interval)
   //
   // We start at medium quality and then the skies the limit, I guess.
-  _currentLevel = 0,
+  _currentLevel = 1,
   
   // The lag counter is a token system that gets set by an interval.  If
   // we accumulate a certain negative or positive balance, then we can exchange
@@ -196,7 +196,7 @@ function setQuality(direction) {
     newQualityIndex = _currentLevel,
     newQualityWord,
                     
-    activeAvailable = _playerById[_index].getAvailableQualityLevels().reverse().slice(0, 2),
+    activeAvailable = _playerById[_index].getAvailableQualityLevels().reverse(),
     activeQualityWord = _playerById[_index].getPlaybackQuality();
 
   // If no video is loaded, then go no further.
@@ -204,11 +204,12 @@ function setQuality(direction) {
     return;
   }
 
-  if(direction == -1) {
+  if(direction === -1) {
     _qualityTimeout = 2 * YTLOADTIME_sec + getNow();
   } else if (direction > 0 && getNow() < _qualityTimeout) {
     return;
   }
+
   // If the lapse has dropped and the direction is specific
   if(direction) {
     newQualityIndex = Math.min(
@@ -223,7 +224,6 @@ function setQuality(direction) {
 
   // If this video doesn't support the destination quality level
   if ( _.indexOf(activeAvailable, newQualityWord) === -1) {
-    eval(_inject("a"));
     console.log("NOT SUPPORTED", newQualityWord, activeAvailable);
     // Use the highest one available (the lower ones are always available)
     // Get the word version of the highest quality available
@@ -384,6 +384,7 @@ function findOffset() {
       if(_lagCounter > LAG_THRESHHOLD && 
         (drift < -YTLOADTIME_sec * 3 && _playerById[_index].getCurrentTime() > 0) 
         ) {
+        console.log(_lagCounter, LAG_THRESHHOLD, drift, YTLOADTIME_sec, _index, playerByIs[_index].getCurrentTime());
         setQuality(-1);
         _lagCounter -= LAG_THRESHHOLD;
 
@@ -528,7 +529,7 @@ function transition(index, offset) {
     _playerById[index] = _player[_active];
 
     _index = index;
-    setQuality();
+    setQuality(0);
   }, remainingTime() * 1000);
 }
 
