@@ -35,6 +35,7 @@ _bad = [
 ["yt:DhX6DniAwGg", 1985, "Duran Duran", "White Lines", BAD],
 ["yt:KRb7Atx6afA", 1984, "Babys Gang", "Challenger", POOR],
 ["yt:Ldyx3KHOFXw", 1979, "Gary Numan", "Cars", EMBED],
+["", 1980, "Haircut 100", "Love Plus One", BAD],
 ["yt:Q_30vrkg8Xo", 1983, "Jacksons", "Can You Feel It", POOR], 
 ["yt:TDzkAmwCo6Y", 1989, "Gloria Estefan", "Dr. Beat", WRONG],
 ["yt:TMZi25Pq3T8", 1986, "N.W.A.", "Straight Outta Compton", WRONG],
