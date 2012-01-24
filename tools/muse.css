@@ -1,0 +1,78 @@
+body{color:#585;margin:0;background:black;font-size:14px;font-family:"Trebuchet MS", Helvetica, sans-serif}
+h2,h1,span,p,body,*,li,ul{color:#585}
+body.main{background:#000 url(fa_back.png) no-repeat}
+a{border:0;color:#226;letter-spacing:0}
+img{border:0}
+a:hover{text-decoration:underline}
+#b{margin-top:20%}
+h1{font-size:3.5em;letter-spacing:-0.1em;margin:0;line-height:1em}
+.main tt{position:fixed;bottom:0;left:0;display:block;width:100%;text-align:center;color:#888;font-weight:normal}
+#main *{background:black;color:#585;border-color:#585;font-size:1.25em;margin:0 3px;padding:3px;}
+#main{margin:0.5em 0}
+#main input:hover{border-color:#afa}
+#b{display:inline-block;text-align:left}
+#b a{color:#338;margin:0 0.25em}
+#q{color:#8f8}
+.clickable{color:#44f;cursor:pointer}
+.expandable{color:#080;cursor:pointer}
+.played{color:#616}
+.playing{color:#c6c}
+.bummer{color:#555;cursor:pointer}
+textarea{width:500px;color:#aaa;background:#000;border:1px solid #222;letter-spacing:0;line-height:16px;font-size:14px;font-family:"Trebuchet MS", Helvetica, sans-serif}
+#prefix{background:#000;border:1px solid #222;color:#aaa}
+#prefix:hover{border-color:#333}
+h4{color:#223;margin-bottom:0.10em;font-size:1.25em;margin-top:0.6em}
+#list{margin-left:0.25em}
+button{background:#000;color:#686;border-color:#242;float:right;border-width:1px;cursor:pointer;margin:0;margin-bottom:0.5em}
+.child{height:0;margin-left:1em;margin-top:-0.15em;overflow:hidden}
+#links a{line-height:20px}
+#links .child a{line-height:16px}
+#links input{background:black;color:#8f8;width:20em;border-width:1px;border-style:solid;border-color:#226}
+#vidCon{position:fixed;top:0;right:0;width:425px;overflow:hidden}
+#contact{position:fixed;right:0;bottom:0}
+#vidWrap *{position:absolute;top:0;left:0}
+#vidWrap{position:relative;height:356px}
+#toggle{position:fixed;bottom:0;left:0;background:#001;padding:0.25em 0.75em}
+#toggle a{cursor:pointer}
+#q,#hint{width:10em}
+#hint{position:absolute;background:#223;min-height:0;display:none}
+#hint a {background:transparent;color:#8f8;text-decoration:none;font-size:0.75em;display:block}
+#hint a:hover {background:#8f8;text-decoration:none;color:#223}
+#nav a{border:1px solid #226;display:inline-block;width:30px;
+	height:15px;color:#226;
+	line-height:10px;
+	font-size:1.5em;
+	cursor:pointer;
+	text-align:center;
+	margin:3px;
+}
+#title{border:0;background:transparent;color:#44f;width:80%}
+#nav a.disabled{cursor:default;color:#555;border-color:#555}
+#nav a.disabled:hover{color:#555;border-color:#555}
+#nav H2{display:inline-block;margin:0;font-size:15px;color:#448}
+#nav a:hover{text-decoration:none;color:#44f;border-color:#44f}
+#rem #up,#rem #down{font-size:0.9em;vertical-align:top;font-weight:bold}
+#rem{position:absolute;top:0;right:0}
+p{margin:0.25em 0}
+.emp{color:#55d;cursor:pointer}
+#list a{white-space:nowrap;}
+#list .del{color:#55d;cursor:pointer}
+#list .link img{border:0;vertical-align:middle}
+#top h1{display:inline;opacity:0.4}
+tt{display:block;margin-left:0.25em}
+blockquote{margin:0.5em}
+#playSave{position:relative;display:inline-block;margin-top:-1em}
+a.special{color:#44f;margin-top:2em;display:block}
+#other h1{margin-top:0.5em;margin-bottom:-0.25em;margin-left:0.10em}
+#other h2{color:#558;margin:0;display:block}
+#desc a, #other a{color:#55f}
+#other h2 a{color:#558;margin:0;display:block}
+#other span{margin:1.5em 0.5em 0.5em 1.5em;padding:0.5em 1em;background:url(w10.png);display:inline-block;min-width:300px;max-width:300px;vertical-align:top;width:300px}
+#desc img{margin:0 0.75em}
+#desc{margin:1.5em 0 -0.5em 0}
+#desc h2{color:#558;margin:0;display:inline}
+#desc ul{margin:0;padding:0 1em;display:inline-block;color:#585}
+#desc li{margin:0;list-style:square;font-size:0.8em;color:#585}
+#limited{width:750px}
+span.notice{display:block;width:310px;background:#100;border:1px solid #400;margin:1em 1.5em 0 1.5em;padding:0.5em;color:#80c;font-size:1em}
+#tnail{position:fixed;bottom:0;right:0}
