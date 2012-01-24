@@ -418,8 +418,8 @@ function flashRequest() {
     body = "Log-on to the cyber-request-line",
     timeout = body.length + 600,
     ival = setInterval(function(){
-      if(++ix % timeout > (timeout - body.length - 50)) {
-        var len = Math.min(timeout - (ix % timeout) - 42, body.length);
+      if(++ix % timeout > (timeout - body.length - 70)) {
+        var len = Math.min(timeout - (ix % timeout) - 62, body.length);
         document.getElementById("request").innerHTML = body.slice(0, body.length - len) + "_";
         if(timeout - (ix % timeout) < 32) {
           if ((ix >> 2) % 2 == 0) { 
