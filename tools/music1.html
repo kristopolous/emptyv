@@ -1,0 +1,625 @@
+<!DOCTYPE HTML PUBLIC "http://www.w3.org/TR/html4/loose.dtd">
+<link rel=stylesheet href=muse.css>
+<img id=tnail>
+<div id=contact><a href=mailto:chris+music@qaa.ath.cx>email author</a></div>
+<div id=vidCon>
+<div id=nav><a class=disabled id=prev>&#8592;</a><a class=disabled id=next>&#8594;</a><input id=title value=""><div id=rem><a id=up class=disabled onclick=go_up()>&#8593;</a><a id=down class=disabled onclick=go_down()>&#8595;</a><a id=del class=disabled onclick=remove()>x</a></div></div>
+<div id=vidWrap>
+<div id=vid0></div>
+<div id=vid1></div>
+</div>
+<div id=list></div></div>
+<span id=links></span>
+<div style=text-align:right;display:inline-block;width:500px>
+<a class=emp id=playSave onclick=playlistGen()></a>
+<textarea rows=7 id=n></textarea>
+<input style=float:left alt="Prefix" title="Prefix" id=prefix value="">
+<button onclick=parse()>Add Tunes</button>
+</div>
+<div id=directions>
+<h4 style=color:#232;display:inline>Youtube Jukebox</h4><h4 style=display:inline-block;margin:0;margin-left:1em><a style="text-decoration:none;border-bottom:1px solid #22a" target=_blank href=http://qaa.ath.cx/watch.html#url=demo.flv>Watch The Demo (&lt;45s)</a></h4>
+<blockquote>
+<p>Copy/Paste playlists in the box above, one tune per line.<br>Try copying the list below and pasting it in the box to see how it works.</p>
+<tt>
+Incredible Bongo Band - Apache<br>
+The Salsoul Orchestra - Getaway<br>
+The Brothers - Under The Skin<br>
+Boney M - Ma Baker
+</tt>
+<p>You have to click "Add Tunes" when you are done of course. :-)</p>
+<p>You can even generate playlists like this: <a href=http://qaa.ath.cx/music.html#21>http://qaa.ath.cx/music.html#21</a></p>
+</blockquote>
+</div>
+<script src=../js/jquery-1.7.1.min.js></script>
+<script src=../js/swfobject.js></script>
+<script>
+var   
+  index = 0,
+  val,
+  vid,
+  lastVid,
+  list,
+  play = {
+    list: {},
+    length: 0,
+    intransit: false,
+    nextFlag: true
+    /* active: 0 */
+    /* current: 0 */
+    /* id: undefined */
+  },
+  /*
+  player = [],
+  */
+  player,
+  first = true,
+  visited = {},
+  prev,
+  next,
+  input,
+  ul;
+function playlistGen(){
+  var   addon = '',
+    o = [];
+  if(play.id) {
+    addon = 'id=' + play.id;
+  }
+  for(ix in play.list) {
+    if(play.list[ix].ttl) {
+      o.push(play.list[ix].ttl);
+    }
+  }
+  $("#playSave").html('Updating...');
+  $.post('/srv/ytplaylist.php?' + addon, {ttl: o.join('\n')}, function(url) {
+    if(!play.id) {
+      play.id = url;
+      url = window.location.toString().split('#')[0] + '#' + play.id;
+      urlReload = window.location.toString().split('#')[0] + '#' + play.id;
+      $("#directions").html('PlayList URL: <a class=clickable href=' + urlReload + '>' + url + '</a>').fadeIn(1000);
+    }
+    $("#playSave").html('');
+  });
+}
+
+function transition(id, opts) {
+  player.stopVideo();
+  player.loadVideoById(id + "&ap=%2526fmt%3D18");
+  player.playVideo();
+}
+
+
+function updateytplayer(){
+  if(player.getCurrentTime() > 0) {
+    if(player.getDuration() - player.getCurrentTime() < 10) {
+      if(play.nextFlag == true) {
+        go_next();
+        play.nextFlag = false;
+      }
+    }
+  }
+}
+function onYouTubePlayerReady(playerId) {
+  player = document.getElementById(playerId);
+  setInterval(updateytplayer, 250);
+  player.playVideo();
+}
+
+function loader(obj,el) {
+  $(el).addClass('played');
+  if(typeof (player) == 'undefined') {
+    var params = { allowScriptAccess: "always" };
+    var atts = { id: "ytplayer0"/*, wmode: 'transparent' */};
+    swfobject.embedSWF("http://www.youtube.com/v/" + obj[0] + "?enablejsapi=1&playerapiid=ytplayer0&ap=%2526fmt%3D18", "vid0", "425", "356", "8", null, null, params, atts);
+  } else {
+    transition(obj[0]);
+  }  
+  visited[obj[0]] = true;
+}
+
+function go_next(){
+  while(play.current++ < play.length) {
+    if(play.list[play.current]) {
+      viewer.apply(play.list[play.current].el);
+      return true;
+    }
+  } 
+  play.current = -1;
+  go_next();
+}
+function plupdate(){
+  if(play.id) {
+    $("#playSave").html('Update Playlist');
+  } else {
+    $("#playSave").html('Save Playlist');
+  }
+}
+function move(amount) {
+  if(amount > 0) {
+    amount = get_next();
+    if(amount === false) {
+      return;
+    }
+  } else {
+    amount = get_prev();
+    if(amount === false) {
+      return;
+    }
+  }
+
+  var   swap = play.list[play.current + amount].el.innerHTML,
+    className = play.list[play.current + amount].el.className,
+    url = play.list[play.current + amount].url;
+
+  play.list[play.current + amount].el.innerHTML = play.list[play.current].el.innerHTML ;
+  play.list[play.current + amount].el.id = play.current;
+  play.list[play.current + amount].url = play.list[play.current + amount].url;
+  $(play.list[play.current + amount].el).addClass('playing');
+
+  play.list[play.current].el.innerHTML = swap;
+  play.list[play.current].el.id = play.current + amount;
+  play.list[play.current].url = url;
+  play.list[play.current].el.className=className;
+
+  play.current += amount;
+  lastVid = play.list[play.current].el;
+  buttoncheck();
+}
+function go_up(){
+  if(play.current > 0) {
+    move(-1);
+  }
+}
+function go_down(){
+  if(play.current < play.length) {
+    move(1);
+  }
+}
+function get_next(){
+  var tmp = play.current;
+  while(tmp ++ <= play.length) {
+    if(play.list[tmp]) {
+      return tmp - play.current;
+    }
+  } 
+  return false;
+}
+function get_prev(){
+  var tmp = play.current;
+  while(tmp -- > 0) {
+    if(play.list[tmp]) {
+      return tmp - play.current;
+    }
+  }
+  return false;
+}
+function go_prev(){
+  while(play.current-- >= 0) {
+    if(play.list[play.current]) {
+      viewer.apply(play.list[play.current].el);
+      return true;
+    }
+  }
+  return false;
+}
+function remove(){
+  if(typeof play.current == 'number') {
+    $(play.list[play.current].el.nextSibling).remove();
+    $(play.list[play.current].el).remove();
+    delete play.list[play.current];
+    if(!go_next()){
+      go_prev();
+    }
+    plupdate();
+  }
+}
+function buttoncheck(){
+  if(play.current > 0) {
+    prev.removeClass('disabled');
+    $("#up").removeClass('disabled');
+  } else {
+    prev.addClass('disabled');
+    $("#up").addClass('disabled');
+  }
+  if((play.current + 1) < play.length) {
+    next.removeClass('disabled');
+    $("#down").removeClass('disabled');
+  } else {
+    next.addClass('disabled');
+    $("#down").addClass('disabled');
+  }
+}
+
+function removevid(id, vidid){
+  var topost = [], ix, len, tmp;
+  play.list[id].url.splice(vidid, 1);
+
+  tmp = play.list[id].url;
+  len = tmp.length;
+  for(ix = 0; ix < len; ix++) {
+    topost.push(tmp[ix].join("\t"));
+  }
+  $.post('/srv/ytsearch.php?q=' + play.list[id].ttl, {value: topost.join("\n")});
+  viewer.list(id);
+}
+
+viewer = function(){
+  var  id = this.ix,
+    ix,
+    played = "";
+
+  loader(play.list[id].url[0]);
+  first = false;
+  played = " played";
+  play.current = parseInt(this.ix);
+  buttoncheck();
+
+  var val = this.innerHTML;
+  val = val.replace(/\&amp;/, '&');
+  $("#title").val(val);
+
+  viewer.list(id);
+      
+  if(lastVid) {
+    $(lastVid).removeClass('playing').addClass('played');
+  }
+  lastVid = this;
+  $(this).addClass('playing');
+}
+viewer.list = function(id){
+  var   len = play.list[id].url.length,
+    o = [],
+    ix;
+
+  for(ix = 0; ix < len; ix++) {
+    if(play.list[id].url[ix][1]) {
+      if(visited[play.list[id].url[ix][0]]) {
+        played = " played"; 
+      }
+      o.push('<a class=del onclick=removevid(' + id + ',' + ix + ')>X</a> <a target=_blank class=link  href=http://www.youtube.com/watch?v=' + play.list[id].url[ix][0] + '><img src=link.gif></a>' + play.list[id].url[ix][0] + '<a yt=' + play.list[id].url[ix][0] + ' class="clickable' + played + '" onclick=\'loader(["' + play.list[id].url[ix][0] + '","' + escape(play.list[id].url[ix][1]) + '"],this)\'>'+ play.list[id].url[ix][1].substr(0,50) + '</a><br>');
+      played = "";
+    }
+  }
+  $(list).html( o.join(''));
+  $(".clickable", list).mouseover(function(which) {
+    $("#tnail").attr('src', 'http://i2.ytimg.com/vi/' + this.getAttribute('yt') + '/default.jpg');
+  });
+
+}
+$(document).ready(function() {
+  vid = document.getElementById('vid');
+  list = document.getElementById('list');
+  ul = document.getElementById('links');
+  input = document.getElementById('n');
+  function check() {
+    if(window.location.hash && (play.id != window.location.hash.toString().substr(1))) {
+      play.id = window.location.hash.toString().substr(1);
+      $("#directions").html("Loading Playlist ... please wait");
+      $.get('/srv/ytplaylist.php?id=' + play.id, function(ttls) {
+        ul.innerHTML='';
+        play.list = {};
+        play.length = 0;
+        play.current = 0;
+        index = 0;
+        first = true;
+        input.value = ttls;
+        parse();
+        $("#playSave").html('');
+      });
+    }
+  }
+  if(window.location.search.length > 0) {
+    query = window.location.search.toString().substr(1);
+    $("#directions").html("Finding " + query.substr(2).replace(/\+/g,' ') + "...please wait");
+    document.title = query.substr(2).replace(/\+/g, ' ') + ' - FindArtist';
+    $.get('/srv/artist.php', {a: query.substr(2)});
+    ul.innerHTML='';
+    play.list = {};
+    play.length = 0;
+    play.current = 0;
+    index = 0;
+    first = true;
+    $("#playSave").html('');
+    /*
+    $.get('/srv/disco_search.php?' + query, function(res) {
+      input.value = res;
+      parse();
+    });
+    */
+    $.get('/srv/lastfm_search.php?' + query, function(res) {
+      input.value = res;
+      parse();
+    });
+  }
+  check();
+  setInterval(check, 250);
+
+  prev = $("#prev");
+  next = $("#next");
+  $("#title").val('');
+  next.mousedown(function(e){
+    e.preventDefault();
+  })
+  prev.mousedown(function(e){
+    e.preventDefault();
+  })
+  $("#title").keydown(function(e){
+    var kc;                                                         
+    if (window.event) kc = window.event.keyCode;                    
+    else if (e) kc = e.which;     
+    if(kc == 13) {
+      play.list[play.current].ttl = this.value;
+      play.list[play.current].el.innerHTML = this.value;
+      play.list[play.current].el.className = "";
+      first = true;
+      addlist(play.current, this.value);
+      plupdate();
+    }
+  });
+  next.click(go_next);
+  prev.click(go_prev);
+});
+function changeup(el) {
+  var ix=el.getAttribute('ix');
+  var input = $("<input ix=" + ix + " value='" + el.innerHTML.replace("'", '"') + "'></input>");
+  play.list[ix].el = input;
+
+  $(el).replaceWith(input);
+  input.select();
+  input.keydown(function(e){
+    var kc;                                                         
+    if (window.event) kc = window.event.keyCode;                    
+    else if (e) kc = e.which;     
+    if(kc == 13) {
+      var ix = this.getAttribute('ix');
+      var ttl = this.value;
+      var el= document.createElement('a');
+      el.innerHTML = ttl;
+      var elOld = play.list[ix].el;
+      elOld.replaceWith(el);
+      play.list[ix].el = el;
+      play.list[ix].ttl = ttl;
+      addlist(ix, ttl);
+      plupdate();
+    }
+  });
+  plupdate();
+}
+function addlist(id, qstr, artist) {
+  if(artist) {
+    play.list[id].artist = artist;
+    artist='&a='+escape(artist);
+  } else if(play.list[id].artist) {
+    artist = '&a='+escape(play.list[id].artist);
+  } else {
+    artist = '';
+  }
+  $.get('/srv/ytsearch.php?ix=' + id + '&q=' + escape(qstr) + artist, function(m) {
+    lines = m.split('\n');
+    id = lines.shift();
+
+    var   len = lines.length,
+      o = [],
+      s = [],
+      tmp,
+      ix;
+
+    if(len == 1) {
+      if(!play.list[id].attempt) {
+        play.list[id].attempt = 0;
+      }
+      var   attempt = play.list[id].attempt,
+        tmp = start = play.list[id].el.innerHTML;
+      do {
+        attempt++;
+        tmp = strip(tmp, attempt, id);
+      } while(tmp == start);
+      play.list[id].attempt = attempt;
+      if(tmp) {
+        play.list[id].ttl = tmp;
+        play.list[id].el.innerHTML = tmp;
+        addlist(id, tmp);
+      } else {
+        $(play.list[id].el).replaceWith('<span ix=' + id + ' onclick=changeup(this) class=bummer>' + 
+          play.list[id].el.innerHTML + '</span>');
+      }
+    } else {
+      console.log(id);
+      play.list[id].el.className = 'clickable';
+      play.list[id].el.ix = id;
+      play.list[id].url = [];
+      for(ix = 0; ix < len; ix++) {
+        play.list[id].url.push(lines[ix].split('\t'));
+      }
+      if(first) {
+        viewer.apply(play.list[id].el);
+        $("#del").removeClass('disabled');
+      }
+      $(play.list[id].el).click(viewer);
+    }
+  });
+}
+
+// whitespace cleanse
+function ws_cleanse(str) {
+  str = str.replace(/^\s*/, '');
+  str = str.replace(/^\s$/, '');
+  str = str.replace(/\s+/g, ' ');
+  return str;
+}
+// try to strip failed finds
+function strip(str, level, id) {
+  switch(level) {
+    case 1:
+      // remove the [.*]
+      return ws_cleanse(str.replace(/\[[^\]]*\]/, ''));
+      break;
+    case 2:
+      // remove the (.*)
+      return ws_cleanse(str.replace(/\([^\)]*\)/, ''));
+      break;
+    case 3:
+      // remove years
+      return ws_cleanse(str.replace(/[0-9]*/, ''));
+      break;
+      // all attempts have been exhausted
+    case 4:
+      if(play.list[id].artist) {
+        return play.list[id].artist;
+      } 
+      break;
+    default:
+      break;
+  }
+  return false;
+}
+function parse(){
+  val = input.value;
+  input.value = '';
+
+  val = val.replace(/[\'*+,"]/g, '');
+  // white space stripping
+  val = val.replace(/^\ *(.*)\ *$/, '$1');
+  // extra newlines
+  val = val.replace(/[\n\r]+/, '\n');
+  
+  els = val.split('\n');
+
+  var   len = els.length,
+    lastVid,
+    chld,
+    ix;
+  $("#directions").fadeOut(3000, "linear", function(){
+    this.innerHTML = '';
+    this.style.display="block";
+  });
+
+  play.length += els.length;
+
+  plupdate();
+
+  var prefix = $("#prefix").val();
+  $("#prefix").val('');
+
+  for(ix = 0; ix < len; ix++) {
+    // ~'s & -'s
+    els[ix] = els[ix].replace(/[~\-]/g, ' ');
+
+    // 10. etc...
+    els[ix] = els[ix].replace(/^[0-9]*[\.)]*[0-9]*\s*/, '');
+
+    // "A1", "B2" format
+    els[ix] = els[ix].replace(/^[A-Z][1-9]\s/g, '');
+
+    // discogs, 'written by'
+    els[ix] = els[ix].replace(/Written By.*/, '');
+
+    // numerical extra links
+    els[ix] = els[ix].replace(/\([0-9]*\)/, '');
+
+    // extra whitespace
+    els[ix] = ws_cleanse(els[ix]);
+
+    // times go bye bye
+    els[ix] = els[ix].replace(/\(*[0-9]+:[0-9]+\)*/, '');
+
+    input.value += els[ix];
+    [artist, song] = els[ix].split('-');
+    if(song) {
+      artist = artist.replace(/\s+$/, '');
+      els[ix] = els[ix].replace(/-/g, '');
+      els[ix] = els[ix].replace(/^\s+/g, ' ');
+    } 
+    els[ix] = [prefix, els[ix]].join(' ');
+    els[ix] = ws_cleanse(els[ix]);
+    if(els[ix].length > 2) {
+      play.list[index] = {};
+      play.list[index].el = ul.appendChild(document.createElement('a'));
+      play.list[index].el.appendChild(document.createTextNode(els[ix]));
+      play.list[index].ttl = els[ix];
+      ul.appendChild(document.createElement('br'));
+      addlist(index, els[ix], artist);
+      index++;
+    }
+  }
+}
+
+
+
+function transition_stillbuggy(id, opts) {
+  player[play.next].loadVideoById(id + "&ap=%2526fmt%3D18");
+  $("#ytplayer" + play.active).css('visibility', 'hidden');
+  $("#ytplayer" + play.next).css('visibility', 'visible');
+  player[play.active].stopVideo();
+  player[play.next].playVideo();
+
+  play.active++;
+  play.next++;
+  play.active %= 2;
+  play.next %= 2;
+  play.nextFlag = true;
+}
+
+function transition_buggy(id, opts) {
+  if(play.intransit == true) {
+    // do a hard next
+    next();
+    play.intransit = false;
+  }
+  var 
+    time = 1000,
+    divisions = 10,
+    step = time / divisions,
+    current = time,
+    percent,
+    
+    vols = {
+      active: player[play.active].getVolume(),
+      next: player[play.next].getVolume()
+    };
+
+  $("#ytplayer" + play.next).css('visibility', 'visible');
+  $("#ytplayer" + play.next).css('opacity', 0);
+
+  player[play.next].setVolume(0);
+  player[play.next].loadVideoById(id + "&ap=%2526fmt%3D18");
+
+  play.intransit = true;
+  function next() {
+    $("#ytplayer" + play.active).css('visibility','hidden');
+    player[play.active].stopVideo();
+    player[play.active].setVolume(vols.active);
+
+    play.active++;
+    play.next++;
+    play.active %= 2;
+    play.next %= 2;
+    play.nextFlag = true;
+    $("#ytplayer" + play.active).css('opacity',1);
+  }
+
+  function transit() {
+    if(play.intransit == false) {
+      return;
+    }
+    if(current == time) {
+      player[play.next].playVideo();
+    }
+    current -= step;
+    percent = current / time;
+    $("#ytplayer" + play.active).css('opacity', percent);
+    $("#ytplayer" + play.next).css('opacity', 1 - percent);
+
+    player[play.active].setVolume(percent / 2 * vols.active);
+    player[play.next].setVolume((1 - percent) * vols.next);
+    if(current > 0) {
+      setTimeout(arguments.callee, step);
+    } else {
+      play.intransit = false;
+      next();
+    }
+  }
+  setTimeout(transit,2000);
+}
+</script>
+
+
