@@ -414,23 +414,35 @@ function flashChannel(){
 
 function flashRequest() {
   var 
-    ix = 400,
-    body = "Log-on to the cyber-request-line",
-    timeout = body.length + 600,
+    ix = 550,
+    body = "Log-in to the cyber request line!",
+    interval,
+    period = body.length + 800,
+    remaining,
+    drawstart = period - body.length - 80,
     ival = setInterval(function(){
-      if(++ix % timeout > (timeout - body.length - 70)) {
-        var len = Math.min(timeout - (ix % timeout) - 62, body.length);
-        document.getElementById("request").innerHTML = body.slice(0, body.length - len) + "_";
-        if(timeout - (ix % timeout) < 32) {
-          if ((ix >> 2) % 2 == 0) { 
-            document.getElementById("request").style.visibility = "visible";
-          } else {
-            document.getElementById("request").style.visibility = "hidden";
-          }
+      ix++;
+      interval = ix % period;
+      if(interval > drawstart) {
+        remaining = period - interval;
+
+        var len = Math.min(remaining - 72, body.length);
+        document.getElementById("request").innerHTML = body.slice(0, body.length - len);
+        if(len > 0) {
+          document.getElementById("request").innerHTML += "_";
         }
 
-      } else if (ix % timeout == 0) {
+        if(remaining < 38) {
+          if ((interval >> 2) % 2 == 0) { 
+            document.getElementById("request").style.visibility = "hidden";
+          } else {
+            document.getElementById("request").style.visibility = "visible";
+          }
+        } 
+
+      } else if (interval == 0) {
         document.getElementById("request").innerHTML = "";
+        document.getElementById("request").style.visibility = "visible";
       }
     }, 100);
 }
