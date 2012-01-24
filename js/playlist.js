@@ -216,7 +216,7 @@ var _duration = [
 ["yt:UBnF7et1plA", 218, 0, 0, 100, 1984, "Go-Gos", "Head Over Heels", "logo title)"],
 ["yt:UCtWkFbW0Us", 170, 0, 0, 100, 1983, "Haysi Fantayzee", "Shiny Shiny", "clean"],
 ["yt:UPuXvpkOLmM", 276, 0, 0, 100, 1988, "Information Society", "What's on your mind", "clean ytad"],
-["yt:Us3LemNhFOA", 210, 0, 0, 100, 1983, "INXS", "The One Thing", "clean title"],
+["yt:Us3LemNhFOA", 208, 0, 2, 100, 1983, "INXS", "The One Thing", "clean title"],
 ["yt:V-mQyRuHIuA", 297, 0, 0, 100, 1988, "The Church", "Under The Milky Way", "clean title"],
 ["yt:VJYfUS96f6w", 264, 0, 0, 100, 1989, "Rufus Chaka Khan", "Ain't Nobody", "ytad logo"],
 ["yt:VPgHbt0ODr4", 176, 0, 0, 100, 1980, "Adam and The Ants", "Stand and Deliver", "clean"],
