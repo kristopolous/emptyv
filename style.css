@@ -3,14 +3,13 @@ img{display:block;margin:5px;padding:3px}
 li{line-height:1.75em;margin-top:.5em;max-width:600px}
 p{line-height:1.75em;max-width:600px}
 tt{display:block;margin:10px;font-weight:bold}
-h1,h2,h3,h4,h5,h6,b{color:brown}
+h1,h2,h3,h4,h5,h6,b{color:brown;margin:0}
 h1{width:auto;margin:30px -15px 10px}
 h2{margin-bottom:0px}
-h3{margin:0;font-size:0.8em;font-weight:normal;}
-h4{margin:0;font-size:1.1em;font-weight:bold;}
-h5{margin:0;font-size:1em;font-weight:bold;}
+h3{font-size:0.8em;font-weight:normal}
+h4{font-size:1.1em;font-weight:bold;margin-top:40px}
+h5{font-size:1em;font-weight:bold}
 h6{font-size:0.95em;margin:10px 0 -15px 0}
-h4{margin-top:40px}
 .emp{color:#000;background:#cec}
 .copy{color:#aaa;font-size:0.9em;display:block;text-align:center}
 a img{float:left;margin-left:-35px}
@@ -18,8 +17,7 @@ a img{float:left;margin-left:-35px}
 .section{margin-left:45px;display:none}
 .section.sel{display:block}
 span{display:block;margin:10px 0}
-table{border-spacing:1}
-table{background:tan}
+table{border-spacing:1;background:tan}
 th,td{background:white;padding:3px 6px}
 th{background:tan}
 #processing span{width:200px}
