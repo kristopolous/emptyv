@@ -29,6 +29,8 @@ _bad = [
 ["yt:_U5HpeA_WSo", 1984, "The Smiths", "How Soon is Now?", EMBED],
 ["yt:0974cze7e_A", 1979, "Baccara", "Body Talk clean", BAD],
 ["yt:eabefjsJsAQ", 1983, "Re-Flex", "The Politics Of Dancing", EMBED], 
+["yt:YfpRm-p7qlY", 1982, "The Jam", "Town Called Malice", BAD],
+["", 1985, "Kate Bush", "This Woman's Work", BAD],
 ["yt:8tI1_KlO6xI", 1982, "Culture Club", "Time (Clock Of The Heart)", BAD],
 ["yt:2sCkVe31fwo", 1988, "Taste of sugar", "HMM", POOR],
 ["yt:6pKPNnk-JhE", 1983, "Midnight Oil", "Power And The Passion", BAD],
