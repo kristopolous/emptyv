@@ -3,7 +3,7 @@ var _duration = [
 ["yt:-5Yx2TnN9mc", 330, 0, 0, 100, 1984, "Alphaville", "Forever Young", "clean"],
 ["yt:-6Y-t85vs4g", 257, 0, 0, 100, 1983, "U2", "New Years Day", "u2.com logo ytad"],
 ["yt:-CyGT8f9_v4", 305, 0, 0, 100, 1984, "Rush", "Afterimage", "clean"],
-["yt:-JoSIGGOGZQ", 282, 0, 0, 100, 1970, "Black Sabbath", "Paranoid", "logo"], 
+["yt:-JoSIGGOGZQ", 162, 0, 0, 100, 1970, "Black Sabbath", "Paranoid", "logo"], 
 ["yt:-b-6ksMdkrU", 224, 0, 0, 100, 1986, "Company B", "Fascinated", "clean ytad title"],
 ["yt:0FFrCZNNCeU", 279, 5, 0, 100, 1986, "Dj Jazzy Jeff & The Fresh Prince", "Girls Aint Nothin' but Trouble", "clean ytad"],
 ["yt:0KfGEJQgsTo", 220, 0, 0, 100, 1984, "Divinyls", "The Good Die Young", "rage logo badtitle"],
