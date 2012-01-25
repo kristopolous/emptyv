@@ -122,7 +122,7 @@ var _duration = [
 ["yt:Gbkhla8Ivlk", 336, 0, 0, 100, 1983, "Styx", "Mr. Roboto", "logo"],
 ["yt:GguPC2U2EaI", 329, 0, 0, 100, 1986, "Mike Mareen", "Agent Of Liberty", "small logo"],
 ["yt:GieHr2CbPxk", 196, 4, 0, 100, 1979, "M", "Pop Muzik", "clean"],
-["yt:Gpq9UsFUuO4", 244, 0, 0, 100, 1983, "Pamala Stanley", "Coming out of hiding", "clean"], 
+["yt:Gpq9UsFUuO4", 243, 0, 1, 100, 1983, "Pamala Stanley", "Coming out of hiding", "clean"], 
 ["yt:HGj1RvOo-2g", 371, 8, 2, 100, 1980, "Sugar Hill Gang", "Rappers Delight", "logo title"],
 ["yt:HP0_hkRV-zs", 229, 0, 0, 100, 1985, "Mary Jane Girls", "In My House", "clean"],
 ["yt:Hc4ENEP_5-w", 255, 0, 0, 100, 1990, "Sweet Sensation", "Love. Child", "clean"],
