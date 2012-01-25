@@ -6,19 +6,29 @@
 # a version of sox that can read in wavs
 # 
 # You may have to custom compile to get this.
-#
-cd archive
-for i in *.mp3; do
-  wav=${i/.mp3/.wav}
-  stat=${i/.mp3/.stats}
 
-  echo "<< Doing $i >>"
+# bpmcount wants an xserver, any xserver, so I run
+# vnc on this server for it, when I need to.
+export DISPLAY=qaa.ath.cx:1
+
+cd archive
+
+for mp3 in *.mp3; do
+  stat=${mp3/.mp3/.stats}
+
+  echo -n "(( $mp3"
   if [ ! -e $stat ]; then
-    if [ ! -e $wav ]; then
-      echo "<< $i -> $wav >>"
-      ffmpeg -i $i -f wav -ac 1 -ar 22050 -f wav -- $wav
-    fi
-    sox -- "$wav" -n stats >& $stat
+    # volume sampling
+    echo -n " volume"
+    sox -- "$mp3" -n stats >& $stat
+
+    # bpm detection
+    # from http://superuser.com/questions/129041/any-beat-detection-software-for-linux
+    echo -n " bpm"
+    bpm=$(../../tools/bpmcount -- "$mp3" 3>&1 1>/dev/null 2>&3 | grep '^[0-9]' | cut -f1)
+
+    echo "bpm $bpm" >> $stat
   fi
-  [ -e $wav ] && rm -- $wav
+  echo " done ))"
+
 done
