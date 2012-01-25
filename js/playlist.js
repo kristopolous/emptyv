@@ -183,7 +183,7 @@ var _duration = [
 ["yt:Nm_QilrHkh8", 220, 0, 0, 100, 1986, "The Jets", "Crush on You", "clean"],
 ["yt:Nnpil_pRUiw", 283, 0, 0, 100, 1966, "The Beatles", "I am the Walrus", "clean"],
 ["yt:O1Q7Wj8IQTQ", 231, 0, 0, 100, 1984, "Ruins", "Fire", "clean"],
-["yt:O4o8TeqKhgY", 357, 8, 0, 100, 1984, "Grandmaster Flash", "The Message", "logos"]
+["yt:O4o8TeqKhgY", 357, 8, 0, 100, 1984, "Grandmaster Flash", "The Message", "logos"],
 ["yt:OG3PnQ3tgzY", 273, 0, 0, 100, 1982, "Taco", "Puttin on the Ritz", "clean"],
 ["yt:Oak4_095Cug", 206, 0, 0, 100, 1982, "ABC", "The Look of Love", "clean ytad title"],
 ["yt:OkE3piTWME8", 207, 0, 0, 100, 1978, "Sylvester", "Can't Stop Dancing", "logo title"],
