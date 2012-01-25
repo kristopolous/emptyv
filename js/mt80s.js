@@ -472,7 +472,7 @@ function flashRequest() {
 }
 
 function onYouTubePlayerReady(playerId) {
-  var id = parseInt(playerId.substr(-1));
+  var id = parseInt(playerId.split('-')[1]);
   _player[ id ] = document.getElementById(playerId);
 
   if(++_loaded === 3) {
