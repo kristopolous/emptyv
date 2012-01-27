@@ -415,6 +415,7 @@ var _duration = [
 ["yt:sXD43jjG0jQ", 216, 0, 0, 100, 1978, "Evelyn Champagne King", "Shame", "clean ytad"],
 ["yt:snsTmi9N9Gs", 266, 0, 0, 100, 1986, "Madonna", "Open Your Heart", "clean"],
 ["yt:swQi4CAzmrA", 206, 0, 0, 100, 1981, "Men At Work", "Who Can It Be Now", "clean ytad"],
+["yt:tSNWeXGZMcU", 251, 0, 0, 100, 1985, "Colonel Abrams", "Trapped", "ytad logo"],
 ["yt:tgFh4RHgn0A", 252, 0, 0, 100, 1988, "Billy Idol", "White Wedding", "ytad clean"],
 ["yt:tkJNyQfAprY", 379, 0, 0, 100, 1980, "Pink Floyd", "Comfortably Numb", "clean"],
 ["yt:tnAQRodZNp0", 217, 0, 0, 100, 1983, "The English Beat", "I Confess", "vh1 logo title"],
