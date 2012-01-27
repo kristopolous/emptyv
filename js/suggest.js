@@ -114,13 +114,14 @@ $(function(){
   $("#artist, #title").keyup(search);
 
   if(document.location.hash.length == 0) {
-    document.location += "#suggest";
+    document.location += "# suggest";
   } 
   var lastHash;
 
   setInterval(function(){
-    if(document.location.hash != lastHash) {
-      lastHash = document.location.hash;
+    var hash = document.location.hash.replace(/\ /, '');
+    if(hash != lastHash) {
+      lastHash = hash;
       $(lastHash).addClass("sel").siblings().removeClass("sel");
       $("#header a").filter(function(){ return '#' + this.href.split('#')[1] == lastHash}).addClass("sel").siblings().removeClass("sel");
       if(lastHash.substr(1) in on) {
