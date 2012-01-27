@@ -1,6 +1,5 @@
 var _duration = [
-//["yt:Lr0xJBsVbZY", 256, 0, 0, 100, 1984, "Jennifer Rush", "The Power of Love", "clean"],
-//["yt:O8PyqxPLUeA", 213, 0, 0, 100, 1983, "The Psychedelic Furs", "Love My Way", "clean ytad"],
+//["yt:Lr0xJBsVbZY", 256, 0, 0, 100, 1984, "Jennifer Rush", "The Power of Love", "clean"]yt:O8PyqxPLUeA", 213, 0, 0, 100, 1983, "The Psychedelic Furs", "Love My Way", "clean ytad"],
 ["yt:-5Yx2TnN9mc", 330, 0, 0, 100, 1984, "Alphaville", "Forever Young", "clean"],
 ["yt:-6Y-t85vs4g", 257, 0, 0, 100, 1983, "U2", "New Years Day", "u2.com logo ytad"],
 ["yt:-CyGT8f9_v4", 305, 0, 0, 100, 1984, "Rush", "Afterimage", "clean"],
@@ -330,7 +329,7 @@ var _duration = [
 ["yt:hFVuuRxM2VU", 286, 0, 0, 100, 1983, "Culture Club", "Miss Me Blind", "vevo"],
 ["yt:hRqdOyMnnxM", 323, 0, 0, 100, 1985, "New Order", "Perfect Kiss", "title logo"],
 ["yt:h_D3VFfhvs4", 589, 0, 0, 100, 1988, "Michael Jackson", "Smooth Criminal", "vevo"],
-["yt:hqyc37aOqT0", 293, 6, 0, 100, 1986, "Peter Gabriel", "Sledgehammer" "logo title"],
+["yt:hqyc37aOqT0", 293, 6, 0, 100, 1986, "Peter Gabriel", "Sledgehammer", "logo title"],
 ["yt:hrUUKoz8IM0", 218, 0, 0, 100, 1986, "XTC", "Dear God", "logo ytad"],
 ["yt:i-j3xITvYQY", 282, 0, 0, 100, 1973, "Pink Floyd", "Money", "logo ytad"],
 ["yt:iNOdFQ-BN7o", 320, 0, 0, 100, 1990, "Los Prisioneros", "Tren al Sur", "clean"],
