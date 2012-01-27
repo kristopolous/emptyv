@@ -1,5 +1,6 @@
 var _duration = [
 //["yt:Lr0xJBsVbZY", 256, 0, 0, 100, 1984, "Jennifer Rush", "The Power of Love", "clean"]yt:O8PyqxPLUeA", 213, 0, 0, 100, 1983, "The Psychedelic Furs", "Love My Way", "clean ytad"],
+["yt:-5EmnQp3V48", 193, 0, 0, 100, 1978, "The Commodores", "Brick House", "clean ytad"],
 ["yt:-5Yx2TnN9mc", 330, 0, 0, 100, 1984, "Alphaville", "Forever Young", "clean"],
 ["yt:-6Y-t85vs4g", 257, 0, 0, 100, 1983, "U2", "New Years Day", "u2.com logo ytad"],
 ["yt:-CyGT8f9_v4", 305, 0, 0, 100, 1984, "Rush", "Afterimage", "clean"],
@@ -279,6 +280,7 @@ var _duration = [
 ["yt:avCeJnw9WbQ", 178, 0, 0, 100, 1990, "Suzanne Vega", "Toms Diner", "clean ytad"],
 ["yt:ayu2XZ-mFGw", 232, 14, 0, 100, 1986, "Gene Loves Jezebel", "Desire(Come And Get It)", "clean ytad"],
 ["yt:azr2ooLlfzQ", 272, 0, 0, 100, 1982, "Berlin", "Masquerade", "ytad logo"],
+["yt:b-98JMMsgPY", 192, 2, 0, 100, 1984, "The Treacherous Three & Doug E Fresh", "Santa's Rap", "line"],
 ["yt:b9xBAtCsCTQ", 271, 0, 0, 100, 1983, "Trans-X", "Living on Video", "clean ytad"],
 ["yt:bDbpzjbXUZI", 246, 0, 0, 100, 1985, "Eddie Murphy", "Party All The Time", "logo ytad title"],
 ["yt:bHoPYLQvnQM", 215, 0, 0, 100, 1983, "Slade", "Run Runaway", "clean"],
@@ -406,6 +408,7 @@ var _duration = [
 ["yt:s86K-p089R8", 259, 0, 0, 100, 1984, "Bon Jovi", "Runaway", "vevo"],
 ["yt:sOnqjkJTMaA", 823, 0, 0, 100, 1981, "Michael Jackson", "Thriller", "vevo"],
 ["yt:sV-3Otn_4uQ", 197, 0, 0, 100, 1977, "Space", "Magic Fly", "clean ytad title"],
+["yt:sXD43jjG0jQ", 216, 0, 0, 100, 1978, "Evelyn Champagne King", "Shame", "clean ytad"],
 ["yt:snsTmi9N9Gs", 266, 0, 0, 100, 1986, "Madonna", "Open Your Heart", "clean"],
 ["yt:swQi4CAzmrA", 206, 0, 0, 100, 1981, "Men At Work", "Who Can It Be Now", "clean ytad"],
 ["yt:tgFh4RHgn0A", 252, 0, 0, 100, 1988, "Billy Idol", "White Wedding", "ytad clean"],
