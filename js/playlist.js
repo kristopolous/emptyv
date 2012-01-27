@@ -368,7 +368,6 @@ var _duration = [
 ["yt:kvDMlk3kSYg", 282, 0, 0, 100, 1978, "Boney M", "Rasputin", "clean"],
 ["yt:kwb9-OlQimc", 157, 0, 0, 100, 1982, "Culture Club", "I'll Tumble 4 Ya", "vevo"],
 ["yt:kykts8xH8q4", 233, 0, 0, 100, 1986, "Device", "Hanging On A Heart Attack", "clean"],
-["yt:lAZgLcK5LzI", 188, 0, 0, 100, 1985, "Bangles", "Manic Monday", "clean ytad"],
 ["yt:lDK9QqIzhwk", 249, 0, 0, 100, 1986, "Bon Jovi", "Livin' On A Prayer", "vevo"],
 ["yt:lKVa4O2MuS0", 224, 0, 0, 100, 1987, "Taylor Dayne", "Tell It To My Heart", "logo"],
 ["yt:lO_68NFm-BE", 223, 0, 0, 100, 1983, "Kano", "Another Life", "disconet logo"],

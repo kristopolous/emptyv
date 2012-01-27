@@ -26,6 +26,7 @@ _bad = [
 ["yt:-VCqAjYO3NM", 1986, "Pet Shop Boys", "Suburbia", BAD],
 ["yt:XfNLORw7r_M", 1981, "DAF", "Der Rauber und der Prinz", BAD],
 ["yt:I-9NEFalsjE", 1977, "Peter Gabriel", "Solsbury Hill", EMBED],
+["yt:lAZgLcK5LzI", 1985, "Bangles", "Manic Monday", MISSING],
 ["yt:_U5HpeA_WSo", 1984, "The Smiths", "How Soon is Now?", EMBED],
 ["yt:0974cze7e_A", 1979, "Baccara", "Body Talk clean", BAD],
 ["yt:eabefjsJsAQ", 1983, "Re-Flex", "The Politics Of Dancing", EMBED], 
