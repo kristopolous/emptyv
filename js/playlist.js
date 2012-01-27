@@ -1,5 +1,6 @@
 var _duration = [
-//["yt:Lr0xJBsVbZY", 256, 0, 0, 100, 1984, "Jennifer Rush", "The Power of Love", "clean"]yt:O8PyqxPLUeA", 213, 0, 0, 100, 1983, "The Psychedelic Furs", "Love My Way", "clean ytad"],
+//["yt:Lr0xJBsVbZY", 256, 0, 0, 100, 1984, "Jennifer Rush", "The Power of Love", "clean"]
+//yt:O8PyqxPLUeA", 213, 0, 0, 100, 1983, "The Psychedelic Furs", "Love My Way", "clean ytad"],
 ["yt:-5EmnQp3V48", 193, 0, 0, 100, 1978, "The Commodores", "Brick House", "clean ytad"],
 ["yt:-5Yx2TnN9mc", 330, 0, 0, 100, 1984, "Alphaville", "Forever Young", "clean"],
 ["yt:-6Y-t85vs4g", 257, 0, 0, 100, 1983, "U2", "New Years Day", "u2.com logo ytad"],
@@ -55,6 +56,7 @@ var _duration = [
 ["yt:7SCXP_8P_W8", 212, 0, 0, 100, 1985, "Paul Hardcastle", "19 Nineteen", "clean"],
 ["yt:7m1UWSD-FaA", 202, 0, 0, 100, 1979, "Olivia Newton John & ELO", "Xanadu", "clean"],
 ["yt:7movKfyTBII", 164, 0, 0, 100, 1983, "Men Without Hats", "Safety Dance", "clean"],
+["yt:7rtIN9dWHsw", 246, 0, 0, 100, 1989, "808 State", "Pacific State", "clean"],
 ["yt:7uEBuqkkQRk", 225, 0, 0, 100, 1986, "New Order", "Bizarre Love Triangle", "clean"],
 ["yt:7v2GDbEmjGE", 251, 0, 0, 100, 1980, "The Police", "De Do Do Do, De Da Da Da", "vevo"],
 ["yt:7wqxHThRgsA", 212, 2, 0, 100, 1986, "Nu Shooz", "Point of No Return", "clean"],
@@ -119,6 +121,7 @@ var _duration = [
 ["yt:G4JXHmvsCMU", 236, 0, 0, 100, 1988, "The Bollock Brothers", "Harley David, Son of a Bitch", "clean"],
 ["yt:GI876rqao8A", 205, 0, 0, 100, 1982, "Palais Schaumburg", "Wir bauen eine neue Stadt", "small logo"],
 ["yt:GND7sPNwWko", 315, 0, 0, 100, 1984, "RUN-DMC", "Rock Box", "vevo"],
+["yt:GQ0Drtft8-I", 237, 0, 0, 100, 1984, "Goria Estefan", "Dr. Beat", "clean ytad"],
 ["yt:Gbkhla8Ivlk", 336, 0, 0, 100, 1983, "Styx", "Mr. Roboto", "logo"],
 ["yt:GguPC2U2EaI", 329, 0, 0, 100, 1986, "Mike Mareen", "Agent Of Liberty", "small logo"],
 ["yt:GieHr2CbPxk", 196, 4, 0, 100, 1979, "M", "Pop Muzik", "clean"],
@@ -343,6 +346,7 @@ var _duration = [
 ["yt:iypUpv9xelg", 235, 0, 0, 100, 1985, "Oingo Boingo", "Dead Man's Party", "mtv2 logo ytad title"],
 ["yt:jF_coqVZJwM", 204, 0, 0, 100, 1977, "Arabesque", "Hello Mr. Monkey", "clean"],
 ["yt:jItz-uNjoZA", 224, 0, 0, 100, 1981, "Oingo Boingo", "Little Girls", "clean"],
+["yt:jPfCOe8_VEw", 320, 0, 0, 100, 1986, "Gloria Estefan & Miami Sound Machine", "Conga", "clean ytad"],
 ["yt:jPj-8_wOZcA", 267, 5, 0, 100, 1986, "Public Image Ltd.", "Rise", "clean"],
 ["yt:jUHYLBxmUEw", 305, 0, 0, 100, 1985, "Thomas Dolby", "I Scare Myself", "vevo"],
 ["yt:j_RcdZzDg3c", 226, 0, 0, 100, 1983, "Class Action", "Weekend", "logo ytad"],
