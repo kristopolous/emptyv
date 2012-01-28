@@ -188,7 +188,7 @@ self.mutetoggle = function(el){
 
   if(_muted) {
     el.src = "images/mute_on_32.png";
-    _player[_active].setVolume(0);
+    _playerPrev[_active].setVolume(0);
   } else {
     el.src = "images/mute_off_32.png";
     var volume = 100;
@@ -196,7 +196,7 @@ self.mutetoggle = function(el){
     if ("index" in _player[_active]) {
       volume = _duration[_player[_active].index][VOLUME];
     }
-    _player[_active].setVolume(volume);
+    _playerPrev[_active].setVolume(volume);
   }
 }
 
@@ -541,14 +541,17 @@ function transition(index, offset, force) {
   ev.isset(dom + _next, function() {
     if(dom === "yt") {
       _player[_next].loadVideoById(uuid, offset);
+      _player[_next].playVideo();
     } else {
       // In the DM api, you can mute prior to loading
       // the video (and the ad), and this works.
       _player[_next].mute();
       setTimeout(function(){
         _player[_next].loadVideoById(uuid);
-      }, 150);
-      _player[_next].mute();
+        _player[_next].mute();
+        _player[_next].playVideo();
+        _player[_next].mute();
+      }, 500);
 
       // This is an advertising work around for
       // daily motion to suppress the video ads.
@@ -564,7 +567,6 @@ function transition(index, offset, force) {
         }, 100); 
     }
     log("video loaded");
-    _player[_next].playVideo();
 
     // This is when the audio for the video starts; some small
     // time before the actual video is to transit over.
@@ -575,6 +577,7 @@ function transition(index, offset, force) {
     // so we should have some of it buffered already and then
     // can just seek back without a buffering issue.
     setTimeout(function(){
+      log("volume changed");
       _player[_next].seekTo(offset);
 
       // Crank up the volume to the computed normalization
