@@ -31,5 +31,6 @@ document.getElementById("controls").innerHTML=[
 ].join('');
 },5000);
 </script>
-<script src=js/all.min.js></script>
+<!--[if IE]><script src=js/all.js></script><![endif]-->
+<![if !IE]><script src=js/all.min.js></script><![endif]>
 </html>
