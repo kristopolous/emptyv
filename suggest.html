@@ -37,20 +37,23 @@ As you type in the artist and song, you will see if it's been added already.
 </span>
 
 <form method=post id=suggest-input action=srv/processing.php?type=suggest name=processing>
-  <span style=display:inline-block;width:244px;vertical-align:top>
+  <span id=suggest-input style=display:inline-block;width:210px;vertical-align:top;margin-left:-20px>
   <span>
-    Artist Name
+    Artist
     <input name=artist id=artist>
   </span>
   <span>
-    Track Title
+    Title
     <input name=title id=title>
   </span>
-  <span>
-    Additional Notes
-    <textarea name=notes id=notes></textarea>
+  <span class=optional>
+    <em>Twitter Handle (optional)</em>
+    We'll <a href=http://twitter.com/mt80s>tweet</a> you when added!
+    <input name=twitter id=twitter>
   </span>
-  <input type=submit value="Send it Off">
+  <span>
+    <input type=submit value="Send it Off">
+  </span>
 </span>
   <span style=display:inline-block;width:60%;vertical-align:top>
     <div id=results></div>
