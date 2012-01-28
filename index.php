@@ -3,7 +3,6 @@
 <style>
 body{background:#000}
 img{border:0}
-a,a:visited{color:#FFF;text-decoration:none;font-style:italic}
 #player-0,#player-1,#player-2{position:absolute;top:0;left:0%;width:100%;height:100%;z-index:0}
 #mute{cursor:pointer;padding:5px 0 5px 10px}
 #controls{position:fixed;top:0;right:0;z-index:9;opacity:0.7}
@@ -21,15 +20,13 @@ a,a:visited{color:#FFF;text-decoration:none;font-style:italic}
 <a style=text-align:center target=_blank href="%20# suggest"><img src=images/mt80s_cyber.png></a>
 </div>
 </body>
-<script src=srv/time.php></script>
-<script src=js/all.min.js></script>
-</html>
 <script>
-var _gaq=_gaq||[];
-_gaq.push(['_setAccount','UA-28399789-1']);
-_gaq.push(['_trackPageview']);
-(function() {
-var ga=document.createElement('script');ga.type='text/javascript';ga.async=true;
+var _gaq=(_gaq||[]).concat(['_setAccount','UA-28399789-1'],['_trackPageview']),_referenceTime=<?=microtime(true);?>,ga;
+setTimeout(function() {
+ga=document.createElement('script');ga.type='text/javascript';ga.async=true;
 ga.src=('https:'==document.location.protocol?'https://ssl':'http://www')+'.google-analytics.com/ga.js';
 var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(ga,s);
-})();</script>
+},3000);
+</script>
+<script src=js/all.min.js></script>
+</html>
