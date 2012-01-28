@@ -258,7 +258,7 @@ var _duration = [
 ["yt:YXTor_NUPIE", 199, 0, 0, 100, 1986, "Radiorama", "Vampires", "logo poor ytad title"],
 ["yt:YlXtrnh-Ejo", 206, 0, 0, 100, 1984, "King", "Love & Pride", "vevo"],
 ["yt:Yv0rHDI0ujY", 302, 0, 0, 100, 1988, "Stevie B", "Spring Love", "clean ytad"],
-["yt:Z3OjiZS5GNc", 232, 0, 0, 100, 1984, "Baby's Gang", "Challenger", "logo"],
+["yt:Z3OjiZS5GNc", 222, 0, 10, 100, 1984, "Baby's Gang", "Challenger", "logo"],
 ["yt:Z61tlxcqaVE", 163, 0, 0, 100, 1968, "Arthur Brown", "Fire", "clean"],
 ["yt:ZCM4_5uB1ww", 226, 0, 0, 100, 1982, "The Fixx", "Red Skies", "vevo"],
 ["yt:ZSjn3CAC5zI", 204, 0, 0, 100, 1975, "Michael Jackson", "Dancing Machine", "logo"],

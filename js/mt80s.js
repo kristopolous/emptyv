@@ -60,6 +60,15 @@ if (typeof console == "undefined") {
   self.console = {log: new Function()}
 }
 
+self.indexOf = function(array, item) {
+  for(var ix = 0; ix < array.length; ix++) {
+    if(array[ix] == item) {
+      return ix;
+    }
+  }
+  return -1;
+}
+
 // Utils {{
 function getNow(offset) {
   return +(new Date() / 1000) + (offset || 0);
@@ -144,6 +153,8 @@ var
   _start = getNow(),
   _epoch = 1325138061 + ( _start - _referenceTime ),
 
+  _bAppend = true,
+
   // How many of the YT players are loaded
   _loaded = 0,
 
@@ -156,10 +167,10 @@ var
   _next = 0,
   _runtime = 0;
 
-_.each(_duration, function(row) { 
-  row[OFFSET] = _runtime;
-  _runtime += row[RUNTIME] - NEXTVIDEO_PRELOAD;
-});
+for(var ix = 0; ix < _duration.length; ix++) {
+  _duration[ix][OFFSET] = _runtime;
+  _runtime += _duration[ix][RUNTIME] - NEXTVIDEO_PRELOAD;
+}
 
 // }} // Globals
 
@@ -241,12 +252,12 @@ function setQuality(direction) {
   newQualityWord = LEVELS[newQualityIndex];
 
   // If this video doesn't support the destination quality level
-  if ( _.indexOf(activeAvailable, newQualityWord) === -1) {
+  if ( indexOf(activeAvailable, newQualityWord) === -1) {
     console.log("NOT SUPPORTED", newQualityWord, activeAvailable);
 
     // Use the highest one available (the lower ones are always available)
     // Get the word version of the highest quality available
-    newQualityWord = _.last(activeAvailable);
+    newQualityWord = activeAvailable[activeAvailable.length - 1];
 
     // state that we are downsampling because of an incompatibility
     supported = false;
@@ -319,9 +330,15 @@ function setQuality(direction) {
       // a forced down-sampling because of available quality
       // limitations.
       if(supported) {
-        _currentLevel = _.indexOf(LEVELS, newQualityWord);
+        _currentLevel = indexOf(LEVELS, newQualityWord);
       }
     } 
+  }
+}
+
+function doTitle(){
+  if(_bAppend) {
+    document.title = _duration[_index][ARTIST] + " - " + _duration[_index][TITLE] + " | " + toTime(getNow() - _start);
   }
 }
 
@@ -354,7 +371,7 @@ function findOffset() {
       _drift = _playerById[_index].getCurrentTime() - lapse;
     }
 
-    document.title = _duration[_index][ARTIST] + " - " + _duration[_index][TITLE] + " | " + toTime(now - _start);
+    doTitle();
     if(DEBUG && _index in _playerById) {
       var drift;
       if(_drift > 0) {
@@ -529,6 +546,14 @@ function transition(index, offset) {
     _index = index;
     setQuality(0);
   }, remainingTime() * 1000);
+}
+
+function append(data){
+  for(var ix = 0; ix < data.length; ix++) {
+    _duration[ix] = [].concat(_duration[ix].slice(0,5), data[ix]);
+  }
+  _bAppend = true;
+  doTitle();
 }
 
 function loadPlayer(ix) {
