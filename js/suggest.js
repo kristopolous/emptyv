@@ -130,7 +130,7 @@ $(function(){
         .removeClass("sel");
 
       $("#header a").filter(function(){ 
-        return this.href.split('#')[1].slice(1) == lastHash
+        return '#' + this.href.split('#')[1].slice(1) == lastHash
       })
         .addClass("sel")
         .siblings()
