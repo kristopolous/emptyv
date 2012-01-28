@@ -1,5 +1,5 @@
 // This is for the minimizer
-(function(){
+//(function(){
 // Constants {{
 var
   ID = 0,
@@ -27,6 +27,8 @@ var
 
   OFFSET = 9,
 
+  COMMERCIAL_sec = 30, 
+
   // If there is a hash value (there should not be regularly)
   // Then debugging output is turned on, whatever the hell that
   // entails
@@ -36,14 +38,14 @@ var
   // seeint how long the player took to load. This seemed
   // to work ok; we really want the drift to be as close
   // to 0 as possible.
-  YTLOADTIME_sec = 5,
+  LOADTIME_sec = 5,
 
   // According to the docs: "The player does not request 
   // the FLV until playVideo() or seekTo() is called.". In
   // order to combat this, we have to pre-load the video
-  // by some increment, we take that to be the YTLOADTIME,
+  // by some increment, we take that to be the LOADTIME,
   // multiplied by 1000 because it's expressed in MS
-  PRELOAD_ms = YTLOADTIME_sec * 1000,
+  PRELOAD_ms = LOADTIME_sec * 1000,
 
   LAG_THRESHHOLD = 12,
 
@@ -76,12 +78,12 @@ function getNow(offset) {
   return +(new Date() / 1000) + (offset || 0);
 }
 
-function remainingTime() {
-  if(_player[_active] && _player[_active].getDuration && 'index' in _player[_active]) {
+function remainingTime(player) {
+  if(player) {
     return Math.max(0,
-      _player[_active].getDuration() - 
-      _duration[_player[_active].index][STOP] - 
-      _player[_active].getCurrentTime()
+      player.getDuration() - 
+      _duration[player.index][STOP] - 
+      player.getCurrentTime()
     );
   } else {
     return 0;
@@ -97,21 +99,21 @@ function toTime(sec) {
 }
 
 function hide(player) {
-  if(document.getElementById('player-' + player)) {
-    document.getElementById("player-" + player).style.left = "-200%";
+  if(player) {
+    player.style.left = "-200%";
   }
 }
 
 function show(player) {
-  if(document.getElementById('player-' + player)) {
-    document.getElementById("player-" + player).style.left = 0;
+  if(player) {
+    player.style.left = 0;
   }
 }
 
-function timer(str) {
+function log() {
   console.log([
-      getNow() - _start,
-      str
+    (getNow() - _start).toFixed(4),
+    Array.prototype.slice.call(arguments).join(' ')
   ].join(' '));
 } 
 
@@ -138,6 +140,8 @@ var
 
   _muted = false,
 
+  ev = EvDa(),
+
   _index = -1,
   _lastLoaded,
 
@@ -156,12 +160,15 @@ var
   _epoch = 1325138061 + ( _start - _referenceTime ),
 
   _bAppend = true,
+  _offsetIval,
 
   // How many of the YT players are loaded
   _loaded = 0,
 
   // And their associated references
   _player = [],
+  _playerPrev, 
+  _playerByDom = {yt:[], dm:[]},
   _playerById = {},
 
   _lastTime = 0,
@@ -236,7 +243,7 @@ function setQuality(direction) {
   }
 
   if(direction === -1) {
-    _qualityTimeout = 2 * YTLOADTIME_sec + getNow();
+    _qualityTimeout = 2 * LOADTIME_sec + getNow();
   } else if (direction > 0 && getNow() < _qualityTimeout) {
     return;
   }
@@ -255,7 +262,7 @@ function setQuality(direction) {
 
   // If this video doesn't support the destination quality level
   if ( indexOf(activeAvailable, newQualityWord) === -1) {
-    console.log("NOT SUPPORTED", newQualityWord, activeAvailable);
+    log("NOT SUPPORTED", newQualityWord, activeAvailable);
 
     // Use the highest one available (the lower ones are always available)
     // Get the word version of the highest quality available
@@ -268,26 +275,26 @@ function setQuality(direction) {
   // If this new, supported quality isn't the current one set
   if (newQualityWord !== activeQualityWord) {
 
-    console.log("Quality: " + activeQualityWord + " => " + newQualityWord);
+    log("Quality: " + activeQualityWord + " => " + newQualityWord);
 
     // If we are downsampling then just do it
     if(direction < 0) {
       // we also shuffle the placement forward to accomodate for the change over
-      _playerById[_index].seekTo(_playerById[_index].getCurrentTime() + YTLOADTIME_sec);
+      _playerById[_index].seekTo(_playerById[_index].getCurrentTime() + LOADTIME_sec);
       _playerById[_index].setPlaybackQuality(newQualityWord);
 
       // If we are upsampling, then do it seemlessly.
     } else if( 
       _playerById[_index].getDuration() - 
       _duration[_index][STOP] - 
-      _playerById[_index].getCurrentTime() > YTLOADTIME_sec * 2.5
+      _playerById[_index].getCurrentTime() > LOADTIME_sec * 2.5
     ) {
 
       // First, load the active video in the extra player,
       // setting the volume to 0
       _player[EXTRA].loadVideoById(
         _duration[_index][ID].split(":")[1], 
-        _playerById[_index].getCurrentTime() + YTLOADTIME_sec
+        _playerById[_index].getCurrentTime() + LOADTIME_sec
       );
 
       _player[EXTRA].setVolume(0);
@@ -328,7 +335,7 @@ function setQuality(direction) {
         }
       }, 10);
 
-      // And sEt it as the default, but only if this isn't
+      // And set it as the default, but only if this isn't
       // a forced down-sampling because of available quality
       // limitations.
       if(supported) {
@@ -400,7 +407,7 @@ function findOffset() {
 
   if ( _index in _playerById ) {
 
-    if (_duration[_index][RUNTIME] - lapse < YTLOADTIME_sec * 2) {
+    if (_duration[_index][RUNTIME] - lapse < COMMERCIAL_sec + LOADTIME_sec) {
       transition(
         (_index + 1) % _duration.length, 
         _duration[(_index + 1) % _duration.length][START]
@@ -421,23 +428,22 @@ function findOffset() {
 
       // Make sure that we don't reseek too frequently.
       if(Math.abs(_lagCounter) > LAG_THRESHHOLD) {
-        _seekTimeout = now + YTLOADTIME_sec;
+        _seekTimeout = now + LOADTIME_sec;
       }
 
       // If we have been buffering for a while, 
       // then we will downsample and shift forward
-      if(_lagCounter > LAG_THRESHHOLD && 
-        (drift < -YTLOADTIME_sec * 3 && _playerById[_index].getCurrentTime() > 0) 
+      if( (drift < -LOADTIME_sec * 3 && _playerById[_index].getCurrentTime() > 0) 
         ) {
-        console.log(_lagCounter, LAG_THRESHHOLD, drift, YTLOADTIME_sec, _index, playerById[_index].getCurrentTime());
+        log(_lagCounter, LAG_THRESHHOLD, drift, LOADTIME_sec, _index, playerById[_index].getCurrentTime());
         setQuality(-1);
         _lagCounter -= LAG_THRESHHOLD;
 
-        console.log("Seeking:", lapse, _playerById[_index].getCurrentTime());
+        log("Seeking:", lapse, _playerById[_index].getCurrentTime());
 
         // We don't trust seeking to be insanely accurate so we throw an offset
         // on to it to avoid some kind of weird seeking loop.
-        _playerById[_index].seekTo(lapse + YTLOADTIME_sec);
+        _playerById[_index].seekTo(lapse + LOADTIME_sec);
       }
 
       // If our lagcounter is really low, then
@@ -468,27 +474,47 @@ function flashChannel(){
     }, 1000);
 }
 
-self.onYouTubePlayerReady = function(playerId) {
-  var id = parseInt(playerId.split('-')[1]);
-  _player[ id ] = document.getElementById(playerId);
-  timer("player ready");
+function onReady(domain, id) {
+  var 
+    id = parseInt(id.split('-')[1]),
+    key = domain + _playerByDom[domain].length;
+
+  _playerByDom[domain].push( document.getElementById("player-" + id) );
+  log(key + " ready");
+
+  ev.set(key);
 
   if(++_loaded === 1) {
     show(_next);
     findOffset();
     flashChannel();
-    setInterval(findOffset, YTLOADTIME_sec * 1000 / 10);
+    _offsetIval = setInterval(findOffset, LOADTIME_sec * 1000 / 10);
 
     setTimeout(function(){ 
-      loadPlayer(1);
-      loadPlayer(2); 
+      loadPlayer("dm",3);
+      loadPlayer("yt",1);
+      loadPlayer("yt",2); 
+      loadPlayer("dm",4);
     }, 2000);
-  } else {
-    hide(id);
-  }
+  } 
 }
 
-function transition(index, offset) {
+self.onYouTubePlayerReady = function(id) {
+  onReady("yt", id);
+}
+
+self.onDailymotionPlayerReady = function(id) {
+  onReady("dm", id);
+}
+
+self.force = function(index){
+  clearInterval(_offsetIval);
+  _index = index;
+  transition(index, 0, true);
+  doTitle();
+}
+
+function transition(index, offset, force) {
   if(index === _lastLoaded) {
     return;
   }
@@ -497,60 +523,101 @@ function transition(index, offset) {
   // Load the next video prior to actually switching over
   var 
     id = _duration[index][ID],
-    proto = id.split(':')[0],
+    dom = id.split(':')[0],
     uuid = id.split(':')[1];
-
-  console.log("Loading: ", id);
 
   // Offset mechanics are throughout, but placing it here
   // make sure that on first load there isn't some brief beginning
   // of video sequence then a seek.
-  _player[_next].loadVideoById(uuid, offset);
-  timer("video loaded");
-  _player[_next].setVolume(0);
-  _player[_next].playVideo();
+  _player = _playerByDom[dom];
+  _player.domain = "yt";
 
-  setTimeout(function(){
-    _player[_next].seekTo(offset);
-    // Crank up the volume to the computed normalization
-    // level.
-    if(_muted) {
-      _player[_next].setVolume(0);
+  // We have to keep track of the previous domain in order to
+  // make sure our mechanics continue to work.
+  if(!_playerPrev) {
+    _playerPrev = _player;
+  }
+
+  ev.isset(dom + _next, function() {
+    if(dom === "yt") {
+      _player[_next].loadVideoById(uuid, offset);
     } else {
-      _player[_next].setVolume(_duration[index][VOLUME]);
+      // In the DM api, you can mute prior to loading
+      // the video (and the ad), and this works.
+      _player[_next].mute();
+      setTimeout(function(){
+        _player[_next].loadVideoById(uuid);
+      }, 150);
+      _player[_next].mute();
+
+      // This is an advertising work around for
+      // daily motion to suppress the video ads.
+      var 
+        myplayer = _player[_next], 
+        ival = setInterval(function(){
+          if(myplayer.getCurrentTime() > 0) {
+            log("DONE");
+            myplayer.unMute();
+            myplayer.setVolume(0);
+            clearInterval(ival);
+          }
+        }, 100); 
     }
-  }, Math.max((remainingTime() - NEXTVIDEO_PRELOAD) * 1000, 0));
+    log("video loaded");
+    _player[_next].playVideo();
 
-  setTimeout(function(){
+    // This is when the audio for the video starts; some small
+    // time before the actual video is to transit over.
+    //
+    // By this point, we have already loaded the video with
+    // enough time for a video commercial and then let that
+    // play in hiding.  The video itself should have started too
+    // so we should have some of it buffered already and then
+    // can just seek back without a buffering issue.
+    setTimeout(function(){
+      _player[_next].seekTo(offset);
 
-    // After the PRELOAD_ms interval, then we stop the playing video
-    if(_active in _player) {
-      _player[_active].stopVideo();
-      if("index" in _player[_active]) {
-        delete _playerById[_player[_active].index];
+      // Crank up the volume to the computed normalization
+      // level.
+      if(_muted) {
+        _player[_next].setVolume(0);
+      } else {
+        _player[_next].setVolume(_duration[index][VOLUME]);
       }
-    }
+    }, force ? 8000 : Math.max((remainingTime(_playerPrev[_active]) - NEXTVIDEO_PRELOAD) * 1000, 0));
 
-    // Toggle the player pointers
-    _active = (_active + 1) % 2;
-    _next = (_active + 1) % 2;
+    setTimeout(function(){
 
-    // When you toggle the visibility, there is still an annoying spinner.
-    // So to avoid this we just "move" the players off screen that aren't
-    // being used.
-    show(_active);
-    hide(_next);
-    hide(EXTRA);
+      // After the PRELOAD_ms interval, then we stop the playing video
+      if(_active in _player) {
+        _playerPrev[_active].stopVideo();
+        if("index" in _player[_active]) {
+          delete _playerById[_player[_active].index];
+        }
+      }
 
-    _player[_active].index = index;
-    _playerById[index] = _player[_active];
+      // Toggle the player pointers
+      _active = (_active + 1) % 2;
+      _next = (_active + 1) % 2;
 
-    _index = index;
-    setQuality(0);
-  }, remainingTime() * 1000);
+      // When you toggle the visibility, there is still an annoying spinner.
+      // So to avoid this we just "move" the players off screen that aren't
+      // being used.
+      show(_player[_active]);
+      hide(_playerPrev[_next]);
+      hide(_playerPrev[EXTRA]);
+
+      _player[_active].index = index;
+      _playerById[index] = _player[_active];
+
+      _index = index;
+      setQuality(0);
+      _playerPrev = _player;
+    }, force ? 10000 : remainingTime(_playerPrev[_active]) * 1000);
+  });
 }
 
-function append(data){
+self.append = function(data){
   for(var ix = 0; ix < data.length; ix++) {
     _duration[ix] = [].concat(_duration[ix].slice(0,5), data[ix]);
   }
@@ -558,36 +625,39 @@ function append(data){
   doTitle();
 }
 
-function loadPlayer(ix) {
-  swfobject.embedSWF("http://www.youtube.com/apiplayer?" + [
-    "version=3",
-    "enablejsapi=1",
-    "playerapiid=player-" + ix
-  ].join('&'),  // swfUrl
-    "vid" + ix, // id
+function loadPlayer(domain, ix) {
+
+  swfobject.embedSWF({
+      "yt": "http://www.youtube.com/apiplayer?" + [
+        "version=3",
+        "enablejsapi=1",
+        "playerapiid=player-" + ix
+      ].join('&'),
+
+      "dm": "http://www.dailymotion.com/swf?" + [
+        "chromeless=1",
+        "enableApi=1",
+        "playerapiid=player-" + ix
+      ].join('&'),
+    }[domain],
+
+    "p" + ix,   // id
     "400",      // width
     "300",      // height
-    "9",        // [false] version (the flv2 player (flash 8) has ad-free vevo, so we use the old player)
+    "9",        // version
     null,       // express install swf url (we assume you have the flash player)
     null,       // flash vars 
 
-    {
-      allowScriptAccess: "always"
-    }, // params
+    { allowScriptAccess: "always" }, // params
 
-    // This little hack forces our small mt80s logo to the bottom left so 
-    // the user can click on it at any time.
     {
       wmode: "transparent", 
       id: 'player-' + ix
-    }, // attributes
-
-    new Function()                 // yt doesn't do the callbackfunction
+    } // attributes
   );
 }
 
-// Load two players to be transitioned between at a nominal
-// resolution ... this is irrelevant as quality will be 
-// managed in a more sophisticated manner than size of screen.
-loadPlayer(0);
-})();
+// Load the first player
+loadPlayer("yt", 0);
+
+//})();

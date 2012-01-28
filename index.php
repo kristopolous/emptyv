@@ -3,7 +3,7 @@
 <style>
 body{background:#000}
 img{border:0}
-#player-0,#player-1,#player-2{position:absolute;top:0;left:0%;width:100%;height:100%;z-index:0}
+#players object,#players embed{position:absolute;top:0;left:0%;width:100%;height:100%;z-index:0}
 #mute{cursor:pointer;padding:5px 0 5px 10px}
 #controls{position:fixed;top:0;right:0;z-index:9;opacity:0.7}
 #controls > *{display:block;padding:5px}
@@ -13,7 +13,10 @@ img{border:0}
 <!--[if IE]><link rel=stylesheet href=css/ie.css><![endif]-->
 </head>
 <body>
-<div id=vid2></div><div id=vid1></div><div id=vid0></div>
+<div id=players>
+<div id=p4></div><div id=p3></div>
+<div id=p2></div><div id=p1></div><div id=p0></div>
+</div>
 <div id=channel>34<br>MTV</div>
 <div id=controls></div>
 </body>
@@ -31,6 +34,8 @@ document.getElementById("controls").innerHTML=[
 ].join('');
 },5000);
 </script>
-<!--[if IE]><script src=js/all.js></script><![endif]-->
-<![if !IE]><script src=js/all.min.js></script><![endif]>
+<script src=js/swfobject.js></script> 
+<script src=js/evda.min.js></script> 
+<script src=js/playlist.js></script> 
+<script src=js/mt80s.js></script> 
 </html>
