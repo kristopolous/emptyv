@@ -86,19 +86,30 @@ function toTime(sec) {
 }
 
 function hide(player) {
-  document.getElementById("player-" + player).style.left = "-200%";
+  if(document.getElementById('player-' + player)) {
+    document.getElementById("player-" + player).style.left = "-200%";
+  }
 }
 
 function show(player) {
-  document.getElementById("player-" + player).style.left = 0;
+  if(document.getElementById('player-' + player)) {
+    document.getElementById("player-" + player).style.left = 0;
+  }
 }
-  
+
+function timer(str) {
+  console.log([
+      getNow() - _start,
+      str
+  ].join(' '));
+} 
+
 // }} // Utils
 
 
 // Globals {{
 var 
-  _active = 0,
+  _active = -1,
 
   // This the the current playback quality index, which can be triggered
   // in a direction (either up or down) based on how successful we can
@@ -142,7 +153,7 @@ var
 
   _lastTime = 0,
 
-  _next = 1,
+  _next = 0,
   _runtime = 0;
 
 _.each(_duration, function(row) { 
@@ -479,12 +490,21 @@ function flashRequest() {
 function onYouTubePlayerReady(playerId) {
   var id = parseInt(playerId.split('-')[1]);
   _player[ id ] = document.getElementById(playerId);
+  timer("player ready");
 
-  if(++_loaded === 3) {
+  if(++_loaded === 1) {
+    show(_next);
     findOffset();
     flashChannel();
     flashRequest();
     setInterval(findOffset, YTLOADTIME_sec * 1000 / 10);
+
+    setTimeout(function(){ 
+      loadPlayer(1);
+      loadPlayer(2); 
+    }, 2000);
+  } else {
+    hide(id);
   }
 }
 
@@ -506,6 +526,7 @@ function transition(index, offset) {
   // make sure that on first load there isn't some brief beginning
   // of video sequence then a seek.
   _player[_next].loadVideoById(uuid, offset);
+  timer("video loaded");
   _player[_next].setVolume(0);
   _player[_next].playVideo();
 
@@ -523,9 +544,11 @@ function transition(index, offset) {
   setTimeout(function(){
 
     // After the PRELOAD_ms interval, then we stop the playing video
-    _player[_active].stopVideo();
-    if("index" in _player[_active]) {
-      delete _playerById[_player[_active].index];
+    if(_active in _player) {
+      _player[_active].stopVideo();
+      if("index" in _player[_active]) {
+        delete _playerById[_player[_active].index];
+      }
     }
 
     // Toggle the player pointers
@@ -547,36 +570,37 @@ function transition(index, offset) {
   }, remainingTime() * 1000);
 }
 
+function loadPlayer(ix) {
+  swfobject.embedSWF("http://www.youtube.com/apiplayer?" + [
+    "version=3",
+    "enablejsapi=1",
+    "playerapiid=player-" + ix
+  ].join('&'),  // swfUrl
+    "vid" + ix, // id
+    "400",      // width
+    "300",      // height
+    "9",        // [false] version (the flv2 player (flash 8) has ad-free vevo, so we use the old player)
+    null,       // express install swf url (we assume you have the flash player)
+    null,       // flash vars 
+
+    {
+      allowScriptAccess: "always"
+    }, // params
+
+    // This little hack forces our small mt80s logo to the bottom left so 
+    // the user can click on it at any time.
+    {
+      wmode: "transparent", 
+      id: 'player-' + ix
+    }, // attributes
+
+    new Function()                 // yt doesn't do the callbackfunction
+  );
+}
+
 (function(){
   // Load two players to be transitioned between at a nominal
   // resolution ... this is irrelevant as quality will be 
   // managed in a more sophisticated manner than size of screen.
-  for(var ix = 0; ix < 3; ix++) {
-
-    swfobject.embedSWF("http://www.youtube.com/apiplayer?" + [
-      "version=3",
-      "enablejsapi=1",
-      "playerapiid=player-" + ix
-    ].join('&'),  // swfUrl
-      "vid" + ix, // id
-      "400",      // width
-      "300",      // height
-      "9",        // [false] version (the flv2 player (flash 8) has ad-free vevo, so we use the old player)
-      null,       // express install swf url (we assume you have the flash player)
-      null,       // flash vars 
-
-      {
-        allowScriptAccess: "always"
-      }, // params
-
-      // This little hack forces our small mt80s logo to the bottom left so 
-      // the user can click on it at any time.
-      {
-        wmode: "transparent", 
-        id: 'player-' + ix
-      }, // attributes
-
-      new Function()                 // yt doesn't do the callbackfunction
-    );
-  }
+  loadPlayer(0);
 })();
