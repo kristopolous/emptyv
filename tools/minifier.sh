@@ -3,7 +3,7 @@ cd ../js
 in=all.js
 out=all.min.js
 
-cat swfobject.js underscore-min.js _inject.min.js playlist.js mt80s.js > all.js 
+cat swfobject.js playlist.js mt80s.js > all.js 
 curl -s \
         -d compilation_level=SIMPLE_OPTIMIZATIONS \
         -d output_format=text \

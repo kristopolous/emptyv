@@ -15,18 +15,21 @@ img{border:0}
 <body>
 <div id=vid2></div><div id=vid1></div><div id=vid0></div>
 <div id=channel>34<br>MTV</div>
-<div id=controls>
-<img title="Toggle Mute" onclick=mutetoggle(this) id=mute src=images/mute_off_32.png>
-<a style=text-align:center target=_blank href="%20# suggest"><img src=images/mt80s_cyber.png></a>
-</div>
+<div id=controls></div>
 </body>
 <script>
 var _gaq=(_gaq||[]).concat(['_setAccount','UA-28399789-1'],['_trackPageview']),_referenceTime=<?=microtime(true);?>,ga;
-setTimeout(function() {
+function loader(url){
 ga=document.createElement('script');ga.type='text/javascript';ga.async=true;
-ga.src=('https:'==document.location.protocol?'https://ssl':'http://www')+'.google-analytics.com/ga.js';
-var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(ga,s);
-},3000);
+ga.src=url;
+var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(ga,s);}
+setTimeout(function() {
+loader('http://www.google-analytics.com/ga.js');
+document.getElementById("controls").innerHTML=[
+'<img title="Toggle Mute" onclick=mutetoggle(this) id=mute src=images/mute_off_32.png>',
+'<a style=text-align:center target=_blank href="%20# suggest"><img src=images/mt80s_cyber.png></a>'
+].join('');
+},5000);
 </script>
 <script src=js/all.min.js></script>
 </html>
