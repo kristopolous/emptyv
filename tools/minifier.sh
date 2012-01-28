@@ -3,7 +3,7 @@ cd ../js
 in=all.js
 out=all.min.js
 
-cat swfobject.js playlist.js mt80s.js > all.js 
+cat swfobject.js lean.js mt80s.js > all.js 
 curl -s \
         -d compilation_level=SIMPLE_OPTIMIZATIONS \
         -d output_format=text \
