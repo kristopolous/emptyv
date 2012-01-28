@@ -99,7 +99,7 @@ function search(){
        ].join(''));
     }
   } else {
-    $("#results").html( 'enter a title or artist' );
+    $("#results").html( 'Enter a title or artist on the left!' );
   }
 }
 
@@ -116,14 +116,26 @@ $(function(){
   if(document.location.hash.length == 0) {
     document.location += "# suggest";
   } 
+
   var lastHash;
 
   setInterval(function(){
     var hash = document.location.hash.replace(/\ /, '');
     if(hash != lastHash) {
       lastHash = hash;
-      $(lastHash).addClass("sel").siblings().removeClass("sel");
-      $("#header a").filter(function(){ return '#' + this.href.split('#')[1] == lastHash}).addClass("sel").siblings().removeClass("sel");
+
+      $(lastHash)
+        .addClass("sel")
+        .siblings()
+        .removeClass("sel");
+
+      $("#header a").filter(function(){ 
+        return this.href.split('#')[1].slice(1) == lastHash
+      })
+        .addClass("sel")
+        .siblings()
+        .removeClass("sel");
+
       if(lastHash.substr(1) in on) {
         on[lastHash.substr(1)]();
       }

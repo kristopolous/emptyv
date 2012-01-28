@@ -74,9 +74,9 @@ function remainingTime() {
 
 function toTime(sec) {
   return [
-    (sec / 3600).toFixed(0),
-    ((sec / 60).toFixed(0) % 60 + 100).toString().substr(1),
-    ((sec.toFixed(0) % 60) + 100).toString().substr(1)
+    Math.floor(sec / 3600),
+    (Math.floor(sec / 60) % 60 + 100).toString().substr(1),
+    ((Math.floor(sec) % 60) + 100).toString().substr(1)
   ].join(':');
 }
 
