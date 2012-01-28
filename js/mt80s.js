@@ -449,44 +449,6 @@ function flashChannel(){
     }, 1000);
 }
 
-// This is the replacement to get to the reqest and legal part of the site
-// It's a gammification style operation and made to look as thematically
-// consistent as possible. This is addressing issue 8
-function flashRequest() {
-  var 
-    ix = 1250,
-    body = "Log-in to the cyber request line!",
-    interval,
-    period = body.length + 1800,
-    remaining,
-    drawstart = period - body.length - 70,
-    ival = setInterval(function(){
-      ix++;
-      interval = ix % period;
-      if(interval > drawstart) {
-        remaining = period - interval;
-
-        var len = Math.min(remaining - 62, body.length);
-        document.getElementById("request").innerHTML = body.slice(0, body.length - len);
-        if(len > 0) {
-          document.getElementById("request").innerHTML += "_";
-        }
-
-        if(remaining < 28) {
-          if ((interval >> 2) % 2 == 0) { 
-            document.getElementById("request").style.visibility = "hidden";
-          } else {
-            document.getElementById("request").style.visibility = "visible";
-          }
-        } 
-
-      } else if (interval == 0) {
-        document.getElementById("request").innerHTML = "";
-        document.getElementById("request").style.visibility = "visible";
-      }
-    }, 100);
-}
-
 function onYouTubePlayerReady(playerId) {
   var id = parseInt(playerId.split('-')[1]);
   _player[ id ] = document.getElementById(playerId);
@@ -496,7 +458,6 @@ function onYouTubePlayerReady(playerId) {
     show(_next);
     findOffset();
     flashChannel();
-    flashRequest();
     setInterval(findOffset, YTLOADTIME_sec * 1000 / 10);
 
     setTimeout(function(){ 
@@ -598,9 +559,7 @@ function loadPlayer(ix) {
   );
 }
 
-(function(){
-  // Load two players to be transitioned between at a nominal
-  // resolution ... this is irrelevant as quality will be 
-  // managed in a more sophisticated manner than size of screen.
-  loadPlayer(0);
-})();
+// Load two players to be transitioned between at a nominal
+// resolution ... this is irrelevant as quality will be 
+// managed in a more sophisticated manner than size of screen.
+loadPlayer(0);
