@@ -28,7 +28,7 @@ a.sel{background:maroon}
 i{font-size:0.75em;font-style:normal;color:#555}
 td a{color:blue;text-decoration:underline;cursor:pointer}
 #results{margin-top:1.25em}
-.optional{border:1px solid #eeeeaa;background:#f6f6cc}
+.optional{border:1px solid #abc;background:#def}
 .optional em{display:block;font-size:0.8em;color:grey}
 #suggest-input span{padding:3px 10px;margin:6px 0}
 #suggest-input {font-size:0.95em}
