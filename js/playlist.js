@@ -183,7 +183,7 @@ var _duration = [
 ["yt:N5XkKceOvwY", 223, 0, 0, 100, 1978, "Kraftwerk", "The Robots", "clean"],
 ["yt:NN5OgiwprP8", 237, 0, 0, 100, 1983, "RedRockets", "China", "logo title"],
 ["yt:NVQCpI4GbKQ", 218, 0, 0, 100, 1983, "Icicle Works", "Whisper To A Scream Birds Fly", "clean title"],
-["yt:NXQYyKzyDaE", 266, 0, 0, 100, 1984, "Talk Talk", "It's My Life", "vevo"],
+["yt:NXQYyKzyDaE", 256, 0, 10, 100, 1984, "Talk Talk", "It's My Life", "vevo"],
 ["yt:NZ2X2_ts5Kw", 118, 0, 0, 100, 1981, "Josie Cotton", "Johnny Are You Queer?", "clean"],
 ["yt:Nl8ULWxt7sQ", 150, 0, 0, 100, 1988, "The Primitives", "Crash", "logo"],
 ["yt:Nm_QilrHkh8", 220, 0, 0, 100, 1986, "The Jets", "Crush on You", "clean"],
