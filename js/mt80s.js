@@ -55,6 +55,11 @@ var
 
 // }} // Constants
 
+// This is for IE
+if (typeof console == "undefined") {
+  self.console = {log: new Function()}
+}
+
 // Utils {{
 function getNow(offset) {
   return +(new Date() / 1000) + (offset || 0);
