@@ -1,3 +1,5 @@
+// This is for the minimizer
+(function(){
 // Constants {{
 var
   ID = 0,
@@ -174,7 +176,7 @@ for(var ix = 0; ix < _duration.length; ix++) {
 
 // }} // Globals
 
-function mutetoggle(el){
+self.mutetoggle = function(el){
   _muted = !_muted;
 
   if(_muted) {
@@ -466,7 +468,7 @@ function flashChannel(){
     }, 1000);
 }
 
-function onYouTubePlayerReady(playerId) {
+self.onYouTubePlayerReady = function(playerId) {
   var id = parseInt(playerId.split('-')[1]);
   _player[ id ] = document.getElementById(playerId);
   timer("player ready");
@@ -588,3 +590,4 @@ function loadPlayer(ix) {
 // resolution ... this is irrelevant as quality will be 
 // managed in a more sophisticated manner than size of screen.
 loadPlayer(0);
+})();
