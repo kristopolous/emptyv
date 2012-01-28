@@ -211,7 +211,7 @@ var _duration = [
 ["yt:Q13FbBavgz4", 173, 0, 0, 100, 1983, "Taco", "Superphysical Resurrection", "clean"],
 ["yt:QQxl9EI9YBg", 303, 0, 0, 100, 1987, "U2", "Where The Streets Have No Name", "logo ytad"],
 ["yt:QYHxGBH6o4M", 202, 0, 0, 100, 1981, "Rick James", "Super Freak", "vevo"],
-["yt:QZN4qLSwS5U", 140, 0, 0, 100, 1967, "The Doors", "People are strange", "clean"],
+["yt:bKyweX0rfOE", 140, 0, 0, 100, 1967, "The Doors", "People are strange", "clean"],
 ["yt:QdV-5ivltkc", 347, 0, 0, 100, 1982, "Yazoo", "Situation", "clean"],
 ["yt:QmDCTLAi67A", 214, 0, 0, 100, 1982, "The Flirts", "Helpless", ""],
 ["yt:QtPefHZ0PV0", 185, 0, 0, 100, 1981, "Electric Light Orchestra", "Hold on Tight", "clean ytad"],
