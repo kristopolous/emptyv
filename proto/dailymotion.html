@@ -4,8 +4,22 @@
 </div>
 
 <script type="text/javascript">
-    var params = { allowScriptAccess: "always" };
-    var atts = { id: "mydmplayer" };
-    swfobject.embedSWF("http://www.dailymotion.com/swf/VIDEO_ID&enableApi=1&playerapiid=dmplayer",
-                       "dmapiplayer", "425", "356", "9", null, null, params, atts);
+var player;
+self.onDailymotionPlayerReady = function(id) {
+  player = document.getElementById("mydmplayer");
+  setTimeout(function(){
+    player.mute();
+    player.setVolume(0);
+    player.loadVideoById("x1zonp");
+    player.mute();
+    player.setVolume(0);
+    player.playVideo();
+    player.mute();
+    player.setVolume(0);
+  }, 1000);
+}
+  var params = { allowScriptAccess: "always" };
+  var atts = { id: "mydmplayer" };
+  swfobject.embedSWF("http://www.dailymotion.com/swf?chromeless=1&enableApi=1&playerapiid=dmplayer",
+                     "dmapiplayer", "425", "356", "9", null, null, params, atts);
 </script>
