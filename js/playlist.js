@@ -251,7 +251,7 @@ var _duration = [
 ["yt:X2LTL8KgKv8", 233, 0, 0, 100, 1983, "Corey Hart", "Sunglasses At Night", "vevo"],
 ["yt:XeJLZi0uyJw", 220, 0, 0, 100, 1984, "Sheila E.", "The Glamorous Life", "rage logo"],
 ["yt:Xn-od3KxBZw", 144, 0, 0, 100, 1965, "Nancy Sinatra", "These Boots Are Made For Walking", "clean"],
-["yt:Xuz94ZIPfJk", 298, 0, 0, 100, 1984, "Bronski Beat", "Smalltwon Boy", "mtv2 logo ytad title"],
+["yt:Xuz94ZIPfJk", 298, 0, 0, 100, 1984, "Bronski Beat", "Smalltown Boy", "mtv2 logo ytad title"],
 ["yt:YEZSpj5R5L4", 123, 0, 0, 100, 1981, "Sandii & The Sunsetz", "Alive", "mtv2 logo"],
 ["yt:YPnGPIMUnus", 224, 0, 0, 100, 1978, "Armi Ja Danny", "I Want to Love You Tender", "mtv logo"],
 ["yt:YR5ApYxkU-U", 361, 0, 0, 100, 1979, "Pink Floyd", "Another Brick in the Wall", "vh1 logo title"],
