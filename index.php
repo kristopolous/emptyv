@@ -27,12 +27,12 @@ ga=document.createElement('script');ga.type='text/javascript';ga.async=true;
 ga.src=url;
 var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(ga,s);}
 setTimeout(function() {
-loader('http://www.google-analytics.com/ga.js');
 document.getElementById("controls").innerHTML=[
 '<img title="Toggle Mute" onclick=mutetoggle(this) id=mute src=images/mute_off_32.png>',
 '<a style=text-align:center target=_blank href="%20# suggest"><img src=images/mt80s_cyber.png></a>'
 ].join('');
-},5000);
+loader('http://www.google-analytics.com/ga.js');
+},1000);
 </script>
 <script src=js/swfobject.js></script> 
 <script src=js/evda.min.js></script> 
