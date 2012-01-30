@@ -21,18 +21,28 @@ img{border:0}
 <div id=controls></div>
 </body>
 <script>
-var _gaq=(_gaq||[]).concat(['_setAccount','UA-28399789-1'],['_trackPageview']),_referenceTime=<?=microtime(true);?>,ga;
-function loader(url){
-ga=document.createElement('script');ga.type='text/javascript';ga.async=true;
-ga.src=url;
-var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(ga,s);}
+
+var 
+  _gaq=[['_setAccount','UA-28399789-1'],['_trackPageview']],
+  _referenceTime=<?=microtime(true);?>,
+  ga,
+  s;
+
+(function(){
+ga=document.createElement('script');
+ga.type='text/javascript';
+ga.async=true;
+ga.src='http://www.google-analytics.com/ga.js';
+s=document.getElementsByTagName('script')[0];
+s.parentNode.insertBefore(ga,s);
+})();
+
 setTimeout(function() {
 document.getElementById("controls").innerHTML=[
 '<img title="Toggle Mute" onclick=mutetoggle(this) id=mute src=images/mute_off_32.png>',
 '<a style=text-align:center target=_blank href="%20# suggest"><img src=images/mt80s_cyber.png></a>'
 ].join('');
-loader('http://www.google-analytics.com/ga.js');
-},1000);
+},4000);
 </script>
 <script src=js/swfobject.js></script> 
 <script src=js/evda.min.js></script> 
