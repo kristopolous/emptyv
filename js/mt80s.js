@@ -407,7 +407,7 @@ function findOffset() {
 
   if ( _index in _playerById ) {
 
-    if (_duration[_index][RUNTIME] - lapse < COMMERCIAL_sec + LOADTIME_sec) {
+    if (_duration[_index][RUNTIME] - lapse < 2 * LOADTIME_sec) {
       transition(
         (_index + 1) % _duration.length, 
         _duration[(_index + 1) % _duration.length][START]

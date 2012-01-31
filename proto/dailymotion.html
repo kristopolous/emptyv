@@ -5,18 +5,21 @@
 
 <script type="text/javascript">
 var player;
-self.onDailymotionPlayerReady = function(id) {
+function cb() {
+    console.log("My debug >> ", this, arguments);
+    return false;
+}
+function onDailymotionPlayerReady() {
   player = document.getElementById("mydmplayer");
-  setTimeout(function(){
-    player.mute();
-    player.setVolume(0);
-    player.loadVideoById("x1zonp");
-    player.mute();
-    player.setVolume(0);
-    player.playVideo();
-    player.mute();
-    player.setVolume(0);
-  }, 1000);
+  player.loadVideoById("x1zonp");
+  player.addEventListener("onStateChange", "cb");
+  player.addEventListener("onNonlinearAdComplete", "cb");
+  player.addEventListener("onNonlinearAdStart", "cb");
+  player.addEventListener("onLinearAdComplete", "cb");
+  player.addEventListener("onLinearAdStart", "cb");
+  player.loadVideoById("x1zonp");
+//    player.loadVideoById("000000");
+
 }
   var params = { allowScriptAccess: "always" };
   var atts = { id: "mydmplayer" };
