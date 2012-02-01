@@ -106,7 +106,7 @@ var _duration = [
 ["yt:Eglgj77T0rk", 180, 0, 0, 100, 1982, "Devo", "Peek-A-Boo", "clean"],
 ["yt:EnDtoFX5ITU", 155, 0, 0, 100, 1982, "Trees", "Shock Of The New", "mtv2 logo title"],
 ["yt:EnmTtC7A_qc", 158, 0, 0, 100, 1986, "A Split-Second", "Flesh", "clean title"],
-["yt:Ey9tJUxMk8Q", 243, 0, 0, 100, 1986, "V. Spy V. Spy", "Don't Tear It Down", "clean"],
+//["yt:Ey9tJUxMk8Q", 243, 0, 0, 100, 1986, "V. Spy V. Spy", "Don't Tear It Down", "clean", BAD],
 ["yt:F0FBi5Rv1ho", 277, 0, 0, 100, 1986, "Peter Gabriel", "Big Time", "clean"],
 ["yt:F0KGF8lg6Dc", 253, 0, 0, 100, 1987, "Pseudo Echo", "Living in a Dream", "logo"],
 ["yt:FG1NrQYXjLU", 203, 0, 0, 100, 1982, "Billy Idol", "Dancing with Myself", "vevo"],
