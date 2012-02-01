@@ -246,6 +246,7 @@ var _duration = [
 ["yt:VPgHbt0ODr4", 176, 0, 0, 100, 1980, "Adam and The Ants", "Stand and Deliver", "clean"],
 ["yt:VQzVHs4pn9A", 204, 0, 0, 100, 1983, "Yello", "I Love You", "clean ytad"],
 ["yt:VdphvuyaV_I", 296, 0, 3, 100, 1983, "Billy Idol", "Rebel Yell", "vevo"],
+["yt:VutHETzf2vU", 454, 0, 0, 100, 1986, "Colonel Abrams", "Speculation", "vevo"],
 ["yt:W-NiJ9K4QKM", 201, 0, 0, 100, 1988, "C. C. Catch", "Backseat Of Your Cadillac", "clean"],
 ["yt:W0YdJ66fM_c", 198, 0, 0, 100, 1982, "Total Coelo", "Dracula's Tango", "clean"],
 ["yt:WANNqr-vcx0", 149, 0, 0, 100, 1967, "Jefferson Airplane", "White Rabbit", "clean"],
