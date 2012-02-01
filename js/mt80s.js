@@ -541,6 +541,7 @@ function transition(index, offset, force) {
   ev.isset(dom + _next, function() {
     if(dom === "yt") {
       _player[_next].loadVideoById(uuid, offset);
+      _player[_next].setVolume(0);
       _player[_next].playVideo();
     } else {
       // In the DM api, you can mute prior to loading
