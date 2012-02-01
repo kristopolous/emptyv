@@ -1,5 +1,7 @@
 var _duration = [
 //["dm:x1zonp", 182, 0, 0, 100, 1983, "The Cure", "Pictures Of You", "clean"],
+//["yt:3i0DMbCKnAg", 397, 0, 0, 100, "Eric Burdon & War", "Spill The Wine", "clean"],
+//["yt:Ey9tJUxMk8Q", 243, 0, 0, 100, 1986, "V. Spy V. Spy", "Don't Tear It Down", "clean", BAD],
 //["yt:Lr0xJBsVbZY", 256, 0, 0, 100, 1984, "Jennifer Rush", "The Power of Love", "clean"]
 //yt:O8PyqxPLUeA", 213, 0, 0, 100, 1983, "The Psychedelic Furs", "Love My Way", "clean ytad"],
 ["yt:-5EmnQp3V48", 193, 0, 0, 100, 1978, "The Commodores", "Brick House", "clean ytad"],
@@ -106,7 +108,6 @@ var _duration = [
 ["yt:Eglgj77T0rk", 180, 0, 0, 100, 1982, "Devo", "Peek-A-Boo", "clean"],
 ["yt:EnDtoFX5ITU", 155, 0, 0, 100, 1982, "Trees", "Shock Of The New", "mtv2 logo title"],
 ["yt:EnmTtC7A_qc", 158, 0, 0, 100, 1986, "A Split-Second", "Flesh", "clean title"],
-//["yt:Ey9tJUxMk8Q", 243, 0, 0, 100, 1986, "V. Spy V. Spy", "Don't Tear It Down", "clean", BAD],
 ["yt:F0FBi5Rv1ho", 277, 0, 0, 100, 1986, "Peter Gabriel", "Big Time", "clean"],
 ["yt:F0KGF8lg6Dc", 253, 0, 0, 100, 1987, "Pseudo Echo", "Living in a Dream", "logo"],
 ["yt:FG1NrQYXjLU", 203, 0, 0, 100, 1982, "Billy Idol", "Dancing with Myself", "vevo"],
@@ -166,6 +167,7 @@ var _duration = [
 ["yt:LV0eTlLU31k", 215, 0, 0, 100, 1987, "Latin Fire", "Fancy", "badtitle poor"],
 ["yt:LoF_a0-7xVQ", 257, 0, 0, 100, 1983, "Suicidal Tendencies", "Institutionalized", "clean ytad"],
 ["yt:Lp2qcCrdBLA", 225, 0, 0, 100, 1986, "Modern Talking", "Brother Louie", "vevo"],
+["yt:Lr-OgG1A74c", 221, 0, 0, 100, 1988, "Farley Jackmaster Funk", "Love Can't Turn Around", "clean"],
 ["yt:LuN6gs0AJls", 228, 0, 0, 100, 1982, "Modern English", "I Melt With You ", "clean ytad"],
 ["yt:LuyS9M8T03A", 255, 0, 0, 100, 1982, "George Clinton", "Atomic Dog", "clean"],
 ["yt:LxLhytQ67fs", 440, 0, 0, 100, 1985, "Cyndi Lauper", "The Goonies 'R' Good Enough", "vevo"],
