@@ -4,6 +4,7 @@ var _duration = [
 //["yt:Ey9tJUxMk8Q", 243, 0, 0, 100, 1986, "V. Spy V. Spy", "Don't Tear It Down", "clean", BAD],
 //["yt:Lr0xJBsVbZY", 256, 0, 0, 100, 1984, "Jennifer Rush", "The Power of Love", "clean"]
 //yt:O8PyqxPLUeA", 213, 0, 0, 100, 1983, "The Psychedelic Furs", "Love My Way", "clean ytad"],
+["yt:-0cFzZt4mc4", 231, 0, 0, 100, 1985, "Propaganda", "p: Machinery", "clean"],
 ["yt:-5EmnQp3V48", 193, 0, 0, 100, 1978, "The Commodores", "Brick House", "clean ytad"],
 ["yt:-5Yx2TnN9mc", 330, 0, 0, 100, 1984, "Alphaville", "Forever Young", "clean"],
 ["yt:-6Y-t85vs4g", 257, 0, 0, 100, 1983, "U2", "New Years Day", "u2.com logo ytad"],
@@ -186,6 +187,7 @@ var _duration = [
 ["yt:N-uyWAe0NhQ", 150, 0, 0, 100, 1979, "Madness", "One Step Beyond", "clean title"],
 ["yt:N5XkKceOvwY", 223, 0, 0, 100, 1978, "Kraftwerk", "The Robots", "clean"],
 ["yt:NIHJ9RMAVGI", 219, 0, 0, 100, 1971, "The Who", "Won't get Fooled Again", "clean"],
+["yt:NKxMueL61z0", 256, 0, 0, 100, 1985, "Belfegore", "All That I Wanted", "logo title"],
 ["yt:NN5OgiwprP8", 237, 0, 0, 100, 1983, "RedRockets", "China", "logo title"],
 ["yt:NVQCpI4GbKQ", 218, 0, 0, 100, 1983, "Icicle Works", "Whisper To A Scream Birds Fly", "clean title"],
 ["yt:NXQYyKzyDaE", 256, 0, 10, 100, 1984, "Talk Talk", "It's My Life", "vevo"],
@@ -278,6 +280,7 @@ var _duration = [
 ["yt:_QtJh7Akb7s", 285, 0, 0, 100, 1981, "Rush", "Tom Sawyer", "clean"],
 ["yt:_SDvb3cjPQg", 208, 0, 0, 100, 1985, "Toy Dolls", "James Bond Lives Down our Street", "clean"],
 ["yt:_UXtort76gY", 239, 0, 0, 100, 1983, "Berlin", "The Metro", "almostclean title"],
+["yt:_pqC563bX_w", 207, 0, 0, 100, 1982, "Captain Sensible", "Wot", "clean"],
 ["yt:_r0n9Dv6XnY", 219, 0, 0, 100, 1985, "Baltimora", "Tarzan Boy", "mtv2 logo title"],
 ["yt:_w4Xulsjo5I", 223, 0, 0, 100, 1982, "Falco", "Der Kommissar", "no logo title"],
 ["yt:a5N7RNQUKts", 202, 0, 0, 100, 1986, "Bangles", "Walk like an Egyptian", "mtv4 logo title"],
