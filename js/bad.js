@@ -53,3 +53,8 @@ _bad = [
 ["yt:g0XLKcMoXRE", 1988, "Van Halen", "Hot for Teacher", MISSING],
 ["yt:vmOf3npKf9I", 1980, "Sparks", "Funny Face", BAD]
 ];
+//["dm:x1zonp", 182, 0, 0, 100, 1983, "The Cure", "Pictures Of You", "clean"],
+//["yt:3i0DMbCKnAg", 397, 0, 0, 100, "Eric Burdon & War", "Spill The Wine", "clean"],
+//["yt:Ey9tJUxMk8Q", 243, 0, 0, 100, 1986, "V. Spy V. Spy", "Don't Tear It Down", "clean", BAD],
+//["yt:Lr0xJBsVbZY", 256, 0, 0, 100, 1984, "Jennifer Rush", "The Power of Love", "clean"]
+//yt:O8PyqxPLUeA", 213, 0, 0, 100, 1983, "The Psychedelic Furs", "Love My Way", "clean ytad"],
