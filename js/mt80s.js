@@ -55,7 +55,7 @@ var
   NEXTVIDEO_PRELOAD = 3,
 
   // @ref: http://code.google.com/apis/youtube/flash_api_reference.html
-  LEVELS = ["small", "medium", "large"]; //, "hd720", "hd1080", "highres"];
+  LEVELS = ["small", "medium"];//, "large"]; //, "hd720", "hd1080", "highres"];
 
 // }} // Constants
 
@@ -129,7 +129,7 @@ var
   // combat drift (basically by playing without hitting a buffer interval)
   //
   // We start at medium quality and then the skies the limit, I guess.
-  _currentLevel = 2,
+  _currentLevel = 1,
   
   // The lag counter is a token system that gets set by an interval.  If
   // we accumulate a certain negative or positive balance, then we can exchange
