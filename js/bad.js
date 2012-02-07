@@ -49,8 +49,10 @@ _bad = [
 ["yt:bIr0yrKeR40", 1982, "Bizzy & Co", "Take a Chance", POOR], 
 ["yt:eSMeUPFjQHc", 1994, "Erasure", "Always", WRONG],
 ["", "(all)", "Prince", "(all)", MISSING],
+["", "(all)", "Dire Straits", "(all)", MISSING],
 ["", "(all)", "The Cure", "(all)", EMBED],
 ["yt:g0XLKcMoXRE", 1988, "Van Halen", "Hot for Teacher", MISSING],
+["yt:", 1976, "Rod Stewart", "Do Ya Think I'm Sexy?", EMBED],
 ["yt:vmOf3npKf9I", 1980, "Sparks", "Funny Face", BAD]
 ];
 //["dm:x1zonp", 182, 0, 0, 100, 1983, "The Cure", "Pictures Of You", "clean"],
