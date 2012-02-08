@@ -53,6 +53,7 @@ _bad = [
 ["", "(all)", "The Cure", "(all)", EMBED],
 ["yt:g0XLKcMoXRE", 1988, "Van Halen", "Hot for Teacher", MISSING],
 ["yt:", 1976, "Rod Stewart", "Do Ya Think I'm Sexy?", EMBED],
+["yt:sSRQCMq1gB8", 1973, "Black Sabbath", "Iron Man", EMBED],
 ["yt:vmOf3npKf9I", 1980, "Sparks", "Funny Face", BAD]
 ];
 //["dm:x1zonp", 182, 0, 0, 100, 1983, "The Cure", "Pictures Of You", "clean"],
