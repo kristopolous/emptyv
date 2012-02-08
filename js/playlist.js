@@ -389,6 +389,7 @@ var _duration = [
 ["yt:kOnde5c7OG8", 255, 0, 0, 100, 1982, "Roxy Music", "More Than This", "vevo"],
 ["yt:knLqYYO-PaM", 233, 0, 0, 100, 1982, "Sunnyboys", "You Need A Friend", "clean"],
 ["yt:kvDMlk3kSYg", 282, 0, 0, 100, 1978, "Boney M", "Rasputin", "clean"],
+["yt:l039y9FaIjc", 631, 0, 0, 100, 1988, "Michael Jackson", "Speed Demon", "vevo"],
 ["yt:kwb9-OlQimc", 157, 0, 0, 100, 1982, "Culture Club", "I'll Tumble 4 Ya", "vevo"],
 ["yt:kykts8xH8q4", 233, 0, 0, 100, 1986, "Device", "Hanging On A Heart Attack", "clean"],
 ["yt:lDK9QqIzhwk", 249, 0, 0, 100, 1986, "Bon Jovi", "Livin' On A Prayer", "vevo"],
