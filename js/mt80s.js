@@ -99,13 +99,13 @@ function toTime(sec) {
 }
 
 function hide(player) {
-  if(player) {
+  if(player && player.style) {
     player.style.left = "-200%";
   }
 }
 
 function show(player) {
-  if(player) {
+  if(player && player.style) {
     player.style.left = 0;
   }
 }
@@ -215,8 +215,8 @@ function secondarySwap(){
       _player[EXTRA].stopVideo();
 
       // Show the higher quality and hide the current one
-      hide(EXTRA);
-      show(_active);
+      hide(_player[EXTRA]);
+      show(_player[_active]);
 
       // And then clear the polling interval
       clearInterval(swapInterval);
@@ -317,8 +317,8 @@ function setQuality(direction) {
           var myplayer = _playerById[_index];
           setTimeout(function(){
             // Show the higher quality and hide the current one
-            hide(_active);
-            show(EXTRA);
+            hide(_player[_active]);
+            show(_player[EXTRA]);
 
             // Bring the volume up of the higher quality player and mute the current
             if(!_muted) {
