@@ -429,6 +429,7 @@ var _duration = [
 ["yt:q4-hixGlELw", 291, 0, 0, 100, 1985, "Propaganda", "Duel", "clean"],
 ["yt:qLl44pj7a70", 147, 0, 0, 100, 1980, "Plastics", "Top Secret Man", "clean"],
 ["yt:qdt2DJQ-pyk", 209, 0, 0, 100, 1983, "QED", "Everywhere I Go", "clean"],
+["yt:szfIDtAlV2Y", 240, 0, 0, 100, 1984, "Alphaville", "Dance With Me", "clean"],
 ["yt:qkV4-QNxLFM", 233, 0, 0, 100, 1984, "Depeche Mode", "Master and Servant", "clean"],
 ["yt:qt0-4FzoNgw", 236, 0, 0, 100, 1980, "The Angels", "Face The Day", "ytad clean"],
 ["yt:qxZInIyOBXk", 218, 0, 0, 100, 1988, "Pat Benatar", "We Belong", "vevo"],
