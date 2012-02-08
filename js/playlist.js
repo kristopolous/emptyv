@@ -377,6 +377,7 @@ var _duration = [
 ["yt:jPfCOe8_VEw", 320, 0, 0, 100, 1986, "Gloria Estefan & Miami Sound Machine", "Conga", "clean ytad"],
 ["yt:jPj-8_wOZcA", 267, 5, 0, 100, 1986, "Public Image Ltd.", "Rise", "clean"],
 ["yt:jUHYLBxmUEw", 305, 0, 0, 100, 1985, "Thomas Dolby", "I Scare Myself", "vevo"],
+["yt:mO3IEDRsP2Q", 269, 0, 0, 100, 1984, "Alphaville", "Sounds Like A Melody", "logo"],
 ["yt:j_RcdZzDg3c", 226, 0, 0, 100, 1983, "Class Action", "Weekend", "logo ytad"],
 ["yt:jlkarj6uJdE", 315, 0, 0, 100, 1987, "INXS", "The Devil Inside", "clean"],
 ["yt:jlsYEuv4rwA", 261, 0, 0, 100, 1982, "Whodini", "Magic's Wand", "logo"],
