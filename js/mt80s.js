@@ -500,10 +500,10 @@ function onReady(domain, id) {
     _offsetIval = setInterval(findOffset, LOADTIME_sec * 1000 / 10);
 
     setTimeout(function(){ 
-      loadPlayer("dm",3);
-      loadPlayer("yt",1);
-      loadPlayer("yt",2); 
-      loadPlayer("dm",4);
+      loadPlayer("dm", 3);
+      loadPlayer("yt", 1);
+      loadPlayer("yt", 2); 
+      loadPlayer("dm", 4);
     }, 2000);
   } 
 }
@@ -588,15 +588,30 @@ function transition(index, offset, force) {
     // can just seek back without a buffering issue.
     setTimeout(function(){
       log("volume changed");
-      _player[_next].seekTo(offset);
+
+      var myPlayer = _player[_next];
+      myPlayer.seekTo(offset);
 
       // Crank up the volume to the computed normalization
-      // level.
-      if(_muted) {
-        _player[_next].setVolume(0);
-      } else {
-        _player[_next].setVolume(_duration[index][VOLUME]);
-      }
+      // level. 
+      //
+      // There's some issue with a fraction of a second
+      // being respected before the seeking goes on, so you hear
+      // a little click then the seekback happens ... I'm guessing
+      // because the seekTo is some kind of asynchronous non-blocking
+      // call and then the volume takes place immediately. 
+      //
+      // So to combat this we simply put a 100ms timeout around
+      // the volume adjusting, accounting for the possibility of
+      // this being the first video of course.
+      setTimeout(function(){
+        if(_muted) {
+          myPlayer.setVolume(0);
+        } else {
+          myPlayer.setVolume(_duration[index][VOLUME]);
+        }
+      }, Math.min(100, remainingTime(_playerPrev[_active])));
+
     }, force ? 8000 : Math.max((remainingTime(_playerPrev[_active]) - NEXTVIDEO_PRELOAD) * 1000, 0));
 
     setTimeout(function(){
