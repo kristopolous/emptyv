@@ -259,7 +259,7 @@ var _duration = [
 ["yt:fcpQQ63zhLU", 263, 0, 0, 100, 1984, "Public Image Limited", "The Order Of Death", "clean"],
 ["yt:WZ-1DYwaxrE", 230, 0, 0, 100, 1983, "Freez", "I.O.U", "clean"],
 ["yt:ZzEo0z5q-XY", 233, 0, 0, 100, 1984, "John Rocca", "I Want It To Be Real", "clean"],
-["yt:egDJc1HhiZ4", 230, 0, 0, 100, 1984, "INXS", "Original Sin", "clean"],
+["yt:egDJc1HhiZ4", 230, 0, 0, 80, 1984, "INXS", "Original Sin", "clean"],
 ["yt:UBnF7et1plA", 218, 0, 0, 100, 1984, "Go-Gos", "Head Over Heels", "logo title)"],
 ["yt:JH3WvI_S6-k", 213, 0, 0, 100, 1986, "Bananarama", "Venus", "rage logo title"],
 ["yt:CdqoNKCCt7A", 260, 0, 0, 100, 1985, "Simple Minds", "Don't You (Forget About Me)", "vevo"],
