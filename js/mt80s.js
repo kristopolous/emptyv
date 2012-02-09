@@ -242,6 +242,15 @@ function setQuality(direction) {
     return;
   }
 
+  // For certain EMI and Polydor muted tracks, 240p (small) works
+  // ok for youtube ... we put 240p in the notes section if this is
+  // the case.
+  if(_duration[_index][NOTES].search("240p") > 0) {
+    // If this is the case, then we limit ourselves to just the 
+    // lowest quality video
+    activeAvailable = ["small"];
+  }
+
   if(direction === -1) {
     _qualityTimeout = 2 * LOADTIME_sec + getNow();
   } else if (direction > 0 && getNow() < _qualityTimeout) {
