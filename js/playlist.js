@@ -58,6 +58,8 @@ var _duration = [
 ["yt:7rtIN9dWHsw", 246, 0, 0, 100, 1989, "808 State", "Pacific State", "clean"],
 ["yt:7uEBuqkkQRk", 225, 0, 0, 100, 1986, "New Order", "Bizarre Love Triangle", "clean"],
 ["yt:7v2GDbEmjGE", 251, 0, 0, 100, 1980, "The Police", "De Do Do Do, De Da Da Da", "vevo"],
+["yt:FRJeN6laaLI", 182, 0, 0, 100, 1990, "The Cure", "Pictures Of You", "240p"],
+["yt:AI10KXw2jzo", 208, 0, 0, 100, 1980, "Joy Division", "Love Will Tear Us Apart", "240p"],
 ["yt:7wqxHThRgsA", 212, 2, 0, 100, 1986, "Nu Shooz", "Point of No Return", "clean"],
 ["yt:8NjbGr2nk2c", 241, 0, 0, 100, 1983, "Michael Sembello (Flashdance)", "Maniac", "clean ytad"],
 ["yt:8SbUC-UaAxE", 548, 0, 0, 100, 1991, "Guns N' Roses", "November Rain", "vevo"],
