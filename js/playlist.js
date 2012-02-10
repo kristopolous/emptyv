@@ -43,7 +43,7 @@ var _duration = [
 ["yt:DH1O6nyKnow", 222, 0, 0, 100, 1982, "Scandal", "Goodbye to You", "logo"],
 ["yt:4kHl4FoK1Ys", 195, 0, 0, 100, 1984, "Modern Talking", "Your my heart, Your my sould", "vevo"],
 ["yt:4nuR780B458", 249, 0, 0, 100, 1983, "Spandau Ballet", "Communication", "vh1 logo title"],
-["yt:4xmckWVPRaI", 272, 0, 0, 100, 1984, "Twisted Sister", "We're Not Gonna Take It", "vevo"],
+//["yt:4xmckWVPRaI", 272, 0, 0, 100, 1984, "Twisted Sister", "We're Not Gonna Take It", "vevo"],
 ["yt:4yM9uVeVLNM", 214, 0, 0, 100, 1984, "John Rocca", "Once Upon A Time", "ytad clean"],
 ["yt:4z_usl6i9IY", 228, 0, 0, 100, 1985, "Katrina and the Waves", "Walking on Sunshine", "vh1 logo title"],
 ["yt:5HI_xFQWiYU", 219, 0, 0, 100, 1988, "When In Rome", "The Promise", "vevo"],
