@@ -442,10 +442,13 @@ function findOffset() {
 
       // If we have been buffering for a while, 
       // then we will downsample and shift forward
-      if( (drift < -LOADTIME_sec * 3 && _playerById[_index].getCurrentTime() > 0) 
+      if( (drift < -LOADTIME_sec  && _playerById[_index].getCurrentTime() > 0) 
         ) {
         log(_lagCounter, LAG_THRESHHOLD, drift, LOADTIME_sec, _index, playerById[_index].getCurrentTime());
-        setQuality(-1);
+
+        if( drift < -LOADTIME_sec * 2) {
+          setQuality(-1);
+        }
         _lagCounter -= LAG_THRESHHOLD;
 
         log("Seeking:", lapse, _playerById[_index].getCurrentTime());
