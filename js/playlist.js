@@ -322,6 +322,7 @@ var _duration = [
 ["yt:azr2ooLlfzQ", 272, 0, 0, 100, 1982, "Berlin", "Masquerade", "ytad logo"],
 ["yt:b-98JMMsgPY", 192, 2, 0, 100, 1984, "The Treacherous Three & Doug E Fresh", "Santa's Rap", "line"],
 ["yt:b9xBAtCsCTQ", 271, 0, 0, 100, 1983, "Trans-X", "Living on Video", "clean ytad"],
+["yt:-f_t3KZoVIc", 236, 0, 0, 100, 1983, "Fun Fun", "Color My Love", "clean"],
 ["yt:bDbpzjbXUZI", 246, 0, 0, 100, 1985, "Eddie Murphy", "Party All The Time", "logo ytad title"],
 ["yt:bEea624OBzM", 220, 0, 0, 100, 1978, "Billy Joel", "Big Shot", "vevo"],
 ["yt:bHoPYLQvnQM", 215, 0, 0, 100, 1983, "Slade", "Run Runaway", "clean"],
