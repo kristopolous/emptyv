@@ -358,6 +358,7 @@ var _duration = [
 ["yt:di60NYGu03Y", 223, 0, 0, 100, 1986, "Pet Shop Boys", "Opportunities", "vevo"],
 ["yt:dsUXAEzaC3Q", 260, 0, 0, 100, 1987, "Michael Jackson", "Beat It", "vevo"],
 ["yt:e3W6yf6c-FA", 304, 0, 0, 100, 1982, "Duran Duran", "Rio", "vevo"],
+["yt:Ac0oaXhz1u8", 190, 0, 0, 100, 1983, "R.E.M.", "Radio Free Europe", "vevo"],
 ["yt:eB1LI9j2btc", 239, 0, 0, 100, 1989, "The B-52's", "Roam", "clean ytad"],
 ["yt:eFTLKWw542g", 246, 0, 0, 100, 1989, "Billy Joel", "We Didn't Start The Fire", "vevo"],
 ["yt:eH3giaIzONA", 315, 0, 0, 100, 1987, "Whitney Houston", "I Wanna Dance With Somebody", "vevo"],
