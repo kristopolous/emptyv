@@ -47,6 +47,7 @@ var _duration = [
 ["yt:4nuR780B458", 249, 0, 0, 100, 1983, "Spandau Ballet", "Communication", "vh1 logo title"],
 //["yt:4xmckWVPRaI", 272, 0, 0, 100, 1984, "Twisted Sister", "We're Not Gonna Take It", "vevo"],
 ["yt:4yM9uVeVLNM", 214, 0, 0, 100, 1984, "John Rocca", "Once Upon A Time", "ytad clean"],
+["yt:NRX63vec5R0", 250, 0, 0, 100, 1980, "Kano", "It's A War", "logos"],
 ["yt:4z_usl6i9IY", 228, 0, 0, 100, 1985, "Katrina and the Waves", "Walking on Sunshine", "vh1 logo title"],
 ["yt:5HI_xFQWiYU", 219, 0, 0, 100, 1988, "When In Rome", "The Promise", "vevo"],
 ["yt:5IBRbzf3Fws", 298, 0, 0, 100, 1988, "Rob Base DJ E Z Rock", "It Takes Two", "clean ytad"],
