@@ -503,10 +503,10 @@ function onReady(domain, id) {
     _offsetIval = setInterval(findOffset, LOADTIME_sec * 1000 / 10);
 
     setTimeout(function(){ 
-      loadPlayer("dm", 3);
+      //loadPlayer("dm", 3);
       loadPlayer("yt", 1);
       loadPlayer("yt", 2); 
-      loadPlayer("dm", 4);
+      //loadPlayer("dm", 4);
     }, 2000);
   } 
 }
