@@ -291,6 +291,7 @@ var _duration = [
 ["yt:VQzVHs4pn9A", 204, 0, 0, 100, 1983, "Yello", "I Love You", "clean ytad"],
 ["yt:WGU_4-5RaxU", 221, 0, 0, 100, 1980, "Blondie", "Heart Of Glass", "vevo"],
 ["yt:Wn9E5i7l-Eg", 257, 0, 0, 100, 1988, "Pet Shop Boys", "What Have I Done To Deserve This?", "vevo"],
+["yt:QE61Bz7IHKg", 329, 0, 0, 100, 1982, "Howard Jones", "What is Love", "clean"],
 ["yt:X2LTL8KgKv8", 233, 0, 0, 100, 1983, "Corey Hart", "Sunglasses At Night", "vevo"],
 ["yt:XeJLZi0uyJw", 220, 0, 0, 100, 1984, "Sheila E.", "The Glamorous Life", "rage logo"],
 ["yt:Xn-od3KxBZw", 144, 0, 0, 100, 1965, "Nancy Sinatra", "These Boots Are Made For Walking", "clean"],
