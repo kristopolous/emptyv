@@ -1,7 +1,7 @@
 var _duration = [
 ["yt:-0cFzZt4mc4", 231, 0, 0, 100, 1985, "Propaganda", "p: Machinery", "clean"],
 ["yt:IC3hhqqk128", 270, 0, 0, 100, 1984, "The Cars", "Hello Again", "logo"],
-["yt:Vn_j9T_DD4k", 305, 0, 0, 100, 1982, "Iron Maiden", "The Number Of The Beast", "clean"],
+["yt:jsmcDLDw9iw", 305, 0, 0, 100, 1982, "Iron Maiden", "The Number Of The Beast", "clean"],
 ["yt:dJeBvNuYPMM", 505, 0, 0, 100, 1975, "Stargazer", "Rainbow", "clean"],
 ["yt:-5EmnQp3V48", 193, 0, 0, 100, 1978, "The Commodores", "Brick House", "clean ytad"],
 ["yt:-5Yx2TnN9mc", 330, 0, 0, 100, 1984, "Alphaville", "Forever Young", "clean"],
@@ -404,7 +404,7 @@ var _duration = [
 ["yt:jF_coqVZJwM", 204, 0, 0, 100, 1977, "Arabesque", "Hello Mr. Monkey", "clean"],
 ["yt:jFfc2LsCPnQ", 154, 0, 0, 100, 1979, "Pointed Sticks", "Lies", "clean"],
 ["yt:jItz-uNjoZA", 224, 0, 0, 100, 1981, "Oingo Boingo", "Little Girls", "clean"],
-["yt:jPfCOe8_VEw", 320, 0, 0, 100, 1986, "Gloria Estefan & Miami Sound Machine", "Conga", "clean ytad"],
+//["yt:jPfCOe8_VEw", 320, 0, 0, 100, 1986, "Gloria Estefan & Miami Sound Machine", "Conga", "clean ytad"],
 ["yt:jPj-8_wOZcA", 267, 5, 0, 100, 1986, "Public Image Ltd.", "Rise", "clean"],
 ["yt:jUHYLBxmUEw", 305, 0, 0, 100, 1985, "Thomas Dolby", "I Scare Myself", "vevo"],
 ["yt:mO3IEDRsP2Q", 269, 0, 0, 100, 1984, "Alphaville", "Sounds Like A Melody", "logo"],
