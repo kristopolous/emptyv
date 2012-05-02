@@ -699,7 +699,8 @@ function showchat(){
     data = [
       [0, "type a message below"],
       [1, "everyone will see it"],
-      [2, "in real time"]
+      [2, "in real time"],
+      [3, "go crazy"]
     ];
 
   function getdata() {
