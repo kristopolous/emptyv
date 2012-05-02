@@ -8,15 +8,15 @@ var
   LANGUAGE_CURRENT = LANGUAGE,
 
   COLORS = [
-    "#04819E",
-    "#FFB100",
-    "#7247D7",
-    "#8D6DD7",
-    "#6E84DC",
-    "#FFD473",
-    "#8D6DD7",
-    "#3882CE",
-    "#60B9CE"
+    "#DC92A8",
+    "#7689C8",
+    "#E0A298",
+    "#386CB3",
+    "#8C6884",
+    "#F4E557",
+    "#C33431",
+    "#9c007b",
+    "#b3b3b9"
   ],
 
   MYCOLOR = Math.floor(Math.random() * COLORS.length),
@@ -722,7 +722,7 @@ var chat = {
     [0, "Type a message below"],
     [1, "everyone will see it"],
     [2, "in real time"],
-    [3, "go crazy"]
+    [3, "Everything you say is in the same color. You may be sharing your color with others. Have fun with that. ;-D"]
   ], 
   lastid: 0,
   datatimeout: null
