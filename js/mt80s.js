@@ -755,6 +755,8 @@ function showchat(){
 
   chat.getdata = function() {
     if(LANGUAGE_CURRENT == "none") {
+      clearTimeout(chat.datatimeout);
+      chat.datatimeout = setTimeout(chat.getdata, 10000);
       return;
     }
 
