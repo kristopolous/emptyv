@@ -383,7 +383,7 @@ function doTitle(){
     var newtitle = _duration[_index][ARTIST] + " - " + _duration[_index][TITLE];
     if(LASTTITLE != newtitle) {
       LASTTITLE = newtitle;
-      addmessage("<b>Playing:</b> " + newtitle);
+      addmessage("<b>Playing:</b> <a target=_blank href=http://youtube.com/watch?v=" + _duration[_index][ID] + ">" + newtitle + "</a>");
     }
     document.title = LASTMESSAGE + newtitle + " | " + toTime(getNow() - _start);
   }
@@ -741,6 +741,7 @@ function showchat(){
     row,
     lastEntry = "",
     entryCount = 0,
+    entryList = [],
     lastindex = 0, 
     lastTime = new Date(),
     lastmessageid = 0;
@@ -770,6 +771,7 @@ function showchat(){
   }
 
   chat.hide = function() {
+    LASTMESSAGE = "";
     $("#talk").slideUp();
     $("#message").slideUp();
   }
@@ -810,10 +812,11 @@ function showchat(){
       if(lastEntry != chat.data[lastindex][1]) {
         lastEntry = chat.data[lastindex][1];
         if(entryCount > 10) {
-          $("#message :first-child").fadeOut().remove();
+          entryList.shift().fadeOut().remove();
         }
 
-        var entry = $("<div>").html(lastEntry).css('opacity', 1);
+        var entry = $("<div>").html(lastEntry);
+        entryList.push(entry);
 
         if(chat.data[lastindex].length > 2) {
           entry.css("color", COLORS[chat.data[lastindex][2]]);
