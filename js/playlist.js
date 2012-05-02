@@ -389,7 +389,7 @@ var _duration = [
 ["yt:hCuMWrfXG4E", 203, 0, 0, 100, 1984, "Billy Joel", "Uptown Girl", "vevo"],
 ["yt:hFVuuRxM2VU", 286, 0, 0, 100, 1983, "Culture Club", "Miss Me Blind", "vevo"],
 ["yt:hRqdOyMnnxM", 323, 0, 0, 100, 1985, "New Order", "Perfect Kiss", "logo"],
-["yt:h_D3VFfhvs4", 589, 0, 0, 100, 1988, "Michael Jackson", "Smooth Criminal", "vevo"],
+["yt:h_D3VFfhvs4", 585, 0, 0, 100, 1988, "Michael Jackson", "Smooth Criminal", "vevo"],
 ["yt:hqyc37aOqT0", 293, 6, 0, 100, 1986, "Peter Gabriel", "Sledgehammer", "logo"],
 ["yt:hrUUKoz8IM0", 218, 0, 0, 100, 1986, "XTC", "Dear God", "logo ytad"],
 ["yt:i-j3xITvYQY", 282, 0, 0, 100, 1973, "Pink Floyd", "Money", "logo ytad"],

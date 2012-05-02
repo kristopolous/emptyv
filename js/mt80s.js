@@ -487,7 +487,7 @@ function flashChannel(){
 
   setTimeout(function(){
     $("#description").fadeOut(showchat);
-  }, 3000);
+  }, 7000);
 }
 
 function onReady(domain, id) {
