@@ -24,6 +24,17 @@ if(strlen($data) > 0) {
   if($r->lLen($key) > 20) {
     $r->lPop($key);
   }
+
+  if($language != "all" ){
+    $key = "mt80s:all";
+    $data = Array($r->incr($key . ":ix"), $data, $color);
+
+    $r->rPush($key, json_encode($data));
+
+    if($r->lLen($key) > 20) {
+      $r->lPop($key);
+    }
+  }
 }
 return json_encode($data);
 

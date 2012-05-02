@@ -724,7 +724,8 @@ var chat = {
     [3, "in real time"],
     [4, "go crazy"]
   ], 
-  lastid: 0
+  lastid: 0,
+  datatimeout: null
 };
 
 function addmessage(data) {
@@ -739,28 +740,30 @@ function showchat(){
     lastindex = 0, 
     lastmessageid = 0;
 
-  function getdata() {
+  chat.getdata = function() {
     $.get("srv/getchat.php", {
       lastid: chat.lastid,
       language: LANGUAGE
     }, function(newdata) {
       chat.data = chat.data.concat(newdata);
       chat.lastid = chat.data[chat.data.length - 1][0];
-      setTimeout(getdata, 3000);
+      chat.datatimeout = setTimeout(chat.getdata, 5000);
     }, "json");
   }
 
-  getdata();
+  chat.getdata();
 
   _.each([
     'en',
     'pl',
     'zh',
-    'jp'
+    'jp',
+    'all'
   ], function(which) {
     var unit = $("<a>" + which + "</a>").click(function(){
       $(this).addClass('selected').siblings().removeClass('selected');
       LANGUAGE = which;
+      addmessage("Switched to language:" + which);
     }).appendTo("#language_tab");
     if(LANGUAGE == which) {
       unit.addClass("selected");
@@ -810,6 +813,9 @@ function dochat() {
       language: LANGUAGE,
       color: MYCOLOR,
       data: message
+    }, function(){
+      clearTimeout(chat.datatimeout);
+      chat.getdata();
     });
     $("#talk").val("");
   }
