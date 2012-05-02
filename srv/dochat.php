@@ -9,11 +9,11 @@ function redisLink() {
 }
 
 $r = redisLink();
-$data = Array($r->incr("mt80s:ix"), $_GET['data']);
+$data = Array($r->incr("mt80s:ix"), strip_tags($_GET['data'], '<i><b><u>'));
 
 $r->rPush("mt80s", json_encode($data));
-if($r->lSize("mt80s") > 50) {
-  $r->lRem("mt80s", 25);
+if($r->lSize("mt80s") > 10) {
+  $r->lRem("mt80s", 5);
 }
 
 ?>

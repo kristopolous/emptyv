@@ -22,7 +22,7 @@ $data = $r->lRange('mt80s',0, -1);
 foreach($data as $row) {
   $row = json_decode($row, true);
   if($row[0] > $lastid) {
-    $row[1] = stripslashes($row[1]);
+    $row[1] = htmlspecialchars(stripslashes($row[1]));
     $output[] = $row;
   }
 }
