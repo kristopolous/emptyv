@@ -5,6 +5,7 @@ var
   ID = 0,
 
   LANGUAGE = navigator.language.split('-')[0],
+  LANGUAGE_CURRENT = LANGUAGE,
 
   COLORS = [
     "#04819E",
@@ -742,13 +743,13 @@ function showchat(){
   chat.getdata = function() {
     $.get("srv/getchat.php", {
       lastid: chat.lastid,
-      version: 1,
-      language: LANGUAGE
+      version: VERSION,
+      language: LANGUAGE_CURRENT
     }, function(newdata) {
       chat.data = chat.data.concat(newdata);
       chat.lastid = chat.data[chat.data.length - 1][0];
       clearTimeout(chat.datatimeout);
-      chat.datatimeout = setTimeout(chat.getdata, 5000);
+      chat.datatimeout = setTimeout(chat.getdata, 15000);
     }, "json");
   }
 
@@ -757,12 +758,13 @@ function showchat(){
   _.each([ LANGUAGE, 'all' ], function(which) {
     var unit = $("<a>" + which + "</a>").click(function(){
       $(this).addClass('selected').siblings().removeClass('selected');
-      LANGUAGE = which;
+      LANGUAGE_CURRENT = which;
       addmessage("Switched to language:" + which);
     }).appendTo("#language_tab");
-    if(LANGUAGE == which) {
+    if(LANGUAGE_CURRENT == which) {
       unit.addClass("selected");
     }
+    $("#language_tab").css('opacity', 0.7);
   });
 
   function showmessage() {
@@ -805,7 +807,7 @@ function dochat() {
   var message = $("#talk").val();
   if(message.length) {
     $.get("srv/dochat.php", {
-      version: 1,
+      version: VERSION,
       language: LANGUAGE,
       color: MYCOLOR,
       data: message
@@ -813,8 +815,8 @@ function dochat() {
       clearTimeout(chat.datatimeout);
       chat.getdata();
     });
-    $("#talk").val("");
   }
+  $("#talk").val("");
 }
 
 function pickcolor(){

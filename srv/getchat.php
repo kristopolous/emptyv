@@ -1,4 +1,5 @@
 <?
+include("globals.php");
 
 function redisLink() {
   static $r = false;
@@ -22,7 +23,7 @@ $language = $_GET['language'];
 $key = "mt80s:" . $language;
 $data = $r->lRange($key,0, -1);
 $version = $_GET['version'];
-if(intval($version) != 1) {
+if(intval($version) != $VERSION) {
   echo json_encode(Array(Array($lastid + 1, "<script>window.location.reload()</script>")));
   exit(0);
 }

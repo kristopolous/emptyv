@@ -1,10 +1,12 @@
+<?  include_once("srv/globals.php"); ?>
 <!doctype html>
 <html><head><meta name=description content="Non-stop back-to-back music videos from the 1980s"><title>1980s MTV</title>
 <style>
 body{background:#000}
 img{border:0}
-#language_tab a{background:#222;color:#aaa;padding:2px;font-family:Verdana;margin:0 3px;cursor:pointer}
-#language_tab a.selected{background:#555;color:#fff}
+#language_tab {float:right}
+#language_tab a{background:#222;color:#999;padding:0.05em 0.4em;font-family:Verdana;margin:0 0 0 0.15em;cursor:pointer;font-size:0.75em}
+#language_tab a.selected{background:#333;color:#eee}
 #players object,#players embed{position:absolute;top:0;left:0%;width:100%;height:100%;z-index:0}
 #mute{cursor:pointer;padding:5px 0 5px 10px}
 #controls{position:fixed;top:0;right:0;z-index:9;opacity:0.7}
@@ -12,7 +14,7 @@ img{border:0}
 #controls > *:hover{background:#555}
 #channel{text-align:center;position:absolute;z-index:9;opacity:0.7;width:100px;top:1em;left:0.5em;color:#8f8;font:bold 40px "Lucida Console",Monaco,monospace;line-height:0.85em}
 #description{box-shadow:0px 0px 4px 4px #555;background:#222;padding:0.75em;font-family:Tahoma, Geneva, sans-serif;position:absolute;bottom:1em;left:1em;font-size:0.95em;font-weight:normal;text-align:left;color:white}
-#chatbar{display:none;position:absolute;bottom:0.5em;left:0.75em}
+#chatbar{display:none;position:absolute;bottom:1em;left:0.75em}
 #message{font-family:Tahoma, Geneva, sans-serif;font-size:0.95em;font-weight:normal;text-align:left;color:#ccc}
 #message div{background:#222;width:205px;padding:0.25em 0.4em}
 #talk{
@@ -36,16 +38,17 @@ at the same time. Just like TV.<br>
 <b>Have fun and please share!</b>
 </div>
 <div id=chatbar> 
-  <div id=language_tab></div>
   <div id=message></div>
   <form action=javascript:dochat() autocomplete=off>
     <input id=talk></input>
   </form>
+  <div id=language_tab></div>
 </div>
 </body>
 <script>
 
 var 
+  VERSION = <?= $VERSION ?>,
   _gaq=[['_setAccount','UA-28399789-1'],['_trackPageview']],
   _referenceTime=<?=microtime(true);?>,
   ga,

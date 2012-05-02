@@ -1,4 +1,5 @@
 <?
+include("globals.php");
 function redisLink() {
   static $r = false;
 
@@ -16,7 +17,7 @@ $data = trim($_GET['data']);
 $color = $_GET['color'];
 $language = $_GET['language'];
 $version = $_GET['version'];
-if(intval($version) != 1) {
+if(intval($version) != $VERSION) {
   return;
 }
 $key = "mt80s:" . $language;
