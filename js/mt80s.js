@@ -718,7 +718,9 @@ function showchat(){
   function showmessage() {
     if(data.length > lastindex) {
       $("#message").fadeOut(function(){
-        $("#message").html(data[lastindex][1]).fadeIn();
+        if($("#message").html() != data[lastindex][1]) {
+          $("#message").html(data[lastindex][1]).fadeIn();
+        }
 
         if(lastindex > 3) {
           LASTMESSAGE = data[lastindex][1] + " - ";
