@@ -33,7 +33,7 @@ at the same time. Just like TV.<br>
 </div>
 <div id=chatbar> 
   <div id=message></div>
-  <form action=javascript:dochat()>
+  <form action=javascript:dochat() autocomplete=off>
     <input id=talk></input>
   </form>
 </div>

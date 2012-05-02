@@ -715,7 +715,12 @@ function addmessage(data) {
 }
 
 function showchat(){
-  var lastindex = 0, lastmessageid = 0;
+  var 
+    row,
+    lastEntry = "",
+    entryCount = 0,
+    lastindex = 0, 
+    lastmessageid = 0;
 
   function getdata() {
     $.get("srv/getchat.php?lastid=" + chat.lastid, function(newdata) {
@@ -733,17 +738,21 @@ function showchat(){
         LASTMESSAGE = chat.data[lastindex][1] + " - ";
       }
 
-      if($("#message").html() != chat.data[lastindex][1]) {
-        $("#message").fadeOut(function(){
-          $("#message").html(chat.data[lastindex][1]).fadeIn();
-
-          lastindex++;
-          setTimeout(showmessage, 1000);
+      if(lastEntry != chat.data[lastindex][1]) {
+        lastEntry = chat.data[lastindex][1];
+        if(entryCount > 10) {
+          $("#message :first-child").fadeOut().remove();
+        }
+        $("#message div").each(function(){
+          var op = $(this).css('opacity');
+          $(this).css('opacity', op - 0.09);
         });
-      } else {
-        lastindex++;
-        setTimeout(showmessage, 1000);
-      }
+
+        $("#message").append($("<div>").html(lastEntry).css('opacity', 1));
+        entryCount++;
+      } 
+      setTimeout(showmessage, entryCount > 10 ? 1000 : 1);
+      lastindex++;
     } else {
       setTimeout(showmessage, 1000);
     }
@@ -758,7 +767,7 @@ function dochat() {
   var message = $("#talk").val();
   if(message.length) {
     $.get("srv/dochat.php", {data: message});
-    $("#message").html(message);
+    addmessage(message);
     $("#talk").val("");
   }
 }
