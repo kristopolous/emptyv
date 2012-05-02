@@ -719,7 +719,7 @@ function loadPlayer(domain, ix) {
 
 var chat = {
   data: [
-    [0, "Then, type a message below"],
+    [0, "Type a message below"],
     [1, "everyone will see it"],
     [2, "in real time"],
     [3, "go crazy"]

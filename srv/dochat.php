@@ -17,6 +17,12 @@ $data = trim($_GET['data']);
 $color = $_GET['color'];
 $language = $_GET['language'];
 $version = $_GET['version'];
+
+if(strlen($data) > 200) {
+  $data = substr($data, 0, 200);
+  $data .= '...';
+}
+
 if(intval($version) != $VERSION) {
   return;
 }
@@ -26,22 +32,20 @@ if(strlen($data) > 0) {
 
   $r->rPush($key, json_encode($redisdata));
 
-  if($r->lLen($key) > 20) {
+  while($r->lLen($key) > 15) {
     $r->lPop($key);
   }
 
   if($language != "all" ){
     $key = "mt80s:all";
-    $data = Array($r->incr($key . ":ix"), $data, $color);
+    $redisdata = Array($r->incr($key . ":ix"), "[$language]: " . $data, $color);
 
-    $r->rPush($key, json_encode($data));
+    $r->rPush($key, json_encode($redisdata));
 
-    if($r->lLen($key) > 20) {
+    while($r->lLen($key) > 15) {
       $r->lPop($key);
     }
   }
-  $data = $redisdata;
 }
-return json_encode($data);
 
 ?>
