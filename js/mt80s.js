@@ -4,7 +4,7 @@
 var
   ID = 0,
 
-  LANGUAGE = 'en',
+  LANGUAGE = navigator.language.split('-')[0],
 
   COLORS = [
     "#04819E",
@@ -718,11 +718,10 @@ function loadPlayer(domain, ix) {
 
 var chat = {
   data: [
-    [0, "FIRST SELECT YOUR LANGUAGE ABOVE"],
-    [1, "Then, type a message below"],
-    [2, "everyone will see it"],
-    [3, "in real time"],
-    [4, "go crazy"]
+    [0, "Then, type a message below"],
+    [1, "everyone will see it"],
+    [2, "in real time"],
+    [3, "go crazy"]
   ], 
   lastid: 0,
   datatimeout: null
@@ -754,13 +753,7 @@ function showchat(){
 
   chat.getdata();
 
-  _.each([
-    'en',
-    'pl',
-    'zh',
-    'jp',
-    'all'
-  ], function(which) {
+  _.each([ LANGUAGE, 'all' ], function(which) {
     var unit = $("<a>" + which + "</a>").click(function(){
       $(this).addClass('selected').siblings().removeClass('selected');
       LANGUAGE = which;
