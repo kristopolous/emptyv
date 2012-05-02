@@ -751,7 +751,7 @@ function showchat(){
         $("#message").append($("<div>").html(lastEntry).css('opacity', 1));
         entryCount++;
       } 
-      setTimeout(showmessage, entryCount > 10 ? 1000 : 1);
+      setTimeout(showmessage, 1000);
       lastindex++;
     } else {
       setTimeout(showmessage, 1000);
