@@ -18,10 +18,7 @@ img{border:0}
 #chatbar{display:none;position:absolute;bottom:0.5em;left:0.75em}
 #message{font-family:Tahoma, Geneva, sans-serif;font-size:0.95em;font-weight:normal;text-align:left;color:#ccc}
 #message div{background:#222;width:205px;padding:0.25em 0.4em;overflow:hidden}
-#talk{
-box-shadow: 0 0 2px 2px #444;
-background:#333;
-color:#ccc;border-width:0;border-top:1px solid #666;font-size:0.85em;width:207px;padding:0.15em 3px;margin-left:2px}
+#talk{display:block;box-shadow: 0 0 2px 2px #444;background:#333;color:#ccc;border-width:0;border-top:1px solid #666;font-size:0.85em;width:207px;padding:0.15em 3px;margin-left:2px}
 </style>
 <!--[if IE]><link rel=stylesheet href=css/ie.css><![endif]-->
 </head>
@@ -40,9 +37,7 @@ at the same time. Just like TV.<br>
 </div>
 <div id=chatbar> 
   <div id=message></div>
-  <form action=javascript:dochat() autocomplete=off>
-    <input id=talk maxlength=200></input>
-  </form>
+  <input id=talk onenter=dochat maxlength=200>
   <div id=language_tab></div>
 </div>
 </body>
@@ -64,23 +59,22 @@ s=document.getElementsByTagName('script')[0];
 s.parentNode.insertBefore(ga,s);
 })();
 
-(function(){
-ga=document.createElement('script');
-ga.type='text/javascript';
-ga.async=true;
-ga.src='js/jquery-1.7.1.min.js';
-s=document.getElementsByTagName('script')[0];
-s.parentNode.insertBefore(ga,s);
-})();
+var scripts = [
+  'js/jquery-1.7.1.min.js',
+  'js/underscore-min.js'
+];
 
-(function(){
-ga=document.createElement('script');
-ga.type='text/javascript';
-ga.async=true;
-ga.src='js/underscore-min.js';
-s=document.getElementsByTagName('script')[0];
-s.parentNode.insertBefore(ga,s);
-})();
+for(var i = 0; i < scripts.length; i++) {
+  (function(){
+  ga=document.createElement('script');
+  ga.type='text/javascript';
+  ga.async=true;
+  ga.src=scripts[i];
+  s=document.getElementsByTagName('script')[0];
+  s.parentNode.insertBefore(ga,s);
+  })();
+}
+
 setTimeout(function() {
 document.getElementById("controls").innerHTML=[
 '<img title="Toggle Mute" onclick=mutetoggle(this) id=mute src=images/mute_off_32.png>',

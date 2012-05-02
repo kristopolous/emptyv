@@ -740,6 +740,13 @@ function showchat(){
     lastindex = 0, 
     lastmessageid = 0;
 
+  $("#talk").keydown(function(e){
+    var kc = window.event ? window.event.keyCode : e.which;
+    if(kc == 13) {
+      dochat();
+    }
+  });
+
   chat.getdata = function() {
     $.get("srv/getchat.php", {
       lastid: chat.lastid,

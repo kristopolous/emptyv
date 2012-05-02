@@ -134,7 +134,7 @@ var _duration = [
 ["yt:HjNTu8jdukA", 237, 0, 0, 100, 1988, "Slick Rick", "Childrens' Story", "vevo"],
 ["yt:I1wg1DNHbNU", 223, 0, 0, 100, 1981, "Talking Heads", "Once in a lifetime", "clean"],
 ["yt:IGVZOLV9SPo", 318, 0, 0, 100, 1983, "Pat Benatar", "Love Is A Battlefield", "vevo"],
-["yt:IW-ftxIrhBc", 217, 0, 0, 100, 1984, "Depeche Mode", "People Are People", "clean"],
+["yt:MzGnX-MbYE4", 220, 0, 0, 100, 1984, "Depeche Mode", "People Are People", "clean"],
 ["yt:IcTP7YWPayU", 225, 0, 0, 100, 1984, "Eurythmics", "Sex Crime 1984", "clean"],
 ["yt:IuezNswtRfo", 253, 0, 0, 100, 1988, "The Sisters Of Mercy", "Lucretia, My Reflection", "clean"],
 ["yt:IwK67UvWPJs", 181, 0, 0, 100, 1978, "Cissy Houston", "Think It Over", "clean"],
