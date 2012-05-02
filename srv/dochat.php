@@ -28,7 +28,7 @@ if(intval($version) != $VERSION) {
 }
 $key = "mt80s:" . $language;
 if(strlen($data) > 0) {
-  $redisdata = Array($r->incr($key . ":ix"), $data, $color);
+  $redisdata = Array($r->incr("mt80s:ix"), $data, $color);
 
   $r->rPush($key, json_encode($redisdata));
 
@@ -38,7 +38,7 @@ if(strlen($data) > 0) {
 
   if($language != "all" ){
     $key = "mt80s:all";
-    $redisdata = Array($r->incr($key . ":ix"), "[$language]: " . $data, $color);
+    $redisdata = Array($r->incr("mt80s:ix"), "[$language]: " . $data, $color);
 
     $r->rPush($key, json_encode($redisdata));
 
