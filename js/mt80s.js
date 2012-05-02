@@ -766,6 +766,7 @@ function showchat(){
     var unit = $("<a>" + which + "</a>").click(function(){
       $(this).addClass('selected').siblings().removeClass('selected');
       LANGUAGE_CURRENT = which;
+      lastindex = chat.data.length - 1;
       addmessage("Switched to language:" + which);
     }).appendTo("#language_tab");
     if(LANGUAGE_CURRENT == which) {
@@ -785,10 +786,6 @@ function showchat(){
         if(entryCount > 10) {
           $("#message :first-child").fadeOut().remove();
         }
-        $("#message div").each(function(){
-          var op = $(this).css('opacity');
-          $(this).css('opacity', op - 0.09);
-        });
 
         var entry = $("<div>").html(lastEntry).css('opacity', 1);
 
@@ -798,7 +795,7 @@ function showchat(){
         $("#message").append(entry);
         entryCount++;
       } 
-      setTimeout(showmessage, 500);
+      setTimeout(showmessage, entryCount < 5 ? 1200 : 300);
       lastindex++;
     } else {
       setTimeout(showmessage, 500);
