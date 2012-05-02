@@ -8,15 +8,23 @@ function redisLink() {
   return $r;
 }
 
+$r = redisLink();
+if($r->sIsMember("mt80s:banned", $_SERVER['HTTP_X_REAL_IP'])) {
+  return json_encode(Array("banned"));
+}
 $data = trim($_GET['data']);
 $color = $_GET['color'];
+$language = $_GET['language'];
+$key = "mt80s:" . $language;
 if(strlen($data) > 0) {
-  $r = redisLink();
-  $data = Array($r->incr("mt80s:ix"), $data, $color);
+  $data = Array($r->incr($key . ":ix"), $data, $color);
 
-  $r->rPush("mt80s", json_encode($data));
-  $r->lPop("mt80s");
+  $r->rPush($key, json_encode($data));
+
+  if($r->lLen($key) > 20) {
+    $r->lPop($key);
+  }
 }
-return json_encoded($data);
+return json_encode($data);
 
 ?>

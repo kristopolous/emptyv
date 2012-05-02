@@ -3,6 +3,8 @@
 <style>
 body{background:#000}
 img{border:0}
+#language_tab a{background:#222;color:#aaa;padding:2px;font-family:Verdana;margin:0 3px;cursor:pointer}
+#language_tab a.selected{background:#555;color:#fff}
 #players object,#players embed{position:absolute;top:0;left:0%;width:100%;height:100%;z-index:0}
 #mute{cursor:pointer;padding:5px 0 5px 10px}
 #controls{position:fixed;top:0;right:0;z-index:9;opacity:0.7}
@@ -34,6 +36,7 @@ at the same time. Just like TV.<br>
 <b>Have fun and please share!</b>
 </div>
 <div id=chatbar> 
+  <div id=language_tab></div>
   <div id=message></div>
   <form action=javascript:dochat() autocomplete=off>
     <input id=talk></input>
@@ -66,6 +69,14 @@ s=document.getElementsByTagName('script')[0];
 s.parentNode.insertBefore(ga,s);
 })();
 
+(function(){
+ga=document.createElement('script');
+ga.type='text/javascript';
+ga.async=true;
+ga.src='js/underscore-min.js';
+s=document.getElementsByTagName('script')[0];
+s.parentNode.insertBefore(ga,s);
+})();
 setTimeout(function() {
 document.getElementById("controls").innerHTML=[
 '<img title="Toggle Mute" onclick=mutetoggle(this) id=mute src=images/mute_off_32.png>',

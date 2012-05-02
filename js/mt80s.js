@@ -4,6 +4,8 @@
 var
   ID = 0,
 
+  LANGUAGE = 'en',
+
   COLORS = [
     "#04819E",
     "#FFB100",
@@ -716,10 +718,11 @@ function loadPlayer(domain, ix) {
 
 var chat = {
   data: [
-    [0, "type a message below"],
-    [1, "everyone will see it"],
-    [2, "in real time"],
-    [3, "go crazy"]
+    [0, "FIRST SELECT YOUR LANGUAGE ABOVE"],
+    [1, "Then, type a message below"],
+    [2, "everyone will see it"],
+    [3, "in real time"],
+    [4, "go crazy"]
   ], 
   lastid: 0
 };
@@ -737,7 +740,10 @@ function showchat(){
     lastmessageid = 0;
 
   function getdata() {
-    $.get("srv/getchat.php?lastid=" + chat.lastid, function(newdata) {
+    $.get("srv/getchat.php", {
+      lastid: chat.lastid,
+      language: LANGUAGE
+    }, function(newdata) {
       chat.data = chat.data.concat(newdata);
       chat.lastid = chat.data[chat.data.length - 1][0];
       setTimeout(getdata, 3000);
@@ -745,6 +751,21 @@ function showchat(){
   }
 
   getdata();
+
+  _.each([
+    'en',
+    'pl',
+    'zh',
+    'jp'
+  ], function(which) {
+    var unit = $("<a>" + which + "</a>").click(function(){
+      $(this).addClass('selected').siblings().removeClass('selected');
+      LANGUAGE = which;
+    }).appendTo("#language_tab");
+    if(LANGUAGE == which) {
+      unit.addClass("selected");
+    }
+  });
 
   function showmessage() {
     if(chat.data.length > lastindex) {
@@ -770,10 +791,10 @@ function showchat(){
         $("#message").append(entry);
         entryCount++;
       } 
-      setTimeout(showmessage, 1000);
+      setTimeout(showmessage, 500);
       lastindex++;
     } else {
-      setTimeout(showmessage, 1000);
+      setTimeout(showmessage, 500);
     }
   }
   showmessage();
@@ -786,6 +807,7 @@ function dochat() {
   var message = $("#talk").val();
   if(message.length) {
     $.get("srv/dochat.php", {
+      language: LANGUAGE,
       color: MYCOLOR,
       data: message
     });

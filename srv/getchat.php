@@ -18,7 +18,9 @@ if(empty($_GET['lastid'])) {
 }
 
 $output = Array();
-$data = $r->lRange('mt80s',0, -1);
+$language = $_GET['language'];
+$key = "mt80s:" . $language;
+$data = $r->lRange($key,0, -1);
 foreach($data as $row) {
   $row = json_decode($row, true);
   if($row[0] > $lastid) {
