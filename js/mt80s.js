@@ -486,15 +486,8 @@ function flashChannel(){
     }, 1000);
 
   setTimeout(function(){
-    var start = 1, ival = setInterval(function(){
-      start -= 0.1;
-      document.getElementById("description").style.opacity = start;
-      if(start == 0) {
-        clearInterval(ival);
-        document.getElementById("description").style.display = "none";
-      }
-    }, 300);
-  }, 7000);
+    $("#description").fadeOut(showchat);
+  }, 3000);
 }
 
 function onReady(domain, id) {
@@ -698,6 +691,51 @@ function loadPlayer(domain, ix) {
     } // attributes
   );
 }
+
+function showchat(){
+  var 
+    lastid = 0,
+    lastindex = 0,
+    data = [
+      [0, "type a message below"],
+      [1, "everyone will see it"],
+      [2, "in real time"]
+    ];
+
+  function getdata() {
+    $.get("srv/getchat.php?lastid=" + lastid, function(newdata) {
+      data = data.concat(newdata);
+      lastid = data[data.length - 1][0];
+      setTimeout(getdata, 3000);
+    }, "json");
+  }
+
+  getdata();
+
+  function showmessage() {
+    if(data.length > lastindex) {
+      $("#message").fadeOut(function(){
+        $("#message").html(data[lastindex][1]).fadeIn();
+        lastindex++;
+        setTimeout(showmessage, 1000);
+      });
+    } else {
+      setTimeout(showmessage, 1000);
+    }
+  }
+  showmessage();
+
+  $("#talk").focus();
+  $("#chatbar").fadeIn();
+}
+
+function chat() {
+  var message = $("#talk").val();
+  $.get("srv/dochat.php", {data: message});
+  $("#message").html(message);
+  $("#talk").val("");
+}
+
 
 // Load the first player
 loadPlayer("yt", 0);

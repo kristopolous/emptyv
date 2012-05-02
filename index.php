@@ -10,6 +10,11 @@ img{border:0}
 #controls > *:hover{background:#555}
 #channel{text-align:center;position:absolute;z-index:9;opacity:0.7;width:100px;top:1em;left:0.5em;color:#8f8;font:bold 40px "Lucida Console",Monaco,monospace;line-height:0.85em}
 #description{box-shadow:0px 0px 4px 4px #555;background:#222;padding:0.75em;font-family:Tahoma, Geneva, sans-serif;position:absolute;bottom:1em;left:1em;font-size:0.95em;font-weight:normal;text-align:left;color:white}
+#chatbar{display:none;position:absolute;bottom:0.5em;left:0.75em}
+#message{font-family:Tahoma, Geneva, sans-serif;padding-bottom:0.25em;font-size:0.95em;font-weight:normal;text-align:left;color:#ccc}
+#talk{
+box-shadow:0 0 2px 2px #333;
+background:transparent;color:#ccc;border:1px solid #666;font-size:0.65em;width:20em;padding:0.25em}
 </style>
 <!--[if IE]><link rel=stylesheet href=css/ie.css><![endif]-->
 </head>
@@ -26,6 +31,12 @@ Everyone is watching the same video,<br>
 at the same time. Just like TV.<br>
 <b>Have fun and please share!</b>
 </div>
+<div id=chatbar> 
+  <div id=message></div>
+  <form action=javascript:chat()>
+    <input id=talk></input>
+  </form>
+</div>
 </body>
 <script>
 
@@ -40,6 +51,15 @@ ga=document.createElement('script');
 ga.type='text/javascript';
 ga.async=true;
 ga.src='http://www.google-analytics.com/ga.js';
+s=document.getElementsByTagName('script')[0];
+s.parentNode.insertBefore(ga,s);
+})();
+
+(function(){
+ga=document.createElement('script');
+ga.type='text/javascript';
+ga.async=true;
+ga.src='js/jquery-1.7.1.min.js';
 s=document.getElementsByTagName('script')[0];
 s.parentNode.insertBefore(ga,s);
 })();
