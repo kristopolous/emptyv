@@ -55,6 +55,7 @@ var
   NEXTVIDEO_PRELOAD = 3,
 
   LASTMESSAGE = "",
+  LASTTITLE = "",
 
   // @ref: http://code.google.com/apis/youtube/flash_api_reference.html
   LEVELS = ["small", "medium"];//, "large"]; //, "hd720", "hd1080", "highres"];
@@ -358,7 +359,12 @@ function setQuality(direction) {
 
 function doTitle(){
   if(_bAppend) {
-    document.title = LASTMESSAGE + _duration[_index][ARTIST] + " - " + _duration[_index][TITLE] + " | " + toTime(getNow() - _start);
+    var newtitle = _duration[_index][ARTIST] + " - " + _duration[_index][TITLE];
+    if(LASTTITLE != newtitle) {
+      LASTTITLE = newtitle;
+      addmessage("<b>Playing:</b> " + newtitle);
+    }
+    document.title = LASTMESSAGE + newtitle + " | " + toTime(getNow() - _start);
   }
 }
 
@@ -694,21 +700,27 @@ function loadPlayer(domain, ix) {
   );
 }
 
+var chat = {
+  data: [
+    [0, "type a message below"],
+    [1, "everyone will see it"],
+    [2, "in real time"],
+    [3, "go crazy"]
+  ], 
+  lastid: 0
+};
+
+function addmessage(data) {
+  chat.data.push([chat.lastid, data]);
+}
+
 function showchat(){
-  var 
-    lastid = 0,
-    lastindex = 0,
-    data = [
-      [0, "type a message below"],
-      [1, "everyone will see it"],
-      [2, "in real time"],
-      [3, "go crazy"]
-    ];
+  var lastindex = 0;
 
   function getdata() {
-    $.get("srv/getchat.php?lastid=" + lastid, function(newdata) {
-      data = data.concat(newdata);
-      lastid = data[data.length - 1][0];
+    $.get("srv/getchat.php?lastid=" + chat.lastid, function(newdata) {
+      chat.data = chat.data.concat(newdata);
+      chat.lastid = chat.data[chat.data.length - 1][0];
       setTimeout(getdata, 3000);
     }, "json");
   }
@@ -716,14 +728,14 @@ function showchat(){
   getdata();
 
   function showmessage() {
-    if(data.length > lastindex) {
-      if($("#message").html() != data[lastindex][1]) {
-        $("#message").fadeOut(function(){
-          $("#message").html(data[lastindex][1]).fadeIn();
+    if(chat.data.length > lastindex) {
+      if(lastindex > 3) {
+        LASTMESSAGE = chat.data[lastindex][1] + " - ";
+      }
 
-          if(lastindex > 3) {
-            LASTMESSAGE = data[lastindex][1] + " - ";
-          }
+      if($("#message").html() != chat.data[lastindex][1]) {
+        $("#message").fadeOut(function(){
+          $("#message").html(chat.data[lastindex][1]).fadeIn();
 
           lastindex++;
           setTimeout(showmessage, 1000);
@@ -742,11 +754,13 @@ function showchat(){
   $("#chatbar").fadeIn();
 }
 
-function chat() {
+function dochat() {
   var message = $("#talk").val();
-  $.get("srv/dochat.php", {data: message});
-  $("#message").html(message);
-  $("#talk").val("");
+  if(message.length) {
+    $.get("srv/dochat.php", {data: message});
+    $("#message").html(message);
+    $("#talk").val("");
+  }
 }
 
 
