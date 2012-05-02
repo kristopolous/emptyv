@@ -4,6 +4,19 @@
 var
   ID = 0,
 
+  COLORS = [
+    "#FFF",
+    "#FF8",
+    "#F8F",
+    "#F88",
+    "#88F",
+    "#8F8",
+    "#8FF",
+    "#F8F"
+  ],
+
+  MYCOLOR = Math.floor(Math.random() * COLORS.length),
+
   // This is the duration of the video minus the offsets in
   // the start and stop, as determined through visual inspection.
   // These are the transitions put on by different uploaders, things
@@ -748,7 +761,12 @@ function showchat(){
           $(this).css('opacity', op - 0.09);
         });
 
-        $("#message").append($("<div>").html(lastEntry).css('opacity', 1));
+        var entry = $("<div>").html(lastEntry).css('opacity', 1);
+
+        if(chat.data[lastindex].length > 2) {
+          entry.css("color", COLORS[chat.data[lastindex][2]]);
+        }
+        $("#message").append(entry);
         entryCount++;
       } 
       setTimeout(showmessage, 1000);
@@ -766,12 +784,17 @@ function showchat(){
 function dochat() {
   var message = $("#talk").val();
   if(message.length) {
-    $.get("srv/dochat.php", {data: message});
-    addmessage(message);
+    $.get("srv/dochat.php", {
+      color: MYCOLOR,
+      data: message
+    });
     $("#talk").val("");
   }
 }
 
+function pickcolor(){
+  MYCOLOR = Math.floor(Math.random() * COLORS.length);
+}
 
 // Load the first player
 loadPlayer("yt", 0);

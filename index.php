@@ -12,11 +12,11 @@ img{border:0}
 #description{box-shadow:0px 0px 4px 4px #555;background:#222;padding:0.75em;font-family:Tahoma, Geneva, sans-serif;position:absolute;bottom:1em;left:1em;font-size:0.95em;font-weight:normal;text-align:left;color:white}
 #chatbar{display:none;position:absolute;bottom:0.5em;left:0.75em}
 #message{font-family:Tahoma, Geneva, sans-serif;font-size:0.95em;font-weight:normal;text-align:left;color:#ccc}
-#message div{background:#222;width:205px;padding:0.15em 3px}
+#message div{background:#222;width:205px;padding:0.25em 0.4em}
 #talk{
 box-shadow: 0 0 2px 2px #444;
 background:#333;
-color:#ccc;border-width:0;border-top:1px solid #666;font-size:0.85em;width:200px;padding:0.15em 3px;margin-left:2px}
+color:#ccc;border-width:0;border-top:1px solid #666;font-size:0.85em;width:207px;padding:0.15em 3px;margin-left:2px}
 </style>
 <!--[if IE]><link rel=stylesheet href=css/ie.css><![endif]-->
 </head>
