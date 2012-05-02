@@ -766,16 +766,8 @@ function showchat(){
       chat.lastid = chat.data[chat.data.length - 1][0];
       clearTimeout(chat.datatimeout);
       chat.datatimeout = setTimeout(chat.getdata, 10000);
-      lastTime = new Date();
     }, "json");
   }
-  
-  setInterval(function(){
-    if((new Date()) - lastTime > 25000) { 
-      clearTimeout(chat.datatimeout);
-      chat.getdata();
-    };
-  }, 1500);
 
   chat.hide = function() {
     $("#talk").slideUp();
