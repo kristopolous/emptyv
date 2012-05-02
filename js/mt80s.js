@@ -742,6 +742,7 @@ function showchat(){
   chat.getdata = function() {
     $.get("srv/getchat.php", {
       lastid: chat.lastid,
+      version: 1,
       language: LANGUAGE
     }, function(newdata) {
       chat.data = chat.data.concat(newdata);
@@ -804,6 +805,7 @@ function dochat() {
   var message = $("#talk").val();
   if(message.length) {
     $.get("srv/dochat.php", {
+      version: 1,
       language: LANGUAGE,
       color: MYCOLOR,
       data: message

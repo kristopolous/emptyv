@@ -15,6 +15,10 @@ if($r->sIsMember("mt80s:banned", $_SERVER['HTTP_X_REAL_IP'])) {
 $data = trim($_GET['data']);
 $color = $_GET['color'];
 $language = $_GET['language'];
+$version = $_GET['version'];
+if(intval($version) != 1) {
+  return;
+}
 $key = "mt80s:" . $language;
 if(strlen($data) > 0) {
   $data = Array($r->incr($key . ":ix"), $data, $color);
