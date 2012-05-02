@@ -54,6 +54,8 @@ var
 
   NEXTVIDEO_PRELOAD = 3,
 
+  LASTMESSAGE = "",
+
   // @ref: http://code.google.com/apis/youtube/flash_api_reference.html
   LEVELS = ["small", "medium"];//, "large"]; //, "hd720", "hd1080", "highres"];
 
@@ -356,7 +358,7 @@ function setQuality(direction) {
 
 function doTitle(){
   if(_bAppend) {
-    document.title = _duration[_index][ARTIST] + " - " + _duration[_index][TITLE] + " | " + toTime(getNow() - _start);
+    document.title = LASTMESSAGE + _duration[_index][ARTIST] + " - " + _duration[_index][TITLE] + " | " + toTime(getNow() - _start);
   }
 }
 
@@ -717,6 +719,11 @@ function showchat(){
     if(data.length > lastindex) {
       $("#message").fadeOut(function(){
         $("#message").html(data[lastindex][1]).fadeIn();
+
+        if(lastindex > 3) {
+          LASTMESSAGE = data[lastindex][1] + " - ";
+        }
+
         lastindex++;
         setTimeout(showmessage, 1000);
       });
