@@ -476,14 +476,25 @@ function flashChannel(){
     ix = 0,
     ival = setInterval(function(){
       if(++ix % 2 == 0) {
-        document.getElementById("channel").style.display = "none";
+        document.getElementById("channel").style.visibility = "hidden";
         if(ix > 7) {
           clearInterval(ival);
         }
       } else {
-        document.getElementById("channel").style.display = "block";
+        document.getElementById("channel").style.visibility = "visible";
       } 
     }, 1000);
+
+  setTimeout(function(){
+    var start = 1, ival = setInterval(function(){
+      start -= 0.1;
+      document.getElementById("description").style.opacity = start;
+      if(start == 0) {
+        clearInterval(ival);
+        document.getElementById("description").style.display = "none";
+      }
+    }, 100);
+  }, 6000);
 }
 
 function onReady(domain, id) {
