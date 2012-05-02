@@ -715,7 +715,7 @@ function addmessage(data) {
 }
 
 function showchat(){
-  var lastindex = 0;
+  var lastindex = 0, lastmessageid = 0;
 
   function getdata() {
     $.get("srv/getchat.php?lastid=" + chat.lastid, function(newdata) {
@@ -729,7 +729,7 @@ function showchat(){
 
   function showmessage() {
     if(chat.data.length > lastindex) {
-      if(lastindex > 3) {
+      if(lastindex > 3 && chat.data[lastindex][1].search("<b>Playing:</b>") == -1) {
         LASTMESSAGE = chat.data[lastindex][1] + " - ";
       }
 
