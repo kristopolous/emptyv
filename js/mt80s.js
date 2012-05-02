@@ -846,9 +846,6 @@ function dochat() {
       language: LANGUAGE,
       color: MYCOLOR,
       data: message
-    }, function(){
-      clearTimeout(chat.datatimeout);
-      chat.getdata();
     });
   }
   $("#talk").val("");
