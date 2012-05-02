@@ -22,9 +22,9 @@ if(intval($version) != $VERSION) {
 }
 $key = "mt80s:" . $language;
 if(strlen($data) > 0) {
-  $data = Array($r->incr($key . ":ix"), $data, $color);
+  $redisdata = Array($r->incr($key . ":ix"), $data, $color);
 
-  $r->rPush($key, json_encode($data));
+  $r->rPush($key, json_encode($redisdata));
 
   if($r->lLen($key) > 20) {
     $r->lPop($key);
@@ -40,6 +40,7 @@ if(strlen($data) > 0) {
       $r->lPop($key);
     }
   }
+  $data = $redisdata;
 }
 return json_encode($data);
 
