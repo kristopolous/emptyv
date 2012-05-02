@@ -383,7 +383,7 @@ function doTitle(){
     var newtitle = _duration[_index][ARTIST] + " - " + _duration[_index][TITLE];
     if(LASTTITLE != newtitle) {
       LASTTITLE = newtitle;
-      addmessage("<b>Playing:</b> <a target=_blank href=http://youtube.com/watch?v=" + _duration[_index][ID] + ">" + newtitle + "</a>");
+      addmessage("<b>Playing:</b> <a target=_blank href=http://youtube.com/watch?v=" + _duration[_index][ID].split(':')[1] + ">" + newtitle + "</a>");
     }
     document.title = LASTMESSAGE + newtitle + " | " + toTime(getNow() - _start);
   }
