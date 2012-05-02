@@ -747,6 +747,7 @@ function showchat(){
     }, function(newdata) {
       chat.data = chat.data.concat(newdata);
       chat.lastid = chat.data[chat.data.length - 1][0];
+      clearTimeout(chat.datatimeout);
       chat.datatimeout = setTimeout(chat.getdata, 5000);
     }, "json");
   }
