@@ -493,8 +493,8 @@ function flashChannel(){
         clearInterval(ival);
         document.getElementById("description").style.display = "none";
       }
-    }, 100);
-  }, 6000);
+    }, 300);
+  }, 7000);
 }
 
 function onReady(domain, id) {
