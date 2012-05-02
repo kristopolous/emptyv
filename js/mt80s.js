@@ -77,6 +77,10 @@ var
   // @ref: http://code.google.com/apis/youtube/flash_api_reference.html
   LEVELS = ["small", "medium"];//, "large"]; //, "hd720", "hd1080", "highres"];
 
+  if (document.referrer.search("wykop.pl") > -1) {
+    LANGUAGE = "pl";
+  }
+
 // }} // Constants
 
 // This is for IE
@@ -738,6 +742,7 @@ function showchat(){
     lastEntry = "",
     entryCount = 0,
     lastindex = 0, 
+    lastTime = new Date(),
     lastmessageid = 0;
 
   $("#talk").keydown(function(e){
@@ -748,6 +753,10 @@ function showchat(){
   });
 
   chat.getdata = function() {
+    if(LANGUAGE_CURRENT == "none") {
+      return;
+    }
+
     $.get("srv/getchat.php", {
       lastid: chat.lastid,
       version: VERSION,
@@ -756,18 +765,43 @@ function showchat(){
       chat.data = chat.data.concat(newdata);
       chat.lastid = chat.data[chat.data.length - 1][0];
       clearTimeout(chat.datatimeout);
-      chat.datatimeout = setTimeout(chat.getdata, 15000);
+      chat.datatimeout = setTimeout(chat.getdata, 10000);
+      lastTime = new Date();
     }, "json");
+  }
+  
+  setInterval(function(){
+    if((new Date()) - lastTime > 25000) { 
+      clearTimeout(chat.datatimeout);
+      chat.getdata();
+    };
+  }, 1500);
+
+  chat.hide = function() {
+    $("#talk").slideUp();
+    $("#message").slideUp();
+  }
+  chat.show = function() {
+    console.log("SHOW");
+    $("#talk").slideDown();
+    $("#message").slideDown();
   }
 
   chat.getdata();
 
-  _.each([ LANGUAGE, 'all' ], function(which) {
+  _.each([ LANGUAGE, 'all', 'none' ], function(which) {
     var unit = $("<a>" + which + "</a>").click(function(){
       $(this).addClass('selected').siblings().removeClass('selected');
+      if (LANGUAGE_CURRENT == "none" && which != "none") {
+        chat.show();
+      }
       LANGUAGE_CURRENT = which;
-      lastindex = chat.data.length - 1;
-      addmessage("Switched to language:" + which);
+      if(which == "none") {
+        chat.hide();
+      } else {
+        lastindex = chat.data.length - 1;
+        addmessage("Switched to language:" + which);
+      }
     }).appendTo("#language_tab");
     if(LANGUAGE_CURRENT == which) {
       unit.addClass("selected");

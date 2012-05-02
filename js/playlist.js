@@ -171,7 +171,7 @@ var _duration = [
 ["yt:LuN6gs0AJls", 228, 0, 0, 100, 1982, "Modern English", "I Melt With You ", "clean ytad"],
 ["yt:XDBA3jtJ-EA", 227, 0, 0, 100, 1983, "Tears For Fears", "Mad World", "clean"],
 ["yt:LAAnF9EMfk8", 205, 0, 0, 100, 1982, "ABC", "Poison Arrow", "clean"],
-["yt:QE61Bz7IHKg", 234, 0, 0, 100, 1983, "Howard Jones", "What is Love", "clean"],
+["yt:QE61Bz7IHKg", 224, 0, 0, 100, 1983, "Howard Jones", "What is Love", "clean"],
 ["yt:M5NE1QHRSUs", 237, 0, 0, 100, 1983, "The Romantics", "Talking in your Sleep", "clean"],
 ["yt:MA5oz8b3UJM", 197, 0, 0, 100, 1983, "Pete Shelley", "Telephone Operator", "mtv2 logo"],
 ["yt:MI0a9hTh5AU", 202, 0, 0, 100, 1987, "The Cure", "Why Can't I Be You", "logo"],
