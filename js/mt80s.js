@@ -487,13 +487,13 @@ function flashChannel(){
 
   setTimeout(function(){
     var start = 1, ival = setInterval(function(){
-      start -= 0.1;
+      start -= 0.05;
       document.getElementById("description").style.opacity = start;
       if(start == 0) {
         clearInterval(ival);
         document.getElementById("description").style.display = "none";
       }
-    }, 300);
+    }, 150);
   }, 7000);
 }
 
