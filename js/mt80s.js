@@ -5,14 +5,15 @@ var
   ID = 0,
 
   COLORS = [
-    "#FFF",
-    "#FF8",
-    "#F8F",
-    "#F88",
-    "#88F",
-    "#8F8",
-    "#8FF",
-    "#F8F"
+    "#04819E",
+    "#FFB100",
+    "#7247D7",
+    "#8D6DD7",
+    "#6E84DC",
+    "#FFD473",
+    "#8D6DD7",
+    "#3882CE",
+    "#60B9CE"
   ],
 
   MYCOLOR = Math.floor(Math.random() * COLORS.length),
