@@ -717,18 +717,21 @@ function showchat(){
 
   function showmessage() {
     if(data.length > lastindex) {
-      $("#message").fadeOut(function(){
-        if($("#message").html() != data[lastindex][1]) {
+      if($("#message").html() != data[lastindex][1]) {
+        $("#message").fadeOut(function(){
           $("#message").html(data[lastindex][1]).fadeIn();
-        }
 
-        if(lastindex > 3) {
-          LASTMESSAGE = data[lastindex][1] + " - ";
-        }
+          if(lastindex > 3) {
+            LASTMESSAGE = data[lastindex][1] + " - ";
+          }
 
+          lastindex++;
+          setTimeout(showmessage, 1000);
+        });
+      } else {
         lastindex++;
         setTimeout(showmessage, 1000);
-      });
+      }
     } else {
       setTimeout(showmessage, 1000);
     }
