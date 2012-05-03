@@ -513,7 +513,7 @@ var _duration = [
 ["yt:x8RKbGgBXSQ", 261, 0, 0, 100, 1981, "Ultravox", "The Voice", "vevo"],
 ["yt:xG3yGdQYwqg", 298, 0, 0, 100, 1984, "Julie Brown", "Homecoming Queen's got a gun", "clean"],
 ["yt:KfDoPEN7n5k", 157, 0, 0, 100, 1986, "The Housemartins", "Happy Hour", "clean ytad"],
-["yt:xLFhCOYRf0E", 343, 0, 0, 100, 1990, "Megadeth", "Holy Wars...The Punishment Due", "clean"],
+["yt:9d4ui9q7eDM", 343, 0, 0, 100, 1990, "Megadeth", "Holy Wars...The Punishment Due", "clean"],
 ["yt:xLb9jPuDS9Y", 183, 0, 0, 100, 1985, "Yello", "Oh Yeah", "logo ytad"],
 ["yt:xTAjEIzDKMY", 219, 0, 0, 100, 1983, "Taco", "Singin´ in the Rain", "clean"],
 ["yt:xTzMeDiv-7U", 227, 0, 0, 100, 1984, "The Fixx", "Less Cities, More Moving People", "vevo"],

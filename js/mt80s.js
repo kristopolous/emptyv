@@ -723,10 +723,8 @@ function loadPlayer(domain, ix) {
 
 var chat = {
   data: [
-    [0, "Type a message below"],
-    [1, "everyone will see it"],
-    [2, "in real time"],
-    [3, "Everything you say is in the same color. You may be sharing your color with others. Have fun with that. ;-D"]
+    [0, "Here's a chatroom. You know what to do!"],
+    [1, "Everything you say is in the same color"]
   ], 
   lastid: 0,
   datatimeout: null
@@ -826,7 +824,7 @@ function showchat(){
         $("#message").append(entry);
         entryCount++;
       } 
-      setTimeout(showmessage, entryCount < 5 ? 1200 : 300);
+      setTimeout(showmessage, entryCount < 3 ? 1200 : 300);
       lastindex++;
     } else {
       setTimeout(showmessage, 500);
