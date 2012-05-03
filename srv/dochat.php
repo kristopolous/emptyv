@@ -45,13 +45,13 @@ if(strlen($data) > 0) {
   $id = $r->incr("mt80s:ix");
   $redisdata = Array($id, $data, $color);
 
-  add($key, json_encode($redisdata));
+  add($key, $redisdata);
 
   if($language != "all" ){
     $key = "mt80s:all";
     $redisdata = Array($id, "$language: " . $data, $color);
 
-    add($key, json_encode($redisdata));
+    add($key, $redisdata);
   }
 }
 
