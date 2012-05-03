@@ -407,7 +407,7 @@ function doTitle(){
       addmessage("<b>Playing:</b> <a target=_blank href=http://youtube.com/watch?v=" + _duration[_index][ID].split(':')[1] + ">" + newtitle + "</a>");
       */
     }
-    document.title = LASTMESSAGE + newtitle + " | " + toTime(getNow() - _start);
+    document.title = newtitle + " | " + toTime(getNow() - _start);
   }
 }
 
