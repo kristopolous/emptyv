@@ -4,8 +4,22 @@
 var
   ID = 0,
 
-  LANGUAGE = navigator.language.split('-')[0],
+  LANGUAGE = (document.location.search.length > 0) ? 
+     document.location.search.substr(1)
+   : navigator.language.split('-')[0],
+
   LANGUAGE_CURRENT = LANGUAGE,
+
+  WORDS = {
+    PLAYING: {
+      en: "Playing",
+      pl: "Odtwarzanie"
+    },
+    NONE: {
+      en: "none",
+      pl: "&#380;aden"
+    }
+  },
 
   COLORS = [
     "#DC92A8",
@@ -81,6 +95,14 @@ var
     LANGUAGE = "pl";
   }
 
+  if (LANGUAGE == "pl") {
+    $("#description").html([
+      "<b>Ponad 500 teledyski.</b>",
+      "Ka&#380;dy ogl&#261;da ten sam film,",
+      "w tym samym czasie. Podobnie jak w TV.",
+      "Baw si&#281; i podziel si&#281;!"
+    ].join("<br>"));
+  }
 // }} // Constants
 
 // This is for IE
@@ -383,7 +405,7 @@ function doTitle(){
     var newtitle = _duration[_index][ARTIST] + " - " + _duration[_index][TITLE];
     if(LASTTITLE != newtitle) {
       LASTTITLE = newtitle;
-      addmessage("<b>Playing:</b> <a target=_blank href=http://youtube.com/watch?v=" + _duration[_index][ID].split(':')[1] + ">" + newtitle + "</a>");
+      addmessage("<b>" + WORDS.PLAYING[LANGUAGE] + ":</b> <a target=_blank href=http://youtube.com/watch?v=" + _duration[_index][ID].split(':')[1] + ">" + newtitle + "</a>");
     }
     document.title = LASTMESSAGE + newtitle + " | " + toTime(getNow() - _start);
   }
@@ -723,14 +745,18 @@ function loadPlayer(domain, ix) {
 
 var chat = {
   data: [
-    [0, "Type a message below"],
-    [1, "everyone will see it"],
-    [2, "in real time"],
-    [3, "Everything you say is in the same color. You may be sharing your color with others. Have fun with that. ;-D"]
+    [0, "Here's a chatroom. You know what to do!"],
+    [1, "Everything you say is in the same color"]
   ], 
   lastid: 0,
   datatimeout: null
 };
+if (LANGUAGE == "pl") {
+  chat.data = [
+    [0, "Oto czacie."],
+    [1, "Wszystko, co powiedzie&#263;, to w tym samym kolorze."]
+  ];
+}
 
 function addmessage(data) {
   chat.data.push([chat.lastid, data]);
@@ -826,7 +852,7 @@ function showchat(){
         $("#message").append(entry);
         entryCount++;
       } 
-      setTimeout(showmessage, entryCount < 5 ? 1200 : 300);
+      setTimeout(showmessage, entryCount < 3 ? 1200 : 300);
       lastindex++;
     } else {
       setTimeout(showmessage, 500);

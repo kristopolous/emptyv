@@ -35,7 +35,7 @@ img{border:0}
 Over 500 music videos.<br>
 Everyone is watching the same video,<br>
 at the same time. Just like TV.<br>
-<b>Have fun and please share!</b>
+<b>Have fun and please share!</b><br>
 </div>
 <div id=chatbar> 
   <div id=message></div>

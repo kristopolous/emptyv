@@ -10,6 +10,7 @@ Thanks to (alphabetically listed):
  * [mysql](http://mysql.com/)
  * [node-mysql](https://github.com/felixge/node-mysql)
  * [node.js](http://nodejs.org/)
+ * [redis](http://redis.io/)
  * [sox](http://sox.sourceforge.net/)
  * [swfobject](http://code.google.com/p/swfobject/)
  * [underscore](https://github.com/documentcloud/underscore)
