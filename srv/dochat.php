@@ -1,5 +1,6 @@
 <?
 include("globals.php");
+
 function redisLink() {
   static $r = false;
 
@@ -10,9 +11,13 @@ function redisLink() {
 }
 
 $r = redisLink();
+
+// This is an extreme action, banning people by ips.
+// Great power, great responsibility.
 if($r->sIsMember("mt80s:banned", $_SERVER['HTTP_X_REAL_IP'])) {
   return json_encode(Array("banned"));
 }
+
 $data = trim($_GET['data']);
 $color = $_GET['color'];
 $language = $_GET['language'];
@@ -26,25 +31,26 @@ if(strlen($data) > 200) {
 if(intval($version) != $VERSION) {
   return;
 }
-$key = "mt80s:" . $language;
-if(strlen($data) > 0) {
-  $redisdata = Array($r->incr("mt80s:ix"), $data, $color);
 
-  $r->rPush($key, json_encode($redisdata));
-
+function add($key, $data) {
+  $r->rPush($key, json_encode($data));
   while($r->lLen($key) > 15) {
     $r->lPop($key);
   }
+}
+
+if(strlen($data) > 0) {
+  $key = "mt80s:" . $language;
+  $id = $r->incr("mt80s:ix");
+  $redisdata = Array($id, $data, $color);
+
+  add($key, json_encode($redisdata));
 
   if($language != "all" ){
     $key = "mt80s:all";
-    $redisdata = Array($r->incr("mt80s:ix"), "[$language]: " . $data, $color);
+    $redisdata = Array($id, "$language: " . $data, $color);
 
-    $r->rPush($key, json_encode($redisdata));
-
-    while($r->lLen($key) > 15) {
-      $r->lPop($key);
-    }
+    add($key, json_encode($redisdata));
   }
 }
 
