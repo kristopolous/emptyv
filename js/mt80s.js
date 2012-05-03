@@ -21,19 +21,7 @@ var
     }
   },
 
-  COLORS = [
-    "#DC92A8",
-    "#9aa6e4",
-    "#E0A298",
-    "#386CB3",
-    "#cfd58b",
-    "#F4E557",
-    "#b86db0",
-    "#9cff7b",
-    "#b3b3b9"
-  ],
-
-  MYCOLOR = Math.floor(Math.random() * COLORS.length),
+  MYCOLOR = Math.floor(Math.random() * 9),
 
   // This is the duration of the video minus the offsets in
   // the start and stop, as determined through visual inspection.
@@ -846,7 +834,9 @@ function showchat(){
         entryList.push(entry);
 
         if(chat.data[lastindex].length > 2) {
-          entry.css("color", COLORS[chat.data[lastindex][2]]);
+          entry.addClass("c" +chat.data[lastindex][2]);
+        } else {
+          entry.addClass("c");
         }
         $("#message").append(entry);
         entryCount++;

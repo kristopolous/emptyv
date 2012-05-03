@@ -19,9 +19,18 @@ img{border:0}
 #chatbar{background:url("css/chat-bg.png");display:none;position:absolute;bottom:1em;left:0.75em}
 #message{font-family:Tahoma, Geneva, sans-serif;font-size:0.95em;font-weight:normal;text-align:left;color:#ccc}
 #message p,h1,h2,h3,h4,h5,h6{margin:0}
-#message a{color:#fff}
 #message div{box-shadow:1px 0 1px 0 #444;;width:205px;padding:0.25em 0.2em;overflow:hidden;margin:0 0.25em}
 #talk{display:block;box-shadow: 0 0 2px 2px #444;background:#333;color:#ccc;border-width:0;font-size:0.85em;width:202px;padding:0.15em 3px;margin-left:6px;margin-bottom:6px;}
+.c a{color:#fff}
+.c0,.c0 a{color:#DC92A8}
+.c1,.c1 a{color:#9aa6e4}
+.c2,.c2 a{color:#E0A298}
+.c3,.c3 a{color:#386CB3}
+.c4,.c4 a{color:#cfd58b}
+.c5,.c5 a{color:#F4E557}
+.c6,.c6 a{color:#b86db0}
+.c7,.c7 a{color:#9cff7b}
+.c8,.c8 a{color:#b3b3b9}
 </style>
 <!--[if IE]><link rel=stylesheet href=css/ie.css><![endif]-->
 </head>
