@@ -838,6 +838,8 @@ function showchat(){
         } else {
           entry.addClass("c");
         }
+        $("a", entry).attr("target", "_blank");
+         
         $("#message").append(entry);
         entryCount++;
       } 
