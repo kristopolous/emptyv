@@ -881,13 +881,18 @@ function pickcolor(){
 }
 
 function volumeSlider() {
-  $("#mute").draggable({
-    axis: "y",
-    containment: $("#mute-control"),
-    drag: function(e, ui) {
-      setVolume((100 - (ui.position.top - 5)) / 100);
-    } 
-  });
+  var ival = setInterval(function(){
+    if($("#mute").draggable) {
+      $("#mute").draggable({
+        axis: "y",
+        containment: $("#mute-control"),
+        drag: function(e, ui) {
+          setVolume((100 - (ui.position.top - 5)) / 100);
+        } 
+      });
+      clearInterval(ival);
+    }
+  }, 100);
 }
 
 // Load the first player

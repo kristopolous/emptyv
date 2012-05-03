@@ -18,6 +18,7 @@ img{border:0}
 #description{box-shadow:0px 0px 4px 4px #555;background:#222;padding:0.75em;font-family:Tahoma, Geneva, sans-serif;position:absolute;bottom:1em;left:1em;font-size:0.95em;font-weight:normal;text-align:left;color:white}
 #chatbar{background:url("css/chat-bg.png");display:none;position:absolute;bottom:1em;left:0.75em}
 #message{font-family:Tahoma, Geneva, sans-serif;font-size:0.95em;font-weight:normal;text-align:left;color:#ccc}
+#message p,h1,h2,h3,h4,h5,h6{margin:0}
 #message a{color:#fff}
 #message div{box-shadow:1px 0 1px 0 #444;;width:205px;padding:0.25em 0.2em;overflow:hidden;margin:0 0.25em}
 #talk{display:block;box-shadow: 0 0 2px 2px #444;background:#333;color:#ccc;border-width:0;font-size:0.85em;width:202px;padding:0.15em 3px;margin-left:6px;margin-bottom:6px;}
@@ -62,19 +63,28 @@ s.parentNode.insertBefore(ga,s);
 })();
 
 var scripts = [
-  'js/jquery-1.7.1.min.js',
   'js/underscore-min.js',
+  'js/jquery-1.7.1.min.js',
   'js/jquery-ui-1.8.20.custom.min.js'
 ];
 
 for(var i = 0; i < scripts.length; i++) {
   (function(){
-  ga=document.createElement('script');
-  ga.type='text/javascript';
-  ga.async=true;
-  ga.src=scripts[i];
-  s=document.getElementsByTagName('script')[0];
-  s.parentNode.insertBefore(ga,s);
+    ga=document.createElement('script');
+    ga.type='text/javascript';
+    ga.async=true;
+    ga.src=scripts[i];
+    s=document.getElementsByTagName('script')[0];
+    if(i != 2) {
+      s.parentNode.insertBefore(ga,s);
+    } else {
+      var ival = setInterval(function(){
+        if(self.$) {
+          s.parentNode.insertBefore(ga,s);
+          clearInterval(ival);
+        }
+      }, 100);
+    }
   })();
 }
 

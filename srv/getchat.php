@@ -1,5 +1,6 @@
 <?
 include("globals.php");
+include("../deps/markdown.php");
 
 function redisLink() {
   static $r = false;
@@ -32,7 +33,7 @@ $data = $r->lRange($key, 0, -1);
 foreach($data as $row) {
   $row = json_decode($row, true);
   if($row[0] > $lastid) {
-    $row[1] = htmlspecialchars(stripslashes($row[1]));
+    $row[1] = Markdown(htmlspecialchars(stripslashes($row[1])));
     $output[] = $row;
   }
 }
