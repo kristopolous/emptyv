@@ -106,8 +106,8 @@ var
       "<b>Ponad 500 teledyski.</b>",
       "Ka&#380;dy ogl&#261;da ten sam film,",
       "w tym samym czasie.",
-      "Podobnie jak w TV.",
-      "Baw si&#281; i podziel si&#281;!"].join("<br>");
+      "Podobnie jak w TV."
+     ].join("<br>");
   }
 // }} // intl
 
@@ -183,6 +183,12 @@ function log() {
 var 
   _active = -1,
 
+  _chat = {
+    data: [],
+    lastid: 0,
+    datatimeout: null
+  },
+
   // This the the current playback quality index, which can be triggered
   // in a direction (either up or down) based on how successful we can
   // combat drift (basically by playing without hitting a buffer interval)
@@ -199,7 +205,7 @@ var
 
   _volume = 1,
 
-  ev = EvDa(),
+  _ev = EvDa(),
 
   _index = -1,
   _lastLoaded,
@@ -541,12 +547,11 @@ function onReady(domain, id) {
   _playerByDom[domain].push( document.getElementById("player-" + id) );
   log(key + " ready");
 
-  ev.set(key);
+  _ev.set(key);
 
   if(++_loaded === 1) {
     show(_next);
     findOffset();
-    setTimeout(function(){$("#description").fadeOut(); }, 5000);
     setTimeout(showchat, 4000);
 
     _offsetIval = setInterval(findOffset, LOADTIME_sec * 1000 / 10);
@@ -599,7 +604,7 @@ function transition(index, offset, force) {
     _playerPrev = _player;
   }
 
-  ev.isset(dom + _next, function() {
+  _ev.isset(dom + _next, function() {
     if(dom === "yt") {
       _player[_next].loadVideoById(uuid, offset);
       _player[_next].setVolume(0);
@@ -733,23 +738,8 @@ function loadPlayer(domain, ix) {
   );
 }
 
-var chat = {
-  data: [
-    [0, "Here's a chatroom. You know what to do!"],
-    [1, "Everything you say is in the same color"]
-  ], 
-  lastid: 0,
-  datatimeout: null
-};
-if (LANGUAGE == "pl") {
-  chat.data = [
-    [0, "Oto czacie."],
-    [1, "Wszystko, co powiedzie&#263;, to w tym samym kolorze."]
-  ];
-}
-
 function addmessage(data) {
-  chat.data.push([chat.lastid, data]);
+  _chat.data.push([_chat.lastid, data]);
 }
 
 function showchat(){
@@ -762,9 +752,7 @@ function showchat(){
     lastTime = new Date(),
     lastmessageid = 0;
 
-  volumeSlider();
-  $("#controls").fadeIn();
-
+  log("Loading chat");
   $("#talk").keydown(function(e){
     var kc = window.event ? window.event.keyCode : e.which;
     if(kc == 13) {
@@ -772,51 +760,52 @@ function showchat(){
     }
   });
 
-  chat.getdata = function() {
+  _chat.getdata = function() {
     if(LANGUAGE_CURRENT == "none") {
-      clearTimeout(chat.datatimeout);
-      chat.datatimeout = setTimeout(chat.getdata, 6000);
+      clearTimeout(_chat.datatimeout);
+      _chat.datatimeout = setTimeout(_chat.getdata, 6000);
       return;
     }
 
     $.get("srv/getchat.php", {
-      lastid: chat.lastid,
+      lastid: _chat.lastid,
       v: VERSION,
       lang: LANGUAGE_CURRENT
     }, function(newdata) {
-      chat.data = chat.data.concat(newdata);
-      chat.lastid = chat.data[chat.data.length - 1][0];
-      clearTimeout(chat.datatimeout);
-      chat.datatimeout = setTimeout(chat.getdata, 6000);
+      _ev.set("chat-loaded");
+      _chat.data = _chat.data.concat(newdata);
+      _chat.lastid = _chat.data[_chat.data.length - 1][0];
+      clearTimeout(_chat.datatimeout);
+      _chat.datatimeout = setTimeout(_chat.getdata, 6000);
     }, "json");
   }
 
-  chat.hide = function() {
+  _chat.hide = function() {
     LASTMESSAGE = "";
     $("#talk").slideUp();
     $("#message").slideUp();
   }
-  chat.show = function() {
-    console.log("SHOW");
+
+  _chat.show = function() {
     $("#talk").slideDown();
     $("#message").slideDown();
   }
 
-  chat.getdata();
+  _chat.getdata();
 
   _.each([ LANGUAGE, 'all', 'none' ], function(which) {
     var unit = $("<a>" + which + "</a>").click(function(){
       $(this).addClass('selected').siblings().removeClass('selected');
       if (LANGUAGE_CURRENT == "none" && which != "none") {
-        chat.show();
+        _chat.show();
       }
-      LANGUAGE_CURRENT = which;
       if(which == "none") {
-        chat.hide();
-      } else {
-        lastindex = chat.data.length - 1;
+        _chat.hide();
+      } else if(LANGUAGE_CURRENT != "none") {
+        lastindex = _chat.data.length - 1;
         addmessage("Switched to language:" + which);
       }
+      LANGUAGE_CURRENT = which;
     }).appendTo("#language_tab");
     if(LANGUAGE_CURRENT == which) {
       unit.addClass("selected");
@@ -825,22 +814,23 @@ function showchat(){
   });
 
   function showmessage() {
-    if(chat.data.length > lastindex) {
-      if(lastindex > 3 && chat.data[lastindex][1].search("<b>Playing:</b>") == -1) {
-        LASTMESSAGE = chat.data[lastindex][1] + " - ";
+    var entry;
+    while(_chat.data.length > lastindex) {
+      if(_chat.data[lastindex][1].search("<b>Playing:</b>") == -1) {
+        LASTMESSAGE = _chat.data[lastindex][1] + " - ";
       }
 
-      if(lastEntry != chat.data[lastindex][1]) {
-        lastEntry = chat.data[lastindex][1];
+      if(lastEntry != _chat.data[lastindex][1]) {
+        lastEntry = _chat.data[lastindex][1];
         if(entryCount > 10) {
-          entryList.shift().fadeOut().remove();
+          entryList.shift().remove();
         }
 
-        var entry = $("<div>").html(lastEntry);
+        entry = $("<div>").html(lastEntry);
         entryList.push(entry);
 
-        if(chat.data[lastindex].length > 2) {
-          entry.addClass("c" +chat.data[lastindex][2]);
+        if(_chat.data[lastindex].length > 2) {
+          entry.addClass("c" + _chat.data[lastindex][2]);
         } else {
           entry.addClass("c");
         }
@@ -849,16 +839,27 @@ function showchat(){
         $("#message").append(entry);
         entryCount++;
       } 
-      setTimeout(showmessage, entryCount < 3 ? 1200 : 300);
       lastindex++;
-    } else {
-      setTimeout(showmessage, 500);
     }
+    setTimeout(showmessage, 400);
   }
   showmessage();
+  volumeSlider();
 
-  $("#talk").focus();
-  $("#chatbar").fadeIn();
+  _ev.isset("chat-loaded", function(){
+    $("#description").animate({
+      opacity: 0,
+      bottom: "40em"
+    }, 1500);
+    $("#controls").fadeIn();
+    $("#talk").focus();
+    $("#chatbar").fadeIn(1000, function(){
+      setTimeout(function(){
+        $("#talk").focus();
+      }, 1000);
+    });
+  });
+
 }
 
 function dochat() {
