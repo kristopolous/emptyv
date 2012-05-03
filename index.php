@@ -51,7 +51,7 @@ at the same time. Just like TV.<br>
 </div>
 <div id=chatbar> 
   <div id=message></div>
-  <input id=talk onenter=dochat maxlength=200>
+  <input id=talk onenter=dochat maxlength=200 autocomplete=off>
   <div id=language_tab></div>
 </div>
 </body>
