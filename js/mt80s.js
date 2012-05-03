@@ -541,7 +541,6 @@ function onReady(domain, id) {
     setTimeout(function(){$("#description").fadeOut(); }, 5000);
     setTimeout(showchat, 4000);
 
-    flashChannel();
     _offsetIval = setInterval(findOffset, LOADTIME_sec * 1000 / 10);
 
     setTimeout(function(){ 
