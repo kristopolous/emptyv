@@ -769,7 +769,7 @@ function showchat(){
   chat.getdata = function() {
     if(LANGUAGE_CURRENT == "none") {
       clearTimeout(chat.datatimeout);
-      chat.datatimeout = setTimeout(chat.getdata, 10000);
+      chat.datatimeout = setTimeout(chat.getdata, 8000);
       return;
     }
 
@@ -781,7 +781,7 @@ function showchat(){
       chat.data = chat.data.concat(newdata);
       chat.lastid = chat.data[chat.data.length - 1][0];
       clearTimeout(chat.datatimeout);
-      chat.datatimeout = setTimeout(chat.getdata, 10000);
+      chat.datatimeout = setTimeout(chat.getdata, 8000);
     }, "json");
   }
 
