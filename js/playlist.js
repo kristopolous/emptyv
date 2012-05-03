@@ -519,7 +519,7 @@ var _duration = [
 ["yt:xTzMeDiv-7U", 227, 0, 0, 100, 1984, "The Fixx", "Less Cities, More Moving People", "vevo"],
 ["yt:xrOek4z32Vg", 213, 0, 0, 100, 1989, "Fine Young Cannibals", "Good Thing", "clean"],
 ["yt:xrzX8rIwZUw", 230, 0, 0, 100, 1984, "Shannon", "Give me Tonight", "clean"],
-["yt:y4CyNvEfWoE", 215, 0, 0, 100, 1982, "Toni Basil", "Mickey", "vh1 logo"],
+["yt:f49ELXpzyHE", 215, 0, 0, 100, 1982, "Toni Basil", "Mickey", "vh1 logo"],
 ["yt:yURRmWtbTbo", 252, 0, 0, 100, 1978, "Michael Jackson", "Don't Stop 'Til You Get Enough", "vevo"],
 ["yt:yiy9eOrifS8", 270, 0, 0, 100, 1982, "Futurisk", "Army Now", "clean"],
 ["yt:zExFchzV5UQ", 225, 0, 0, 100, 1981, "OMD", "Electricity", "clean"],
