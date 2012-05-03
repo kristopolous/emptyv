@@ -538,7 +538,7 @@ function flashChannel(){
 
   setTimeout(function(){
     $("#description").fadeOut(showchat);
-  }, 7000);
+  }, 6000);
 }
 
 function onReady(domain, id) {
@@ -769,6 +769,7 @@ function showchat(){
     lastmessageid = 0;
 
   volumeSlider();
+  $("#controls").fadeIn();
 
   $("#talk").keydown(function(e){
     var kc = window.event ? window.event.keyCode : e.which;
