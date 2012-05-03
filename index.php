@@ -25,7 +25,7 @@ img{border:0}
 .c0,.c0 a{color:#DC92A8}
 .c1,.c1 a{color:#9aa6e4}
 .c2,.c2 a{color:#E0A298}
-.c3,.c3 a{color:#386CB3}
+.c3,.c3 a{color:#7ac749}
 .c4,.c4 a{color:#cfd58b}
 .c5,.c5 a{color:#F4E557}
 .c6,.c6 a{color:#b86db0}
@@ -73,7 +73,6 @@ s.parentNode.insertBefore(ga,s);
 
 var scripts = [
   'js/underscore-min.js',
-  'js/jquery-1.7.1.min.js',
   'js/jquery-ui-1.8.20.custom.min.js'
 ];
 
@@ -84,16 +83,7 @@ for(var i = 0; i < scripts.length; i++) {
     ga.async=true;
     ga.src=scripts[i];
     s=document.getElementsByTagName('script')[0];
-    if(i != 2) {
-      s.parentNode.insertBefore(ga,s);
-    } else {
-      var ival = setInterval(function(){
-        if(self.$) {
-          s.parentNode.insertBefore(ga,s);
-          clearInterval(ival);
-        }
-      }, 100);
-    }
+    s.parentNode.insertBefore(ga,s);
   })();
 }
 
@@ -107,5 +97,6 @@ document.getElementById("controls").innerHTML=[
 <script src=js/swfobject.js></script> 
 <script src=js/evda.min.js></script> 
 <script src=js/playlist.js></script> 
+<script src=js/jquery-1.7.1.min.js></script>
 <script src=js/mt80s.js></script> 
 </html>
