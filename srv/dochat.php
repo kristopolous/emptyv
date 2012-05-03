@@ -33,6 +33,7 @@ if(intval($version) != $VERSION) {
 }
 
 function add($key, $data) {
+  global $r;
   $r->rPush($key, json_encode($data));
   while($r->lLen($key) > 15) {
     $r->lPop($key);
