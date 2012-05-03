@@ -1,3 +1,20 @@
+setTimeout(function(){
+  var scripts = [
+    'js/underscore-min.js',
+    'js/jquery-1.7.1.min.js',
+    'js/jquery-ui-1.8.20.custom.min.js'
+  ];
+
+  for(var i = 0; i < scripts.length; i++) {
+    (function(){
+      ga=document.createElement('script');
+      ga.type='text/javascript';
+      ga.src=scripts[i];
+      s=document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(ga,s);
+    })();
+  }
+},10);
 // This is for the minimizer
 //(function(){
 // Constants {{
@@ -508,27 +525,6 @@ function findOffset() {
   }
 }
 
-// This is the 34 / MTV effect at the beginning (working towards fixing
-// issue #8)
-function flashChannel(){
-  var 
-    ix = 0,
-    ival = setInterval(function(){
-      if(++ix % 2 == 0) {
-        document.getElementById("channel").style.visibility = "hidden";
-        if(ix > 7) {
-          clearInterval(ival);
-        }
-      } else {
-        document.getElementById("channel").style.visibility = "visible";
-      } 
-    }, 1000);
-
-  setTimeout(function(){
-    $("#description").fadeOut(showchat);
-  }, 6000);
-}
-
 function onReady(domain, id) {
   var 
     id = parseInt(id.split('-')[1]),
@@ -542,6 +538,9 @@ function onReady(domain, id) {
   if(++_loaded === 1) {
     show(_next);
     findOffset();
+    setTimeout(function(){$("#description").fadeOut(); }, 5000);
+    setTimeout(showchat, 4000);
+
     flashChannel();
     _offsetIval = setInterval(findOffset, LOADTIME_sec * 1000 / 10);
 
@@ -886,6 +885,10 @@ function volumeSlider() {
     }
   }, 100);
 }
+
+setTimeout(function() {
+document.getElementById("controls").innerHTML= '<a style=text-align:center target=_blank href="%20# suggest"><img src=images/mt80s_cyber.png></a>' + '<div id=mute-control><div id=mute-bg></div><img id=mute src=images/mute_off_32.png></div>';
+},4000);
 
 // Load the first player
 loadPlayer("yt", 0);
