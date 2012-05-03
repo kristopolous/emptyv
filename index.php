@@ -39,7 +39,10 @@ img{border:0}
 <div id=p4></div><div id=p3></div>
 <div id=p2></div><div id=p1></div><div id=p0></div>
 </div>
-<div id=controls></div>
+<div id=controls>
+  <a style=text-align:center target=_blank href="%20# suggest"><img src=images/mt80s_cyber.png></a>
+  <div id=mute-control><div id=mute-bg></div><img id=mute src=images/mute_off_32.png></div>
+</div>
 <div id=description>
 Over 500 music videos.<br>
 Everyone is watching the same video,<br>

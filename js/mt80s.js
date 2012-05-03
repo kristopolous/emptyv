@@ -15,9 +15,7 @@ setTimeout(function(){
     })();
   }
 },10);
-// This is for the minimizer
-//(function(){
-// Constants {{
+
 var
   ID = 0,
 
@@ -99,7 +97,9 @@ var
   if (document.referrer.search("wykop.pl") > -1) {
     LANGUAGE = "pl";
   }
+// }} // Constants
 
+// intl {{
   if (LANGUAGE == "pl") {
     $("#description").html([
       "<b>Ponad 500 teledyski.</b>",
@@ -108,7 +108,7 @@ var
       "Baw si&#281; i podziel si&#281;!"
     ].join("<br>"));
   }
-// }} // Constants
+// }} // intl
 
 // This is for IE
 if (typeof console == "undefined") {
@@ -125,6 +125,13 @@ self.indexOf = function(array, item) {
 }
 
 // Utils {{
+function linkify(f) {
+  if (f && f.replace) {
+    return f.replace(/[a-z]+:\/\/[^\s^<]+/g, '<a href="$&" target=_blank>$&</a>').replace(/\n/g, '<br>');
+  }
+  return f;
+}
+
 function getNow(offset) {
   return +(new Date() / 1000) + (offset || 0);
 }
@@ -885,11 +892,5 @@ function volumeSlider() {
   }, 100);
 }
 
-setTimeout(function() {
-document.getElementById("controls").innerHTML= '<a style=text-align:center target=_blank href="%20# suggest"><img src=images/mt80s_cyber.png></a>' + '<div id=mute-control><div id=mute-bg></div><img id=mute src=images/mute_off_32.png></div>';
-},4000);
-
 // Load the first player
 loadPlayer("yt", 0);
-
-//})();
