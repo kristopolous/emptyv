@@ -1,20 +1,21 @@
-setTimeout(function(){
-  var scripts = [
-    'js/underscore-min.js',
-    'js/jquery-1.7.1.min.js',
-    'js/jquery-ui-1.8.20.custom.min.js'
-  ];
+var scripts = [
+  [0, 'js/underscore-min.js'],
+  [10, 'js/jquery-1.7.1.min.js'],
+  [5000, 'js/jquery-ui-1.8.20.custom.min.js']
+];
 
-  for(var i = 0; i < scripts.length; i++) {
-    (function(){
-      ga=document.createElement('script');
-      ga.type='text/javascript';
-      ga.src=scripts[i];
-      s=document.getElementsByTagName('script')[0];
-      s.parentNode.insertBefore(ga,s);
-    })();
-  }
-},10);
+for(var i = 0; i < scripts.length; i++) {
+  (function(row){
+    setTimeout(function(){
+      log("Loading " + row[1]);
+      var ga = document.createElement('script');
+      ga.type = 'text/javascript';
+      ga.src = row[1];
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(ga, s);
+    }, row[0]);
+  })(scripts[i]);
+}
 
 var
   ID = 0,
