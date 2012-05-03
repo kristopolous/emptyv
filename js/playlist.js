@@ -103,7 +103,7 @@ var _duration = [
 ["yt:E5gNYVia2rg", 202, 0, 0, 100, 1976, "Boney M", "Daddy Cool", "logo"],
 ["yt:E7t8eoA_1jQ", 216, 0, 0, 100, 1987, "Erik B and Rakim", "Paid in Full", "vevo"],
 ["yt:E_8IXx4tsus", 243, 0, 0, 100, 1983, "David Bowie", "China Girl", "vevo"],
-["yt:EcNLr0AYgXc", 242, 0, 0, 100, 1983, "Madonna", "Lucky Star", "clean"],
+["yt:ThHz9wlBeLU", 243, 0, 0, 100, 1983, "Madonna", "Lucky Star", "clean"],
 ["yt:Egdv8xhw35M", 135, 0, 0, 100, 1980, "Blondie", "Call Me", "clean"],
 ["yt:BUj8NlnHPbA", 150, 0, 0, 100, 1976, "Double Exposure", "Ten Percent", "clean"],
 ["yt:EnDtoFX5ITU", 155, 0, 0, 100, 1982, "Trees", "Shock Of The New", "mtv2 logo"],

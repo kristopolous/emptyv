@@ -184,7 +184,7 @@ var
   // sampling
   _lagCounter = 0,
 
-  _muted = false,
+  _volume = 1,
 
   ev = EvDa(),
 
@@ -229,21 +229,15 @@ for(var ix = 0; ix < _duration.length; ix++) {
 
 // }} // Globals
 
-self.mutetoggle = function(el){
-  _muted = !_muted;
+function setVolume(amount) {
+  _volume = amount;
 
-  if(_muted) {
-    el.src = "images/mute_on_32.png";
-    _playerPrev[_active].setVolume(0);
-  } else {
-    el.src = "images/mute_off_32.png";
-    var volume = 100;
+  var volume = 100;
 
-    if ("index" in _player[_active]) {
-      volume = _duration[_player[_active].index][VOLUME];
-    }
-    _playerPrev[_active].setVolume(volume);
+  if ("index" in _player[_active]) {
+    volume = _duration[_player[_active].index][VOLUME] * _volume;
   }
+  _playerPrev[_active].setVolume(volume * _volume);
 }
 
 function secondarySwap(){
@@ -252,9 +246,7 @@ function secondarySwap(){
 
       // Nows our time to shine
       _playerById[_index].playVideo();
-      if(!_muted) {
-        _playerById[_index].setVolume(_duration[_index][VOLUME]);
-      }
+      _playerById[_index].setVolume(_duration[_index][VOLUME] * _volume);
      
       // Bring the volume up of the higher quality player and mute the current
       _player[EXTRA].setVolume(0);
@@ -376,9 +368,7 @@ function setQuality(direction) {
             show(_player[EXTRA]);
 
             // Bring the volume up of the higher quality player and mute the current
-            if(!_muted) {
-              _player[EXTRA].setVolume(_duration[_index][VOLUME]);
-            }
+            _player[EXTRA].setVolume(_duration[_index][VOLUME] * _volume);
             myplayer.setVolume(0);
             myplayer.seekTo(_player[EXTRA].getCurrentTime() + 3.5);
             myplayer.setPlaybackQuality(newQualityWord);
@@ -406,6 +396,16 @@ function doTitle(){
     if(LASTTITLE != newtitle) {
       LASTTITLE = newtitle;
       addmessage("<b>" + WORDS.PLAYING[LANGUAGE] + ":</b> <a target=_blank href=http://youtube.com/watch?v=" + _duration[_index][ID].split(':')[1] + ">" + newtitle + "</a>");
+  /*
+      $.get("srv/dochat.php", {
+        type: "track",
+        v: VERSION,
+        ytid: _duration[_index][ID],
+        artist: _duration[_index][ARTIST],
+        title: _duration[_index][TITLE],
+      });
+      addmessage("<b>Playing:</b> <a target=_blank href=http://youtube.com/watch?v=" + _duration[_index][ID].split(':')[1] + ">" + newtitle + "</a>");
+      */
     }
     document.title = LASTMESSAGE + newtitle + " | " + toTime(getNow() - _start);
   }
@@ -663,11 +663,7 @@ function transition(index, offset, force) {
       // the volume adjusting, accounting for the possibility of
       // this being the first video of course.
       setTimeout(function(){
-        if(_muted) {
-          myPlayer.setVolume(0);
-        } else {
-          myPlayer.setVolume(_duration[index][VOLUME]);
-        }
+        myPlayer.setVolume(_duration[index][VOLUME] * _volume);
       }, Math.min(100, remainingTime(_playerPrev[_active])));
 
     }, force ? 8000 : Math.max((remainingTime(_playerPrev[_active]) - NEXTVIDEO_PRELOAD) * 1000, 0));
@@ -772,6 +768,8 @@ function showchat(){
     lastTime = new Date(),
     lastmessageid = 0;
 
+  volumeSlider();
+
   $("#talk").keydown(function(e){
     var kc = window.event ? window.event.keyCode : e.which;
     if(kc == 13) {
@@ -788,8 +786,8 @@ function showchat(){
 
     $.get("srv/getchat.php", {
       lastid: chat.lastid,
-      version: VERSION,
-      language: LANGUAGE_CURRENT
+      v: VERSION,
+      lang: LANGUAGE_CURRENT
     }, function(newdata) {
       chat.data = chat.data.concat(newdata);
       chat.lastid = chat.data[chat.data.length - 1][0];
@@ -868,8 +866,8 @@ function dochat() {
   var message = $("#talk").val();
   if(message.length) {
     $.get("srv/dochat.php", {
-      version: VERSION,
-      language: LANGUAGE,
+      v: VERSION,
+      lang: LANGUAGE,
       color: MYCOLOR,
       data: message
     });
@@ -879,6 +877,16 @@ function dochat() {
 
 function pickcolor(){
   MYCOLOR = Math.floor(Math.random() * COLORS.length);
+}
+
+function volumeSlider() {
+  $("#mute").draggable({
+    axis: "y",
+    containment: $("#mute-control"),
+    drag: function(e, ui) {
+      setVolume((100 - (ui.position.top - 5)) / 100);
+    } 
+  });
 }
 
 // Load the first player

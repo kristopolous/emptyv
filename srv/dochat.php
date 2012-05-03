@@ -18,10 +18,11 @@ if($r->sIsMember("mt80s:banned", $_SERVER['HTTP_X_REAL_IP'])) {
   return json_encode(Array("banned"));
 }
 
+$type = $_GET['type'];
 $data = trim($_GET['data']);
 $color = $_GET['color'];
-$language = $_GET['language'];
-$version = $_GET['version'];
+$language = $_GET['lang'];
+$version = $_GET['v'];
 
 if(strlen($data) > 200) {
   $data = substr($data, 0, 200);

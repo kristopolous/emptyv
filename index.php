@@ -9,10 +9,10 @@ img{border:0}
 #language_tab a:hover{box-shadow:0 0 2px 2px #444}
 #language_tab a.selected{background:#333;color:#fff}
 #players object,#players embed{position:absolute;top:0;left:0%;width:100%;height:100%;z-index:0}
-#mute-control{height:150px;position:relative}
-#mute-bg{position:absolute;background:#000;height:120px;left:25px;width:10px}
-#mute{cursor:pointer;padding:5px 0 5px 10px;position:absolute}
-#controls{position:fixed;top:0;right:0;z-index:9;opacity:0.7;width:60px}
+#mute-control{height:132px;position:relative}
+#mute-bg{position:absolute;background:#222;top:10px;height:122px;left:20px;width:10px}
+#mute{cursor:pointer;position:absolute;left:10px}
+#controls{position:fixed;top:0;right:0;z-index:9;opacity:0.7;width:50px}
 #controls > *{display:block;padding:5px}
 #channel{text-align:center;position:absolute;z-index:9;opacity:0.7;width:100px;top:1em;left:0.5em;color:#8f8;font:bold 40px "Lucida Console",Monaco,monospace;line-height:0.85em}
 #description{box-shadow:0px 0px 4px 4px #555;background:#222;padding:0.75em;font-family:Tahoma, Geneva, sans-serif;position:absolute;bottom:1em;left:1em;font-size:0.95em;font-weight:normal;text-align:left;color:white}
@@ -63,7 +63,8 @@ s.parentNode.insertBefore(ga,s);
 
 var scripts = [
   'js/jquery-1.7.1.min.js',
-  'js/underscore-min.js'
+  'js/underscore-min.js',
+  'js/jquery-ui-1.8.20.custom.min.js'
 ];
 
 for(var i = 0; i < scripts.length; i++) {
@@ -80,7 +81,7 @@ for(var i = 0; i < scripts.length; i++) {
 setTimeout(function() {
 document.getElementById("controls").innerHTML=[
 '<a style=text-align:center target=_blank href="%20# suggest"><img src=images/mt80s_cyber.png></a>',
-'<div id=mute-control><div id=mute-bg></div><img title="Toggle Mute" onclick=mutetoggle(this) id=mute src=images/mute_off_32.png></div>'
+'<div id=mute-control><div id=mute-bg></div><img title="Toggle Mute" id=mute src=images/mute_off_32.png></div>'
 ].join('');
 },4000);
 </script>
