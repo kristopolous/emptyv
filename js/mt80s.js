@@ -101,12 +101,12 @@ var
 
 // intl {{
   if (LANGUAGE == "pl") {
-    $("#description").html([
+    document.getElementById("description").innerHTML = [
       "<b>Ponad 500 teledyski.</b>",
       "Ka&#380;dy ogl&#261;da ten sam film,",
-      "w tym samym czasie. Podobnie jak w TV.",
-      "Baw si&#281; i podziel si&#281;!"
-    ].join("<br>"));
+      "w tym samym czasie.",
+      "Podobnie jak w TV.",
+      "Baw si&#281; i podziel si&#281;!"].join("<br>");
   }
 // }} // intl
 
