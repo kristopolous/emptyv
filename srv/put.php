@@ -1,5 +1,8 @@
 <?
 include("common.php");
+if(intval($_GET['v']) != $VERSION) {
+  return;
+}
 
 function add($key, $data) {
   global $r;
@@ -19,11 +22,9 @@ if($r->sIsMember("mt80s:banned", $_SERVER['HTTP_X_REAL_IP'])) {
   exit(0);
 }
 
-if(intval($version) != $VERSION) {
-  return;
-}
-
 function api_chat($hash) {
+  global $r;
+
   $data = $hash['d'];
   $color = $hash['c'];
   $language = $hash['l'];
@@ -59,5 +60,7 @@ if(function_exists("api_" . $_GET['f'])) {
   } else {
     result(true, $result);
   }
+} else {
+  result(false, "no function");
 }
 ?>

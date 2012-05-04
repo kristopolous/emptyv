@@ -4,14 +4,14 @@ include("../deps/markdown.php");
 
 $r = redisLink();
 
-if(empty($_GET['lastid'])) {
+if(empty($_GET['id'])) {
   $lastid = 0;
 } else {
-  $lastid = intval($_GET['lastid']);
+  $lastid = intval($_GET['id']);
 }
 
 $output = Array();
-$language = $_GET['lang'];
+$language = $_GET['l'];
 $version = $_GET['v'];
 if(intval($version) != $VERSION) {
   echo json_encode(Array(Array($lastid + 1, "<script>window.location.reload()</script>")));

@@ -768,9 +768,9 @@ function showchat(){
     }
 
     $.get("srv/get.php", {
-      lastid: _chat.lastid,
+      id: _chat.lastid,
       v: VERSION,
-      lang: LANGUAGE_CURRENT
+      l: LANGUAGE_CURRENT
     }, function(newdata) {
       _ev.set("chat-loaded");
       $("#stats").html(newdata.stats.online + " online");
