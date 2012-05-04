@@ -53,7 +53,7 @@ padding:0.20em 0 0.20em 0.25em;background:url("css/chat-bg.png")}
   <div id=mute-control><div id=mute-bg></div><img id=mute src=images/mute_off_32.png></div>
 </div>
 <div id=description>
-Over 560 music videos.<br>
+Over 570 music videos.<br>
 Everyone is watching<br>
 the same video,<br>
 at the same time.<br>
