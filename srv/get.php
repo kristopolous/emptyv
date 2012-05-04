@@ -19,12 +19,17 @@ if(empty($_GET['id'])) {
 }
 
 $output = Array();
+$chat = Array();
 $language = $_GET['l'];
+$uid = $_GET['u'];
+if($uid == 0) {
+  $output['uid'] = $uid = uniqid();
+} 
 
-$myhb = "mt80s:hb:" . session_id();
+$myhb = "mt80s:hb:" . $uid;
 
 $r->set($myhb, 1);
-$r->setTimeout($myhb, 15);
+$r->setTimeout($myhb, 100);
 
 $stats = Array();
 $stats['online'] = count($r->keys("mt80s:hb:*"));
@@ -35,12 +40,11 @@ foreach($data as $row) {
   $row = json_decode($row, true);
   if($row[0] > $lastid) {
     $row[1] = Markdown(htmlspecialchars(stripslashes($row[1])));
-    $output[] = $row;
+    $chat[] = $row;
   }
 }
 
-echo json_encode(Array(
-  "stats" => $stats,
-  "chat" => $output
-));
+$output['stats'] = $stats;
+$output['chat'] = $chat;
+echo json_encode($output);
 ?>

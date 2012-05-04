@@ -1,7 +1,5 @@
 <?
-session_start();
-
-$VERSION = 20;
+$VERSION = 21;
 
 function redisLink() {
   static $r = false;

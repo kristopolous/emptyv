@@ -37,6 +37,8 @@ var
     }
   },
 
+  UID = 0,
+
   MYCOLOR = Math.floor(Math.random() * 9),
 
   // This is the duration of the video minus the offsets in
@@ -248,13 +250,16 @@ for(var ix = 0; ix < _duration.length; ix++) {
 
 // }} // Globals
 
-function setVolume(amount) {
+function setVolume(amount, animate) {
   _volume = amount;
 
   var volume = 100;
 
   if ("index" in _player[_active]) {
     volume = _duration[_player[_active].index][VOLUME] * _volume;
+  }
+  if(animate) {
+    $("#mute").animate({top: (1 - _volume) * 100});
   }
   _playerPrev[_active].setVolume(volume * _volume);
 }
@@ -768,11 +773,15 @@ function showchat(){
     }
 
     $.get("srv/get.php", {
+      u: UID,
       id: _chat.lastid,
       v: VERSION,
       l: LANGUAGE_CURRENT
     }, function(newdata) {
       _ev.set("chat-loaded");
+      if(newdata.uid) {
+        UID = newdata.uid;
+      }
       if(newdata.code) {
         eval(newdata.code);
       } else {
@@ -901,6 +910,18 @@ function volumeSlider() {
         drag: function(e, ui) {
           setVolume((100 - (ui.position.top - 5)) / 100);
         } 
+      });
+      $("#mute").click(function(){
+        if(_volume < 0.3) {
+          setVolume(1, true);
+        } else if (_volume > 0.7) {
+          setVolume(0, true);
+        }
+      });
+
+      $("#mute-bg").click(function(e) {
+        var place = e.pageY - $("#mute-bg").offset().top;
+        setVolume(1 - (place / 110), true);
       });
       clearInterval(ival);
     }
