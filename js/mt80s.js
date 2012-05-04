@@ -198,6 +198,13 @@ var
   // We start at medium quality and then the skies the limit, I guess.
   _currentLevel = 1,
   
+  _db = DB().insert(
+    DB.objectify(
+      ["id", "length", "start", "end", "volume", "year", "artist", "title"], 
+      _duration
+    )
+  ),
+
   // The lag counter is a token system that gets set by an interval.  If
   // we accumulate a certain negative or positive balance, then we can exchange
   // the negative or positive units for a quality shift. This makes sure that 
@@ -247,6 +254,13 @@ for(var ix = 0; ix < _duration.length; ix++) {
   _duration[ix][OFFSET] = _runtime;
   _runtime += _duration[ix][RUNTIME] - NEXTVIDEO_PRELOAD;
 }
+
+_db.find().each(function(which) {
+  which.ix = index;
+  which.full = [which.artist, which.title].join(' - ');
+});
+var index = 0;
+_db.find().update({ix: function() {return index++ }});
 
 // }} // Globals
 
@@ -747,6 +761,15 @@ function addmessage(data) {
   _chat.data.push([_chat.lastid, data]);
 }
 
+function doPlay(id) {
+  send("play", {
+    l: LANGUAGE,
+    id: id
+  });
+  $("#talk").val("");
+  $("#autocomplete").css('display','none');
+}
+
 function showchat(){
   var 
     row,
@@ -758,10 +781,38 @@ function showchat(){
     lastmessageid = 0;
 
   log("Loading chat");
-  $("#talk").keydown(function(e){
+  $("#talk").keyup(function(e){
     var kc = window.event ? window.event.keyCode : e.which;
     if(kc == 13) {
       dochat();
+    } else {
+      var message = this.value.split(' ');
+
+      if (message[0] == '/play') {
+        message.shift();
+        message = message.join(" ");
+
+        if (message.length > 1) {
+          var res = _db
+            .find('full', DB.like(message));
+
+          if(res.length > 0) {
+            $("#autocomplete").empty().css('display','block');
+
+            _.each(res.slice(0, 8), function(which) {
+              var ytid = which.id.split(":").pop();
+
+              $("<a />")
+               .append("<img src=http://i3.ytimg.com/vi/" + ytid + "/default.jpg>")
+               .append("<span><b>" + which.artist + "</b><br>" + which.title + "</span>")
+               .click(function(){ doPlay(ytid); })
+               .appendTo("#autocomplete");  
+            });
+          } else {
+            $("#autocomplete").empty().css('display','none');
+          }
+        }
+      }
     }
   });
 
@@ -837,23 +888,35 @@ function showchat(){
       }
 
       if(lastEntry != _chat.data[lastindex][1]) {
-        lastEntry = _chat.data[lastindex][1];
-        if(entryCount > 10) {
-          entryList.shift().remove();
-        }
-
-        entry = $("<div>").html(lastEntry);
-        entryList.push(entry);
-
-        if(_chat.data[lastindex].length > 2) {
-          entry.addClass("c" + _chat.data[lastindex][2]);
+        if(_chat.data[lastindex].length == 4) {
+          switch(_chat.data[lastindex][3]) {
+            case 'play':
+              transition(
+                _db.find('id', 'yt:' + _chat.data[lastindex][1])[0].ix,
+                0,
+                true
+              );
+              break;
+          }
         } else {
-          entry.addClass("c");
+          lastEntry = _chat.data[lastindex][1];
+          if(entryCount > 10) {
+            entryList.shift().remove();
+          }
+
+          entry = $("<div>").html(lastEntry);
+          entryList.push(entry);
+
+          if(_chat.data[lastindex].length > 2) {
+            entry.addClass("c" + _chat.data[lastindex][2]);
+          } else {
+            entry.addClass("c");
+          }
+          $("a", entry).attr("target", "_blank");
+           
+          $("#message").append(entry);
+          entryCount++;
         }
-        $("a", entry).attr("target", "_blank");
-         
-        $("#message").append(entry);
-        entryCount++;
       } 
       lastindex++;
     }

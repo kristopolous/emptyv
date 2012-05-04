@@ -22,6 +22,17 @@ if($r->sIsMember("mt80s:banned", $_SERVER['HTTP_X_REAL_IP'])) {
   exit(0);
 }
 
+function api_play($hash) {
+  global $r;
+  $language = $hash['l'];
+  $id = $r->incr("mt80s:ix");
+
+  add(
+    "mt80s:" . $language,
+    Array($id, $hash['id'], 0, "play")
+  );
+}
+
 function api_chat($hash) {
   global $r;
 

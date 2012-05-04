@@ -2,11 +2,11 @@
 <!doctype html>
 <html><head><meta name=description content="Non-stop back-to-back music videos from the 1980s"><title>1980s MTV</title>
 <style>
-body{background:#000}
+body{background:#000;font-family:Verdana}
 img{border:0}
-#stats{color:#666;height:0;font-family:Verdana;font-size:0.6em;margin-top:-0.2em;margin-left:0.3em}
+#stats{color:#666;height:0;font-size:0.6em;margin-top:-0.2em;margin-left:0.3em}
 #language_tab {float:right;margin-top:-0.2em;height:0}
-#language_tab a{background:#222;color:#888;padding:0.05em 0.4em;font-family:Verdana;margin:0 0 0 0.15em;cursor:pointer;font-size:0.75em}
+#language_tab a{background:#222;color:#888;padding:0.05em 0.4em;margin:0 0 0 0.15em;cursor:pointer;font-size:0.75em}
 #language_tab a:hover{box-shadow:0 0 2px 2px #444}
 #language_tab a.selected{background:#333;color:#fff}
 #players object,#players embed{position:absolute;top:0;left:0%;width:100%;height:100%;z-index:0}
@@ -21,6 +21,14 @@ img{border:0}
 #message{font-family:Tahoma, Geneva, sans-serif;font-size:0.95em;font-weight:normal;text-align:left;color:#ccc}
 #message p,h1,h2,h3,h4,h5,h6{margin:0}
 #message div{box-shadow:1px 0 1px 0 #444;width:205px;padding:0.25em 0.2em;overflow:hidden;margin:0 0.25em}
+#autocomplete{display:none;width:220px;position:absolute;bottom:0em;left:220px;background:url("css/chat-bg.png");color:#ccc;padding:0 0.15em}
+#autocomplete a{display:block;font-size:0.75em;
+cursor: pointer;
+margin:0.2em 0;
+padding:0.20em 0 0.20em 0.25em;background:url("css/chat-bg.png")}
+#autocomplete a:hover{background:#444;color:#fff}
+#autocomplete img{height:50px;vertical-align:top}
+#autocomplete span{cursor:pointer; display:inline-block;width:130px;margin-left:6px;color:#aaa;margin-top:0.25em}
 #talk{display:block;box-shadow: 0 0 2px 2px #444;background:#333;color:#ccc;border-width:0;font-size:0.85em;width:202px;padding:0.15em 3px;margin-left:6px;margin-bottom:6px;}
 .c a{color:#fff}
 .c0,.c0 a{color:#DC92A8}
@@ -57,6 +65,7 @@ Just like TV.<br>
   <input id=talk onenter=dochat maxlength=200 autocomplete=off>
   <div id=stats></div>
   <div id=language_tab></div>
+  <div id=autocomplete></div>
 </div>
 </body>
 <script>
@@ -81,5 +90,6 @@ s.parentNode.insertBefore(ga,s);
 <script src=js/swfobject.js></script> 
 <script src=js/evda.min.js></script> 
 <script src=js/playlist.js></script> 
+<script src=js/db.min.js></script>
 <script src=js/mt80s.js></script> 
 </html>
