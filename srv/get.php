@@ -29,7 +29,7 @@ if($uid == 0) {
 $myhb = "mt80s:hb:" . $uid;
 
 $r->set($myhb, 1);
-$r->setTimeout($myhb, 100);
+$r->setTimeout($myhb, 200);
 
 $stats = Array();
 $stats['online'] = count($r->keys("mt80s:hb:*"));
