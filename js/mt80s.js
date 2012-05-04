@@ -105,7 +105,7 @@ var
 // intl {{
   if (LANGUAGE == "pl") {
     document.getElementById("description").innerHTML = [
-      "<b>Ponad 550 teledyski.</b>",
+      "<b>Ponad 560 teledyski.</b>",
       "Ka&#380;dy ogl&#261;da ten sam film,",
       "w tym samym czasie.",
       "Podobnie jak w TV."
@@ -889,6 +889,7 @@ function showchat(){
 
       if(lastEntry != _chat.data[lastindex][1]) {
         if(_chat.data[lastindex].length == 4) {
+          /*
           switch(_chat.data[lastindex][3]) {
             case 'play':
               transition(
@@ -898,6 +899,7 @@ function showchat(){
               );
               break;
           }
+          */
         } else {
           lastEntry = _chat.data[lastindex][1];
           if(entryCount > 10) {
