@@ -767,13 +767,14 @@ function showchat(){
       return;
     }
 
-    $.get("srv/getchat.php", {
+    $.get("srv/get.php", {
       lastid: _chat.lastid,
       v: VERSION,
       lang: LANGUAGE_CURRENT
     }, function(newdata) {
       _ev.set("chat-loaded");
-      _chat.data = _chat.data.concat(newdata);
+      $("#stats").html(newdata.stats.online + " online");
+      _chat.data = _chat.data.concat(newdata.chat);
       _chat.lastid = _chat.data[_chat.data.length - 1][0];
       clearTimeout(_chat.datatimeout);
       _chat.datatimeout = setTimeout(_chat.getdata, 6000);
@@ -784,11 +785,13 @@ function showchat(){
     LASTMESSAGE = "";
     $("#talk").slideUp();
     $("#message").slideUp();
+    $("#stats").fadeOut();
   }
 
   _chat.show = function() {
     $("#talk").slideDown();
     $("#message").slideDown();
+    $("#stats").fadeIn();
   }
 
   _chat.getdata();
@@ -862,14 +865,20 @@ function showchat(){
 
 }
 
+function send(func, data) {
+  $.get("srv/put.php", _.extend(data, {
+    f: func,
+    v: VERSION
+  }));
+}
+
 function dochat() {
   var message = $("#talk").val();
   if(message.length) {
-    $.get("srv/dochat.php", {
-      v: VERSION,
-      lang: LANGUAGE,
-      color: MYCOLOR,
-      data: message
+    send("chat", {
+      l: LANGUAGE,
+      c: MYCOLOR,
+      d: message
     });
   }
   $("#talk").val("");

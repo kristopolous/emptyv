@@ -1,15 +1,6 @@
 <?
-include("globals.php");
+include("common.php");
 include("../deps/markdown.php");
-
-function redisLink() {
-  static $r = false;
-
-  if ($r) return $r;
-  $r = new Redis();
-  $r->connect('localhost');
-  return $r;
-}
 
 $r = redisLink();
 
@@ -27,6 +18,13 @@ if(intval($version) != $VERSION) {
   exit(0);
 }
 
+$myhb = "mt80s:hb:" . session_id();
+
+$r->set($myhb, 1);
+$r->setTimeout($myhb, 15);
+
+$stats = Array();
+$stats['online'] = count($r->keys("mt80s:hb:*"));
 $key = "mt80s:" . $language;
 $data = $r->lRange($key, 0, -1);
 
@@ -37,5 +35,9 @@ foreach($data as $row) {
     $output[] = $row;
   }
 }
-echo json_encode($output);
+
+echo json_encode(Array(
+  "stats" => $stats,
+  "chat" => $output
+));
 ?>

@@ -1,9 +1,10 @@
-<?  include_once("srv/globals.php"); ?>
+<?  include_once("srv/common.php"); ?>
 <!doctype html>
 <html><head><meta name=description content="Non-stop back-to-back music videos from the 1980s"><title>1980s MTV</title>
 <style>
 body{background:#000}
 img{border:0}
+#stats{color:#666;height:0;font-family:Verdana;font-size:0.6em;margin-top:-0.2em;margin-left:0.3em}
 #language_tab {float:right;margin-top:-0.2em;height:0}
 #language_tab a{background:#222;color:#888;padding:0.05em 0.4em;font-family:Verdana;margin:0 0 0 0.15em;cursor:pointer;font-size:0.75em}
 #language_tab a:hover{box-shadow:0 0 2px 2px #444}
@@ -54,6 +55,7 @@ Just like TV.<br>
 <div id=chatbar> 
   <div id=message></div>
   <input id=talk onenter=dochat maxlength=200 autocomplete=off>
+  <div id=stats></div>
   <div id=language_tab></div>
 </div>
 </body>
