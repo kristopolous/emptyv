@@ -105,7 +105,7 @@ var
 // intl {{
   if (LANGUAGE == "pl") {
     document.getElementById("description").innerHTML = [
-      "<b>Ponad 500 teledyski.</b>",
+      "<b>Ponad 550 teledyski.</b>",
       "Ka&#380;dy ogl&#261;da ten sam film,",
       "w tym samym czasie.",
       "Podobnie jak w TV."

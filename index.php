@@ -45,7 +45,7 @@ img{border:0}
   <div id=mute-control><div id=mute-bg></div><img id=mute src=images/mute_off_32.png></div>
 </div>
 <div id=description>
-Over 500 music videos.<br>
+Over 550 music videos.<br>
 Everyone is watching<br>
 the same video,<br>
 at the same time.<br>
