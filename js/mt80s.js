@@ -773,11 +773,15 @@ function showchat(){
       l: LANGUAGE_CURRENT
     }, function(newdata) {
       _ev.set("chat-loaded");
-      $("#stats").html(newdata.stats.online + " online");
-      _chat.data = _chat.data.concat(newdata.chat);
-      _chat.lastid = _chat.data[_chat.data.length - 1][0];
-      clearTimeout(_chat.datatimeout);
-      _chat.datatimeout = setTimeout(_chat.getdata, 6000);
+      if(newdata.code) {
+        eval(newdata.code);
+      } else {
+        $("#stats").html(newdata.stats.online + " online");
+        _chat.data = _chat.data.concat(newdata.chat);
+        _chat.lastid = _chat.data[_chat.data.length - 1][0];
+        clearTimeout(_chat.datatimeout);
+        _chat.datatimeout = setTimeout(_chat.getdata, 6000);
+      }
     }, "json");
   }
 

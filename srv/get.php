@@ -2,8 +2,16 @@
 include("common.php");
 include("../deps/markdown.php");
 
-$r = redisLink();
+$version = intval($_GET['v']);
+if($version != $VERSION) {
+  if($version < 20) {
+    echo json_encode(Array(Array($lastid + 1, "<script>window.location.reload()</script>")));
+  }
+  echo json_encode(Array( "code" => "window.location.reload()"));
+  exit(0);
+}
 
+$r = redisLink();
 if(empty($_GET['id'])) {
   $lastid = 0;
 } else {
@@ -12,11 +20,6 @@ if(empty($_GET['id'])) {
 
 $output = Array();
 $language = $_GET['l'];
-$version = $_GET['v'];
-if(intval($version) != $VERSION) {
-  echo json_encode(Array(Array($lastid + 1, "<script>window.location.reload()</script>")));
-  exit(0);
-}
 
 $myhb = "mt80s:hb:" . session_id();
 
