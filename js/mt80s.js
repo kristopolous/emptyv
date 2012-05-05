@@ -102,17 +102,6 @@ var
   }
 // }} // Constants
 
-// intl {{
-  if (LANGUAGE == "pl") {
-    document.getElementById("description").innerHTML = [
-      "<b>Ponad 570 teledyski.</b>",
-      "Ka&#380;dy ogl&#261;da ten sam film,",
-      "w tym samym czasie.",
-      "Podobnie jak w TV."
-     ].join("<br>");
-  }
-// }} // intl
-
 // This is for IE
 if (typeof console == "undefined") {
   self.console = {log: new Function()}
@@ -212,7 +201,7 @@ var
   // sampling
   _lagCounter = 0,
 
-  _volume = 1,
+  _volume = Store("volume") || 1,
 
   _ev = EvDa(),
 
@@ -264,8 +253,19 @@ _db.find().update({ix: function() {return index++ }});
 
 // }} // Globals
 
+function Store(key, value) {
+  if(self.localStorage) {
+    if(arguments.length == 2) {
+      localStorage[key] = value;
+    }
+    return localStorage[key];
+  }
+}
+
 function setVolume(amount, animate) {
   _volume = amount;
+
+  Store("volume", _volume);
 
   var volume = 100;
 
@@ -571,15 +571,14 @@ function onReady(domain, id) {
   if(++_loaded === 1) {
     show(_next);
     findOffset();
-    setTimeout(showchat, 4000);
 
     _offsetIval = setInterval(findOffset, LOADTIME_sec * 1000 / 10);
 
+    showchat();
+
     setTimeout(function(){ 
-      //loadPlayer("dm", 3);
       loadPlayer("yt", 1);
       loadPlayer("yt", 2); 
-      //loadPlayer("dm", 4);
     }, 2000);
   } 
 }
@@ -928,10 +927,6 @@ function showchat(){
   volumeSlider();
 
   _ev.isset("chat-loaded", function(){
-    $("#description").animate({
-      opacity: 0,
-      bottom: "40em"
-    }, 1500);
     $("#controls").fadeIn();
     $("#talk").focus();
     $("#chatbar").fadeIn(1000, function(){
@@ -967,6 +962,7 @@ function pickcolor(){
 }
 
 function volumeSlider() {
+  $("#mute").css({top: (1 - _volume) * 100});
   var ival = setInterval(function(){
     if($("#mute").draggable) {
       $("#mute").draggable({

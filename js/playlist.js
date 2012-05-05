@@ -561,7 +561,7 @@ var _duration = [
 ["yt:vWz9VN40nCA", 224, 0, 0, 100, 1981, "Olivia Newton-John", "Physical", "ve"],
 ["yt:zeH2Um-yOrA", 188, 0, 0, 100, 1982, "Vanessa", "Upside Down", "clean"], 
 ["yt:zyUZRKNc8jk", 207, 0, 0, 100, 1987, "Mandy", "Positive Reaction", "clean"],
-["yt:GieHr2CbPxk", 196, 4, 0, 100, 1979, "M", "Pop Muzik", "clean"],
+//["yt:GieHr2CbPxk", 196, 4, 0, 100, 1979, "M", "Pop Muzik", "clean"],
 ["yt:ILWSp0m9G2U", 198, 0, 0, 100, 1983, "Irene Cara", "Flasdance (What A Feeling)", "clean"],
 ["yt:ThHz9wlBeLU", 243, 0, 0, 100, 1983, "Madonna", "Lucky Star", "clean"],
 ["yt:JH3WvI_S6-k", 213, 0, 0, 100, 1986, "Bananarama", "Venus", "logo"],

@@ -39,13 +39,12 @@ img{border:0}
 <!--[if IE]><link rel=stylesheet href=css/ie.css><![endif]-->
 </head>
 <body>
-<div id=players><div id=p4></div><div id=p3></div><div id=p2></div><div id=p1></div><div id=p0></div>
+<div id=players><div id=p2></div><div id=p1></div><div id=p0></div>
 </div>
 <div id=controls>
 <a style=text-align:center target=_blank href="%20# suggest"><img src=images/mt80s_cyber.png></a>
 <div id=mute-control><div id=mute-bg></div><img id=mute src=images/mute_off_32.png></div>
 </div>
-<div id=description>Over 570 music videos.<br>Everyone is watching<br>the same video,<br>at the same time.<br>Just like TV.<br><b>Here comes the chat!</b><br></div>
 <div id=chatbar> 
 <div id=message></div>
 <input id=talk onenter=dochat maxlength=200 autocomplete=off>
