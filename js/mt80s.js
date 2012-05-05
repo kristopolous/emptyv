@@ -37,7 +37,7 @@ var
     }
   },
 
-  UID = 0,
+  UID = Store("uid") || 0,
 
   MYCOLOR = Math.floor(Math.random() * 9),
 
@@ -831,6 +831,7 @@ function showchat(){
       _ev.set("chat-loaded");
       if(newdata.uid) {
         UID = newdata.uid;
+        Store("uid", UID);
       }
       if(newdata.code) {
         eval(newdata.code);
