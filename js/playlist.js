@@ -90,7 +90,7 @@ var _duration = [
 ["yt:Ded4MZVVAhE", 244, 0, 0, 100, 1979, "The Knack", "My Sharona", "logo"],
 ["yt:Di-z4XSnus8", 223, 0, 0, 100, 1988, "Confetti", "Sound of C", "logo"],
 ["yt:pTwFs99iGXg", 221, 0, 0, 100, 1983, "My Mine", "Hypnotic Tango", "logo"],
-["yt:4ycl_ayPHU0", 251, 0, 0, 100, 1989, "The Cure", "Fascination Street", "ve"],
+["yt:4ycl_ayPHU0", 251, 0, 0, 100, 1989, "The Cure", "Fascination Street", "ve 240p"],
 ["yt:Dj52Jjr0nrs", 221, 5, 0, 100, 1983, "Comateens", "Get Off My Case", "clean"],
 ["yt:E5gNYVia2rg", 202, 0, 0, 100, 1976, "Boney M", "Daddy Cool", "logo"],
 ["yt:E7t8eoA_1jQ", 216, 0, 0, 100, 1987, "Erik B and Rakim", "Paid in Full", "ve"],
