@@ -487,7 +487,7 @@ var _duration = [
 ["yt:YCA8cFCL9_w", 224, 0, 0, 100, 1982, "George Kranz", "Din da da", "clean"],
 ["yt:nqh9pKPalWo", 236, 0, 0, 100, 1982, "Wish Key", "Orient Express", "logo"],
 ["yt:nv0ENvpaHVQ", 233, 0, 0, 100, 1983, "Laura Branigan", "Gloria", "ytad"],
-["yt:-PtrEx-IZIw", 233, 0, 0, 100, 1983, "Irene Cara", "Why me?", "clean"],
+//["yt:-PtrEx-IZIw", 233, 0, 0, 100, 1983, "Irene Cara", "Why me?", "clean"],
 ["yt:szfIDtAlV2Y", 240, 0, 0, 100, 1984, "Alphaville", "Dance With Me", "clean"],
 ["yt:IsvfofcIE1Q", 230, 0, 0, 100, 1984, "Depeche Mode", "Master and Servant", "clean"],
 ["yt:qt0-4FzoNgw", 236, 0, 0, 100, 1980, "The Angels", "Face The Day", "ytad clean"],
