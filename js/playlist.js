@@ -467,7 +467,7 @@ var _duration = [
 ["yt:lO_68NFm-BE", 223, 0, 0, 100, 1983, "Kano", "Another Life", "disconet logo"],
 ["yt:lTaXtWWR16A", 385, 0, 0, 100, 1990, "Madonna", "Vogue", "clean"],
 ["yt:lXInek0kz70", 229, 0, 0, 100, 1983, "Yes", "Owner of a lonely heart", "logo"],
-["yt:lbT2lHtYtEQ", 256, 0, 0, 100, 1983, "Iron Maiden", "The Trooper", "clean"],
+["yt:gQIcFkGyR78", 256, 0, 0, 100, 1983, "Iron Maiden", "The Trooper", "clean"],
 ["yt:4ayApFc9D7E", 247, 0, 0, 100, 1972, "Ozzy Osbourne", "Crazy Train", "clean"],
 ["yt:HPkTGm4RtVM", 255, 0, 0, 100, 1988, "Joan Jett & The Blackhearts", "I Hate Myself For Loving You", "clean"],
 ["yt:leohcvmf8kM", 259, 0, 0, 100, 1989, "The B-52s", "Love Shack", "clean"],
