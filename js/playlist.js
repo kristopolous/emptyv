@@ -351,6 +351,7 @@ var _duration = [
 ["yt:aENX1Sf3fgQ", 251, 0, 0, 100, 1981, "The Police", "Every Little Thing She Does Is Magic", "ve"],
 ["yt:aINmJ5ieM6Y", 231, 0, 0, 100, 1985, "Stacey Q", "Two of Hearts", "almostclean"],
 ["yt:aNSRdXMMY-M", 209, 0, 0, 100, 1985, "Muriel Dacq", "Tropique", "clean"],
+["yt:sOu3Dy5A4ME", 224, 0, 0, 100, 1986, "Alaska y Dinarama", "Alaska y Dinarama", "clean"],
 ["yt:gvlxRvhCB_A", 110, 0, 0, 100, 1968, "Elvis Presley", "A Little Less Conversation", "ytad clean"],
 ["yt:hCuMWrfXG4E", 203, 0, 0, 100, 1984, "Billy Joel", "Uptown Girl", "ve"],
 ["yt:p4oya9nYv7Q", 236, 0, 0, 100, 1984, "Raf", "Self Control", "clean"],
