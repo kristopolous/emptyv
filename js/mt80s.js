@@ -220,7 +220,7 @@ var
   // the emit from the server of course (which we assume to be fairly
   // constant).
   _start = getNow(),
-  _epoch = 1325888561 + ( _start - _referenceTime ),
+  _epoch = 1325778000 + ( _start - _referenceTime ),
 
   _bAppend = true,
   _offsetIval,
