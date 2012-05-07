@@ -26,17 +26,6 @@ var
 
   LANGUAGE_CURRENT = LANGUAGE,
 
-  WORDS = {
-    PLAYING: {
-      en: "Playing",
-      pl: "Odtwarzanie"
-    },
-    NONE: {
-      en: "none",
-      pl: "&#380;aden"
-    }
-  },
-
   UID = Store("uid") || 0,
 
   MYCOLOR = Math.floor(Math.random() * 9),
@@ -433,7 +422,14 @@ function doTitle(){
     var newtitle = _duration[_index][ARTIST] + " - " + _duration[_index][TITLE];
     if(LASTTITLE != newtitle) {
       LASTTITLE = newtitle;
-      addmessage("<b>" + WORDS.PLAYING[LANGUAGE] + ":</b> <a target=_blank href=http://youtube.com/watch?v=" + _duration[_index][ID].split(':')[1] + ">" + newtitle + "</a>");
+      addmessage(
+       "<a class=title target=_blank href=http://youtube.com/watch?v=" + _duration[_index][ID].split(':')[1] + ">" + 
+         "<img src=http://i3.ytimg.com/vi/" + _duration[_index][ID].split(":").pop() + "/default.jpg>" +
+         "<span>" +
+           "<b>" + _duration[_index][ARTIST] + "</b>" +  
+           _duration[_index][TITLE] +
+         "</span>" +
+       "</a>");
   /*
       $.get("srv/dochat.php", {
         type: "track",

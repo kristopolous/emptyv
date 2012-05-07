@@ -35,6 +35,10 @@ img{border:0}
 .c6,.c6 a{color:#b86db0}
 .c7,.c7 a{color:#9cff7b}
 .c8,.c8 a{color:#b3b3b9}
+.title {text-decoration:none}
+.title span{display:inline-block;width:154px;margin-left:6px;font-size:0.8em;color:#ccc}
+.title img{width:45px;vertical-align:top}
+.title b{background:none;display:block;font-size:1.2em;color:#fff}
 </style>
 <!--[if IE]><link rel=stylesheet href=css/ie.css><![endif]-->
 </head>
