@@ -46,7 +46,7 @@ foreach($data as $row) {
   }
 }
 
-$outpue['vid'] = json_decode($r->hGet("mt80s:vid", $channel));
+//$outpue['vid'] = json_decode($r->hGet("mt80s:vid", $channel));
 $output['stats'] = $stats;
 $output['chat'] = $chat;
 echo json_encode($output);

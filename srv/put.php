@@ -24,11 +24,11 @@ if($r->sIsMember("mt80s:banned", $_SERVER['HTTP_X_REAL_IP'])) {
 
 function api_play($hash) {
   global $r;
-  $language = $hash['l'];
+  $channel = $hash['l'];
   $id = $r->incr("mt80s:ix");
 
   add(
-    "mt80s:" . $language,
+    "mt80s:log:" . $channel,
     Array($id, $hash['id'], 0, "play")
   );
 }
@@ -38,7 +38,7 @@ function api_chat($hash) {
 
   $data = $hash['d'];
   $color = $hash['c'];
-  $language = $hash['l'];
+  $channel = $hash['l'];
   $version = $hash['v'];
 
   if(strlen($data) > 0) {
@@ -49,14 +49,14 @@ function api_chat($hash) {
     $id = $r->incr("mt80s:ix");
 
     add(
-      "mt80s:" . $language,
+      "mt80s:log:" . $channel,
       Array($id, $data, $color)
     );
 
-    if($language != "all" ){
+    if($channel != "all" ){
       add(
-        "mt80s:all",
-        Array($id, "$language: " . $data, $color)
+        "mt80s:log:all",
+        Array($id, "$channel: " . $data, $color)
       );
     }
   }
