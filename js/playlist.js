@@ -568,6 +568,8 @@ var _duration = [
 ["yt:sXD43jjG0jQ", 216, 0, 0, 100, 1978, "Evelyn Champagne King", "Shame", "clean ytad"],
 ["yt:1Hm08f5b8tc", 240, 0, 0, 100, 1979, "Amii Stewart", "Knock on Wood", ""],
 ["yt:BUj8NlnHPbA", 150, 0, 0, 100, 1976, "Double Exposure", "Ten Percent", ""],
+["yt:A_sY2rjxq6M", 224, 0, 0, 100, 1977, "The Trammps", "Disco Inferno", ""],
+["yt:_JoZS6LgqYI", 255, 0, 0, 100, 1978, "Bee Gees", "You Should Be Dancing", ""],
 ["yt:-D9PdjuuwNM", 144, 0, 0, 100, 1973, "First Choice", "Armed And Extremely Dangerous", ""],
 ["yt:fcpj1j31jWc", 265, 0, 0, 100, 1982, "The Flirts", "Passion", ""],
 ["yt:IwK67UvWPJs", 181, 0, 0, 100, 1978, "Cissy Houston", "Think It Over", ""],
