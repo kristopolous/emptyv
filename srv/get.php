@@ -20,7 +20,7 @@ if(empty($_GET['id'])) {
 
 $output = Array();
 $chat = Array();
-$language = $_GET['l'];
+$channel = $_GET['l'];
 $uid = $_GET['u'];
 if($uid == 0) {
   $output['uid'] = $uid = uniqid();
@@ -33,7 +33,7 @@ $r->setTimeout($myhb, 200);
 
 $stats = Array();
 $stats['online'] = count($r->keys("mt80s:hb:*"));
-$key = "mt80s:" . $language;
+$key = "mt80s:log:" . $channel;
 $data = $r->lRange($key, 0, -1);
 
 foreach($data as $row) {
@@ -46,6 +46,7 @@ foreach($data as $row) {
   }
 }
 
+$outpue['vid'] = json_decode($r->hGet("mt80s:vid", $channel));
 $output['stats'] = $stats;
 $output['chat'] = $chat;
 echo json_encode($output);

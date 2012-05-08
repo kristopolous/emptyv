@@ -18,13 +18,15 @@ for(var i = 0; i < scripts.length; i++) {
 }
 
 var
+  DUMMYFUNCTION = function(){},
+
   ID = 0,
 
-  LANGUAGE = (document.location.search.length > 0) ? 
+  CHANNEL = (document.location.search.length > 0) ? 
      document.location.search.substr(1)
    : navigator.language.split('-')[0],
 
-  LANGUAGE_CURRENT = LANGUAGE,
+  CHANNEL_CURRENT = CHANNEL,
 
   UID = Store("uid") || 0,
 
@@ -58,7 +60,7 @@ var
   // If there is a hash value (there should not be regularly)
   // Then debugging output is turned on, whatever the hell that
   // entails
-  DEBUG = location.hash.length > 0,
+  DEBUG = location.hash.search("DEBUG") > -1,
 
   // The offset addition was after some toying around and 
   // seeint how long the player took to load. This seemed
@@ -84,11 +86,8 @@ var
   LASTTITLE = "",
 
   // @ref: http://code.google.com/apis/youtube/flash_api_reference.html
-  LEVELS = ["small", "medium"];//, "large"]; //, "hd720", "hd1080", "highres"];
+  LEVELS = ["small", "medium", "large"]; //, "hd720", "hd1080", "highres"];
 
-  if (document.referrer.search("wykop.pl") > -1) {
-    LANGUAGE = "pl";
-  }
 // }} // Constants
 
 // This is for IE
@@ -127,6 +126,10 @@ function remainingTime(player) {
   } else {
     return 0;
   }
+}
+
+function image(id) {
+  return "http://i3.ytimg.com/vi/" + id.split(":").pop() + "/default.jpg>";
 }
 
 function toTime(sec) {
@@ -422,24 +425,16 @@ function doTitle(){
     var newtitle = _duration[_index][ARTIST] + " - " + _duration[_index][TITLE];
     if(LASTTITLE != newtitle) {
       LASTTITLE = newtitle;
-      addmessage(
-       "<a class=title target=_blank href=http://youtube.com/watch?v=" + _duration[_index][ID].split(':')[1] + ">" + 
+      var dom = "<a class=title target=_blank href=http://youtube.com/watch?v=" + _duration[_index][ID].split(':')[1] + ">" + 
          "<img src=http://i3.ytimg.com/vi/" + _duration[_index][ID].split(":").pop() + "/default.jpg>" +
          "<span>" +
            "<b>" + _duration[_index][ARTIST] + "</b>" +  
            _duration[_index][TITLE] +
          "</span>" +
-       "</a>");
-  /*
-      $.get("srv/dochat.php", {
-        type: "track",
-        v: VERSION,
-        ytid: _duration[_index][ID],
-        artist: _duration[_index][ARTIST],
-        title: _duration[_index][TITLE],
-      });
-      addmessage("<b>Playing:</b> <a target=_blank href=http://youtube.com/watch?v=" + _duration[_index][ID].split(':')[1] + ">" + newtitle + "</a>");
-      */
+       "</a>";
+
+      $("#song").html(dom);
+      addmessage(dom);
     }
     document.title = newtitle + " | " + toTime(getNow() - _start);
   }
@@ -758,12 +753,96 @@ function addmessage(data) {
 
 function doPlay(id) {
   send("play", {
-    l: LANGUAGE,
+    l: CHANNEL,
     id: id
   });
   $("#talk").val("");
   $("#autocomplete").css('display','none');
 }
+
+var Title = {
+  visible: false,
+  Init: function(){
+    $(document.body).mousemove(function(e){
+      if(e.pageY < 20 && !visible) {
+        Title.show();
+      } else if(e.pageY > 60 && visible) {
+        Title.hide();
+      }
+    });
+    Title.show();
+  },
+  show: function(){
+    visible = true;
+    $("#titlebar").animate({top: 0});
+  },
+  hide: function(){
+    visible = false;
+    $("#titlebar").animate({top: '-50px'});
+  }
+};
+
+var Channel = {
+  Init: function(){
+    _ev("channel", function(name) {
+      $("#channel-title").html("80sMTV");
+    });
+
+    _ev("channel", CHANNEL);
+    $("#channel-cancel").click(Channel.hide);
+    $("#channel-change").click(Channel.show);
+
+    $("#channel-query").keyup(function(){
+      Channel.search(this.value);
+    });
+  },
+
+  stats: function(d) {
+    return "users " + d;
+  },
+
+  set: function(which) {
+  },
+
+  gen: function(data) {
+    $("#channel-search-results").empty();
+
+    _.each(data, function(which) {
+      $("<a />")
+        .append("<img src=" + image(which.current) + ">")
+        .append("<span>" +
+            "<b>" + which.title + "</b>" +
+            Channel.stats(which.stats) +
+            "</span>"
+        ).click(function(){ Channel.set(which.uid); })
+        .appendTo("#channel-search-results");
+    });
+  },
+
+  search: function(q) {
+    send(
+      "channel_search", 
+      {query: q},
+      gen
+    );
+  },
+
+  hide: function() {
+    $("#channel-selector-wrapper").animate({
+      top: "-80%",
+      opacity: 0
+    }, 1000);
+  },
+
+  show: function() {
+    $("#channel-selector-wrapper").animate({
+      top: "0%",
+      opacity: 100 
+    }, 500, function(){
+      $("#channel-query").focus()
+    });
+  }
+};
 
 function showchat(){
   var 
@@ -776,6 +855,10 @@ function showchat(){
     lastmessageid = 0;
 
   log("Loading chat");
+
+  Title.Init();
+  Channel.Init();
+
   $("#talk").keyup(function(e){
     var kc = window.event ? window.event.keyCode : e.which;
     if(kc == 13) {
@@ -812,7 +895,7 @@ function showchat(){
   });
 
   _chat.getdata = function() {
-    if(LANGUAGE_CURRENT == "none") {
+    if(CHANNEL_CURRENT == "none") {
       clearTimeout(_chat.datatimeout);
       _chat.datatimeout = setTimeout(_chat.getdata, 6000);
       return;
@@ -822,7 +905,7 @@ function showchat(){
       u: UID,
       id: _chat.lastid,
       v: VERSION,
-      l: LANGUAGE_CURRENT
+      l: CHANNEL_CURRENT
     }, function(newdata) {
       _ev.set("chat-loaded");
       if(newdata.uid) {
@@ -856,21 +939,21 @@ function showchat(){
 
   _chat.getdata();
 
-  _.each([ LANGUAGE, 'all', 'none' ], function(which) {
+  _.each([ CHANNEL, 'all', 'none' ], function(which) {
     var unit = $("<a>" + which + "</a>").click(function(){
       $(this).addClass('selected').siblings().removeClass('selected');
-      if (LANGUAGE_CURRENT == "none" && which != "none") {
+      if (CHANNEL_CURRENT == "none" && which != "none") {
         _chat.show();
       }
       if(which == "none") {
         _chat.hide();
-      } else if(LANGUAGE_CURRENT != "none") {
+      } else if(CHANNEL_CURRENT != "none") {
         lastindex = _chat.data.length - 1;
         addmessage("Switched to language:" + which);
       }
-      LANGUAGE_CURRENT = which;
+      CHANNEL_CURRENT = which;
     }).appendTo("#language_tab");
-    if(LANGUAGE_CURRENT == which) {
+    if(CHANNEL_CURRENT == which) {
       unit.addClass("selected");
     }
     $("#language_tab").css('opacity', 0.7);
@@ -922,6 +1005,10 @@ function showchat(){
   }
   showmessage();
   volumeSlider();
+  $("#mute-control").hover(
+    function(){ $("#mute-bg").css('background', '#444'); },
+    function(){ $("#mute-bg").css('background', 'url("css/chat-bg.png")'); }
+  );
 
   _ev.isset("chat-loaded", function(){
     $("#controls").fadeIn();
@@ -935,18 +1022,18 @@ function showchat(){
 
 }
 
-function send(func, data) {
+function send(func, data, callback) {
   $.get("srv/put.php", _.extend(data, {
     f: func,
     v: VERSION
-  }));
+  }), callback || DUMMYFUNCTION);
 }
 
 function dochat() {
   var message = $("#talk").val();
   if(message.length) {
     send("chat", {
-      l: LANGUAGE,
+      l: CHANNEL,
       c: MYCOLOR,
       d: message
     });
@@ -960,6 +1047,7 @@ function pickcolor(){
 
 function volumeSlider() {
   $("#mute").css({top: (1 - _volume) * 100});
+
   var ival = setInterval(function(){
     if($("#mute").draggable) {
       $("#mute").draggable({

@@ -1,5 +1,6 @@
 <?
-$VERSION = 40;
+
+$VERSION = 41;
 
 function redisLink() {
   static $r = false;
