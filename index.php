@@ -47,7 +47,7 @@ input{display:block;box-shadow:0 0 2px 2px #444;background:#333;color:#ccc;borde
 #channel-title{color:#ccc;margin-top:-0.28em}
 #channel-wrap{display:inline-block}
 #channel-wrap *{display:block}
-#cover{position:absolute;top:0;left:0;height:100%;width:100%}
+#cover{display:none;position:absolute;top:0;left:0;height:100%;width:100%}
 .button {cursor:pointer;color:#aaa}
 .button {float:right;display:inline-block;font-size:12px;line-height:0.9em;background:#222;padding:0.25em 0.5em; width:55px;height:25px;vertical-align:middle}
 .button:hover{background:#444}

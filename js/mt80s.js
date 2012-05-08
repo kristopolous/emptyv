@@ -770,6 +770,7 @@ var Title = {
         Title.hide();
       }
     });
+    $("#cover").css('display', 'block');
     Title.show();
   },
   show: function(){
