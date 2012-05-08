@@ -909,6 +909,7 @@ function showchat(){
     }, function(newdata) {
       _ev.set("chat-loaded");
       if(newdata.uid) {
+        console.log(newdata.uid);
         UID = newdata.uid;
         Store("uid", UID);
       }
@@ -967,37 +968,26 @@ function showchat(){
       }
 
       if(lastEntry != _chat.data[lastindex][1]) {
-        if(_chat.data[lastindex].length == 4) {
-          /*
-          switch(_chat.data[lastindex][3]) {
-            case 'play':
-              transition(
-                _db.find('id', 'yt:' + _chat.data[lastindex][1])[0].ix,
-                0,
-                true
-              );
-              break;
-          }
-          */
-        } else {
-          lastEntry = _chat.data[lastindex][1];
-          if(entryCount > 10) {
-            entryList.shift().remove();
-          }
-
-          entry = $("<div>").html(lastEntry);
-          entryList.push(entry);
-
-          if(_chat.data[lastindex].length > 2) {
-            entry.addClass("c" + _chat.data[lastindex][2]);
-          } else {
-            entry.addClass("c");
-          }
-          $("a", entry).attr("target", "_blank");
-           
-          $("#message").append(entry);
-          entryCount++;
+        lastEntry = _chat.data[lastindex][1];
+        if(entryCount > 10) {
+          entryList.shift().remove();
         }
+
+        entry = $("<div>")
+          .html(lastEntry)
+          .attr({title: _chat.data[lastindex][3]});
+
+        entryList.push(entry);
+
+        if(_chat.data[lastindex].length > 2) {
+          entry.addClass("c" + _chat.data[lastindex][2]);
+        } else {
+          entry.addClass("c");
+        }
+        $("a", entry).attr("target", "_blank");
+         
+        $("#message").append(entry);
+        entryCount++;
       } 
       lastindex++;
     }
@@ -1025,13 +1015,35 @@ function showchat(){
 function send(func, data, callback) {
   $.get("srv/put.php", _.extend(data, {
     f: func,
+    u: UID,
     v: VERSION
   }), callback || DUMMYFUNCTION);
 }
 
+function processCommand(text) {
+  if(text.substr(0, 1) == '/') {
+    var 
+      tokens = text.slice(1).split(' '),
+      command = tokens.shift(),
+      arguments = tokens;
+    switch(command) {
+      case 'user':
+        self.UID = arguments.join('-');
+        Store("uid", self.UID);
+        addmessage("Set user to " + self.UID);
+        break;
+      default: 
+        addmessage("Unknown command: " + command);
+        break;
+    }
+    return true;
+  }
+  return false;
+}
+
 function dochat() {
   var message = $("#talk").val();
-  if(message.length) {
+  if(message.length && !processCommand(message)) {
     send("chat", {
       l: CHANNEL,
       c: MYCOLOR,

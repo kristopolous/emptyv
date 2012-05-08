@@ -36,6 +36,7 @@ function api_play($hash) {
 function api_chat($hash) {
   global $r;
 
+  $user = $hash['u'];
   $data = $hash['d'];
   $color = $hash['c'];
   $channel = $hash['l'];
@@ -50,13 +51,13 @@ function api_chat($hash) {
 
     add(
       "mt80s:log:" . $channel,
-      Array($id, $data, $color)
+      Array($id, $data, $color, $user)
     );
 
     if($channel != "all" ){
       add(
         "mt80s:log:all",
-        Array($id, "$channel: " . $data, $color)
+        Array($id, "$channel: " . $data, $color, $user)
       );
     }
   }

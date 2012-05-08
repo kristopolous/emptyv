@@ -22,7 +22,7 @@ $output = Array();
 $chat = Array();
 $channel = $_GET['l'];
 $uid = $_GET['u'];
-if($uid == 0) {
+if($uid == "0") {
   $output['uid'] = $uid = uniqid();
 } 
 
