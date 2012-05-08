@@ -569,6 +569,7 @@ var _duration = [
 ["yt:1Hm08f5b8tc", 240, 0, 0, 100, 1979, "Amii Stewart", "Knock on Wood", ""],
 ["yt:BUj8NlnHPbA", 150, 0, 0, 100, 1976, "Double Exposure", "Ten Percent", ""],
 ["yt:A_sY2rjxq6M", 224, 0, 0, 100, 1977, "The Trammps", "Disco Inferno", ""],
+["yt:UzrnTIJt_m0", 261, 0, 0, 100, 1978, "Chilly", "For Your Love", ""],
 ["yt:_JoZS6LgqYI", 255, 0, 0, 100, 1978, "Bee Gees", "You Should Be Dancing", ""],
 ["yt:-D9PdjuuwNM", 144, 0, 0, 100, 1973, "First Choice", "Armed And Extremely Dangerous", ""],
 ["yt:fcpj1j31jWc", 265, 0, 0, 100, 1982, "The Flirts", "Passion", ""],
