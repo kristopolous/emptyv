@@ -112,4 +112,5 @@ s.parentNode.insertBefore(ga,s);
 <script src=js/deps.min.js></script>
 <script src=js/playlist.js></script> 
 <script src=js/mt80s.js></script> 
+<script src=/socket.io/socket.io.js></script>
 </html>

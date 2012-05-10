@@ -206,6 +206,8 @@ var
   _index = -1,
   _lastLoaded,
 
+  _socket = false,
+
   _seekTimeout = 0,
   _qualityTimeout = 0,
 
@@ -759,7 +761,7 @@ function addmessage(data) {
 
 function doPlay(id) {
   send("play", {
-    l: CHANNEL,
+    chan: CHANNEL,
     id: id
   });
   $("#talk").val("");
@@ -829,8 +831,7 @@ var Channel = {
   search: function(q) {
     send(
       "channel_search", 
-      {query: q},
-      gen
+      {query: q}
     );
   },
 
@@ -860,6 +861,8 @@ function showchat(){
     lastindex = 0, 
     lastTime = new Date(),
     lastmessageid = 0;
+
+  _socket = io.connect('http://qaa.ath.cx:1985/');
 
   log("Loading chat");
 
@@ -901,37 +904,6 @@ function showchat(){
     }
   });
 
-  _chat.getdata = function() {
-    if(CHANNEL_CURRENT == "none") {
-      clearTimeout(_chat.datatimeout);
-      _chat.datatimeout = setTimeout(_chat.getdata, 6000);
-      return;
-    }
-
-    $.get("srv/get.php", {
-      u: UID,
-      id: _chat.lastid,
-      v: VERSION,
-      l: CHANNEL_CURRENT
-    }, function(newdata) {
-      _ev.set("chat-loaded");
-      if(newdata.uid) {
-        console.log(newdata.uid);
-        UID = newdata.uid;
-        Store("uid", UID);
-      }
-      if(newdata.code) {
-        eval(newdata.code);
-      } else {
-        $("#stats").html(newdata.stats.online + " online");
-        _chat.data = _chat.data.concat(newdata.chat);
-        _chat.lastid = _chat.data[_chat.data.length - 1][0];
-        clearTimeout(_chat.datatimeout);
-        _chat.datatimeout = setTimeout(_chat.getdata, 6000);
-      }
-    }, "json");
-  }
-
   _chat.hide = function() {
     LASTMESSAGE = "";
     $("#talk").slideUp();
@@ -945,7 +917,31 @@ function showchat(){
     $("#stats").fadeIn();
   }
 
-  _chat.getdata();
+  _socket.on("stats", function(d) {
+    $("#stats").html(d.online + " online");
+  });
+
+  _socket.on("code", eval);
+
+  _socket.on("uid", function(d) {
+    UID = d;
+    Store("uid", UID);
+    console.log(UID);
+  });
+
+  _socket.on("greet-request", function() {
+    _ev.set("chat-loaded");
+    send("greet-response", {
+      lastid: _chat.lastid,
+      channel: CHANNEL_CURRENT
+    });
+  });
+
+  _socket.on("chat", function(d) {
+    _chat.data = _chat.data.concat(d);
+    _chat.lastid = _chat.data[_chat.data.length - 1][0];
+  });
+
 
   _.each([ CHANNEL, 'all', 'none' ], function(which) {
     var unit = $("<a>" + which + "</a>").click(function(){
@@ -1020,11 +1016,11 @@ function showchat(){
 }
 
 function send(func, data, callback) {
-  $.get("srv/put.php", _.extend(data, {
+  _socket.emit(func, _.extend(data, {
     f: func,
-    u: UID,
+    uid: UID,
     v: VERSION
-  }), callback || DUMMYFUNCTION);
+  }));
 }
 
 function processCommand(text) {
@@ -1052,7 +1048,7 @@ function dochat() {
   var message = $("#talk").val();
   if(message.length && !processCommand(message)) {
     send("chat", {
-      l: CHANNEL,
+      chan: CHANNEL,
       c: MYCOLOR,
       d: message
     });

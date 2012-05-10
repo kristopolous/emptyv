@@ -1,3 +1,4 @@
 volume/archive
 srv/db.php
+node_modules
 *~
