@@ -43,6 +43,15 @@ io.sockets.on('connection', function (socket) {
     };
   });
 
+  function hb() {
+    // uid subject to change w/o notice
+    var hb = "mt80s:hb:" + _user.uid;
+    _db.multi([
+      ["set", hb, 1],
+      ["expire", hb, 10]
+    ]).exec();
+  }
+
   function poll() {
     _db.get("mt80s:ix", function(err, last) {
 
@@ -97,14 +106,8 @@ io.sockets.on('connection', function (socket) {
 
     if(!_ival.poll) {
       _ival.poll = setInterval(poll, 50);
-      _ival.hb = setInterval(function(){
-        // uid subject to change w/o notice
-        var hb = "mt80s:hb:" + _user.uid;
-        _db.multi([
-          ["set", hb, 1],
-          ["expire", hb, 10]
-        ]).exec();
-      }, 5000);
+      _ival.hb = setInterval(hb, 5000);
+      hb();
     }
   });
 

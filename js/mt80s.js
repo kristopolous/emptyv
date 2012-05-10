@@ -862,7 +862,7 @@ function showchat(){
     lastTime = new Date(),
     lastmessageid = 0;
 
-  _socket = io.connect('http://qaa.ath.cx:1985/');
+  _socket = io.connect('http://' + window.location.hostname + ':1985/');
 
   log("Loading chat");
 

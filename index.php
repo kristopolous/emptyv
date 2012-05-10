@@ -99,7 +99,7 @@ input{display:block;box-shadow:0 0 2px 2px #444;background:#333;color:#ccc;borde
 </div>
 </body>
 <script>
-var VERSION=<?= $VERSION ?>,_gaq=[['_setAccount','UA-28399789-1'],['_trackPageview']],_referenceTime=<?=microtime(true);?>;
+var _gaq=[['_setAccount','UA-28399789-1'],['_trackPageview']],_referenceTime=<?=microtime(true);?>;
 (function(){
 ga=document.createElement('script');
 ga.type='text/javascript';
