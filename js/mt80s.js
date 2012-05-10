@@ -17,6 +17,10 @@ for(var i = 0; i < scripts.length; i++) {
   })(scripts[i]);
 }
 
+if(!self.console) {
+  self.console = function(){}
+}
+
 var
   DUMMYFUNCTION = function(){},
 
@@ -24,7 +28,9 @@ var
 
   CHANNEL = (document.location.search.length > 0) ? 
      document.location.search.substr(1)
-   : navigator.language.split('-')[0],
+   : (navigator.language ? 
+        navigator.language
+      : this.clientInformation.browserLanguage).split('-')[0]
 
   CHANNEL_CURRENT = CHANNEL,
 

@@ -109,7 +109,7 @@ s=document.getElementsByTagName('script')[0];
 s.parentNode.insertBefore(ga,s);
 })();
 </script>
-<script src=js/deps.js></script>
+<script src=js/deps.min.js></script>
 <script src=js/playlist.js></script> 
 <script src=js/mt80s.js></script> 
 </html>
