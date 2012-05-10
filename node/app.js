@@ -3,7 +3,6 @@ var app = require('http').createServer(handler)
   , _db = redis.createClient()
   , io = require('socket.io').listen(app)
   , _md = require("node-markdown").Markdown
-  , _VERSION = 50
   , fs = require('fs');
 
 app.listen(1985);
@@ -36,7 +35,13 @@ io.sockets.on('connection', function (socket) {
   var 
     _user = {}, 
     _online = -1,
-    _ival;
+    _ival = {};
+
+  socket.on("disconnect", function(){
+    for(var which in _ival) {
+      clearInterval(_ival[which]);
+    };
+  });
 
   function poll() {
     _db.get("mt80s:ix", function(err, last) {
@@ -90,14 +95,14 @@ io.sockets.on('connection', function (socket) {
       socket.emit("uid", _user.uid);
     } 
 
-    if(!_ival) {
-      _ival = setInterval(poll, 50);
-      setInterval(function(){
+    if(!_ival.poll) {
+      _ival.poll = setInterval(poll, 50);
+      _ival.hb = setInterval(function(){
         // uid subject to change w/o notice
         var hb = "mt80s:hb:" + _user.uid;
         _db.multi([
           ["set", hb, 1],
-          ["expire", hb, 10000]
+          ["expire", hb, 10]
         ]).exec();
       }, 5000);
     }

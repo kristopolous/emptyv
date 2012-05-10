@@ -1018,8 +1018,7 @@ function showchat(){
 function send(func, data, callback) {
   _socket.emit(func, _.extend(data, {
     f: func,
-    uid: UID,
-    v: VERSION
+    uid: UID
   }));
 }
 
