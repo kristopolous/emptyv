@@ -53,7 +53,7 @@ input{display:block;box-shadow:0 0 2px 2px #444;background:#333;color:#ccc;borde
 .button:hover{background:#444}
 .button span{display:inline-block}
 
-#channel-selector-wrapper {position:absolute;top:-80%;left:0;width:100%;height:0;text-align:center;z-index:10}
+#channel-selector-wrapper {display:none;position:absolute;top:-80%;left:0;width:100%;height:0;text-align:center;z-index:10}
 #channel-selector{padding:0.5em;display:inline-block;margin-top:100px;width:500px;height:300px;background:url("css/chat-bg.png")}
 #channel-query{width:490px;margin:0}
 #channel-search-results{background:url("css/chat-bg.png");height:230px;width:500px;margin:9px 0}
