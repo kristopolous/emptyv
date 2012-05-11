@@ -572,6 +572,13 @@ function onReady(domain, id) {
 
     showchat();
 
+    $("#loader").animate({
+      top: "-100px",
+      opacity: 0
+    }, 1000, function(){
+      $(this).remove();
+    });
+
     setTimeout(function(){ 
       loadPlayer("yt", 1);
       loadPlayer("yt", 2); 
