@@ -4,6 +4,7 @@
 body{background:#000;font-family:Verdana,sans-serif}
 p,h1,h2,h3,h4,h5,h6{margin:0}
 img{border:0}
+#loader{width:100%;text-align:center;line-height:0.6em;position:absolute;top:0;left:0;font-size:3em;padding-top:4em;text-shadow:0px 0px 4px #AAF;color:#5FA}
 #stats{color:#666;height:0;font-size:0.6em;margin:-0.2em 0 0 0.3em}
 #language_tab {float:right;margin-top:-0.2em;height:0}
 #language_tab a{background:#222;color:#888;padding:0.05em 0.4em;margin-left:0.15em;cursor:pointer;font-size:0.75em}
@@ -63,6 +64,9 @@ input{display:block;box-shadow:0 0 2px 2px #444;background:#333;color:#ccc;borde
 <!--[if IE]><link rel=stylesheet href=css/ie.css><![endif]-->
 </head>
 <body>
+<div id=loader>loading<br>
+<img src=css/l.gif>
+</div>
 <div id=players><div id=p2></div><div id=p1></div><div id=p0></div></div>
 <div id=cover></div>
 <div id=titlebar>
