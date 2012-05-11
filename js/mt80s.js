@@ -24,13 +24,11 @@ if(!self.console) {
 var
   DUMMYFUNCTION = function(){},
 
-  ID = 0,
-
-  CHANNEL = (document.location.search.length > 0) ? 
+  CHANNEL = 1/*(document.location.search.length > 0) ? 
      document.location.search.substr(1)
    : (navigator.language ? 
         navigator.language
-      : this.clientInformation.browserLanguage).split('-')[0]
+      : this.clientInformation.browserLanguage).split('-')[0])*/,
 
   CHANNEL_CURRENT = CHANNEL,
 
@@ -42,6 +40,8 @@ var
   // the start and stop, as determined through visual inspection.
   // These are the transitions put on by different uploaders, things
   // like "THIS IS A JJ COOLGUY RIP" etc.
+  ID = 0,
+
   RUNTIME = 1,
   START = 2,
   STOP = 3,
@@ -50,14 +50,11 @@ var
   // basis
   VOLUME = 4,
 
-  // The year of release
-  YEAR = 5,
+  ARTIST = 5,
 
-  ARTIST = 6,
+  TITLE = 6,
 
-  TITLE = 7,
-
-  NOTES = 8,
+  NOTES = 7,
 
   OFFSET = 9,
 
@@ -121,7 +118,7 @@ function remainingTime(player) {
   if(player) {
     return Math.max(0,
       player.getDuration() - 
-      _duration[player.index][STOP] - 
+      _song[STOP] - 
       player.getCurrentTime()
     );
   } else {
@@ -199,7 +196,6 @@ var
   _ev = EvDa(),
 
   _index = -1,
-  _lastLoaded,
 
   _socket = false,
 
@@ -217,7 +213,6 @@ var
   _start = getNow(),
   _epoch = 1325778000 + ( _start - _referenceTime ),
 
-  _bAppend = true,
   _offsetIval,
 
   // How many of the YT players are loaded
@@ -231,6 +226,7 @@ var
 
   _lastTime = 0,
 
+  _song,
   _next = 0,
   _runtime = 0;
 
@@ -265,7 +261,7 @@ function setVolume(amount, animate) {
   var volume = 100;
 
   if ("index" in _player[_active]) {
-    volume = _duration[_player[_active].index][VOLUME] * _volume;
+    volume = _song[VOLUME] * _volume;
   }
   if(animate) {
     $("#mute").animate({top: (1 - _volume) * 100});
@@ -295,10 +291,14 @@ function secondarySwap(){
   }, 10);
 }
 
+function onYouTubePlayerReady(id) { onReady("yt", id); }
+function onDailymotionPlayerReady (id) { onReady("dm", id); }
+
 // This sets the quality of the video along with
 // supporting going down or up a notch based on
 // what is detected, probably in findOffset
 function setQuality(direction) {
+  console.log(_playerById);
   var 
     supported = true,
 
@@ -316,7 +316,7 @@ function setQuality(direction) {
   // For certain EMI and Polydor muted tracks, 240p (small) works
   // ok for youtube ... we put 240p in the notes section if this is
   // the case.
-  if(_duration[_index][NOTES].search("240p") > 0) {
+  if(_song[NOTES].search("240p") > 0) {
     // If this is the case, then we limit ourselves to just the 
     // lowest quality video
     activeAvailable = ["small"];
@@ -424,23 +424,20 @@ function setQuality(direction) {
 }
 
 function doTitle(){
-  if(_bAppend) {
-    var newtitle = _duration[_index][ARTIST] + " - " + _duration[_index][TITLE];
-    if(LASTTITLE != newtitle) {
-      LASTTITLE = newtitle;
-      var dom = "<a class=title target=_blank href=http://youtube.com/watch?v=" + _duration[_index][ID].split(':')[1] + ">" + 
-         "<img src=http://i3.ytimg.com/vi/" + _duration[_index][ID].split(":").pop() + "/default.jpg>" +
-         "<span>" +
-           "<b>" + _duration[_index][ARTIST] + "</b>" +  
-           _duration[_index][TITLE] +
-         "</span>" +
-       "</a>";
+  var newtitle = _song[ARTIST] + " - " + _song[TITLE];
+  if(LASTTITLE != newtitle) {
+    LASTTITLE = newtitle;
+    var dom = "<a class=title target=_blank href=http://youtube.com/watch?v=" + _song[ID].split(':')[1] + ">" + 
+       "<img src=http://i3.ytimg.com/vi/" + _song[ID].split(":").pop() + "/default.jpg>" +
+       "<span>" +
+         "<b>" + _song[ARTIST] + "</b>" +  
+         _song[TITLE] +
+       "</span>" +
+     "</a>";
 
-      $("#song").html(dom);
-      addmessage(dom);
-    }
-    document.title = newtitle + " | " + toTime(getNow() - _start);
+    $("#song").html(dom);
   }
+  document.title = newtitle + " | " + toTime(getNow() - _start);
 }
 
 function findOffset() {
@@ -564,9 +561,9 @@ function onReady(domain, id) {
 
   if(++_loaded === 1) {
     show(_next);
-    findOffset();
+   // findOffset();
 
-    _offsetIval = setInterval(findOffset, LOADTIME_sec * 1000 / 10);
+   // _offsetIval = setInterval(findOffset, LOADTIME_sec * 1000 / 10);
 
     showchat();
 
@@ -577,33 +574,18 @@ function onReady(domain, id) {
   } 
 }
 
-self.onYouTubePlayerReady = function(id) {
-  onReady("yt", id);
-}
 
-self.onDailymotionPlayerReady = function(id) {
-  onReady("dm", id);
-}
-
-self.force = function(index){
-  clearInterval(_offsetIval);
-  _index = index;
-  transition(index, 0, true);
-  doTitle();
-}
-
-function transition(index, offset, force) {
-  if(index === _lastLoaded) {
-    return;
-  }
-  _lastLoaded = index;
+function transition(song) {
 
   // Load the next video prior to actually switching over
   var 
-    id = _duration[index][ID],
+    id = song[ID],
+    offset = song[START],
+    index = id,
     dom = id.split(':')[0],
     uuid = id.split(':')[1];
 
+  console.log(song);
   // Offset mechanics are throughout, but placing it here
   // make sure that on first load there isn't some brief beginning
   // of video sequence then a seek.
@@ -647,6 +629,10 @@ function transition(index, offset, force) {
     }
     log("video loaded");
 
+    var 
+      step1Timeout = Math.min(8000, (remainingTime(_playerPrev[_active]) - NEXTVIDEO_PRELOAD) * 1000),
+      step2Timeout = step1Timeout + 2000;
+
     // This is when the audio for the video starts; some small
     // time before the actual video is to transit over.
     //
@@ -674,10 +660,12 @@ function transition(index, offset, force) {
       // the volume adjusting, accounting for the possibility of
       // this being the first video of course.
       setTimeout(function(){
-        myPlayer.setVolume(_duration[index][VOLUME] * _volume);
+        myPlayer.setVolume(song[VOLUME] * _volume);
       }, Math.min(100, remainingTime(_playerPrev[_active])));
 
-    }, force ? 8000 : Math.max((remainingTime(_playerPrev[_active]) - NEXTVIDEO_PRELOAD) * 1000, 0));
+      doTitle();
+
+    }, step1Timeout);
 
     setTimeout(function(){
 
@@ -706,16 +694,8 @@ function transition(index, offset, force) {
       _index = index;
       setQuality(0);
       _playerPrev = _player;
-    }, force ? 10000 : remainingTime(_playerPrev[_active]) * 1000);
+    }, step2Timeout);//force ? 10000 : remainingTime(_playerPrev[_active]) * 1000);
   });
-}
-
-self.append = function(data){
-  for(var ix = 0; ix < data.length; ix++) {
-    _duration[ix] = [].concat(_duration[ix].slice(0,5), data[ix]);
-  }
-  _bAppend = true;
-  doTitle();
 }
 
 function loadPlayer(domain, ix) {
@@ -755,9 +735,12 @@ function addmessage(data) {
 }
 
 function doPlay(id) {
-  send("play", {
-    chan: CHANNEL,
-    id: id
+  send("channel", {
+    action: "play",
+    params: {
+      channel: 1,
+      ytid: id
+    }
   });
   $("#talk").val("");
   $("#autocomplete").css('display','none');
@@ -789,10 +772,9 @@ var Title = {
 var Channel = {
   Init: function(){
     _ev("channel", function(name) {
-      $("#channel-title").html("80sMTV");
+      $("#channel-title").html(name);
     });
 
-    _ev("channel", CHANNEL);
     $("#channel-cancel").click(Channel.hide);
     $("#channel-change").click(Channel.show);
 
@@ -886,7 +868,7 @@ function showchat(){
               var ytid = which.id.split(":").pop();
 
               $("<a />")
-               .append("<img src=http://i3.ytimg.com/vi/" + ytid + "/default.jpg>")
+               .append("<img src=" + image(ytid))
                .append("<span><b>" + which.artist + "</b><br>" + which.title + "</span>")
                .click(function(){ doPlay(ytid); })
                .appendTo("#autocomplete");  
@@ -918,10 +900,19 @@ function showchat(){
 
   _socket.on("code", eval);
 
+  _socket.on("song", function(d) {
+    _song = d;
+    transition(d);
+  });
+
   _socket.on("uid", function(d) {
     UID = d;
     Store("uid", UID);
     console.log(UID);
+  });
+
+  _socket.on("channel-name", function(d){
+    _ev("channel", d);
   });
 
   _socket.on("greet-request", function() {
@@ -933,29 +924,32 @@ function showchat(){
   });
 
   _socket.on("chat", function(d) {
+    console.log(_chat);
     _chat.data = _chat.data.concat(d);
     _chat.lastid = _chat.data[_chat.data.length - 1][0];
   });
 
 
-  _.each([ CHANNEL, 'all', 'none' ], function(which) {
-    var unit = $("<a>" + which + "</a>").click(function(){
-      $(this).addClass('selected').siblings().removeClass('selected');
-      if (CHANNEL_CURRENT == "none" && which != "none") {
-        _chat.show();
+  _ev.on("channel", function(channel) {
+    _.each([ channel, 'none' ], function(which) {
+      var unit = $("<a>" + which + "</a>").click(function(){
+        $(this).addClass('selected').siblings().removeClass('selected');
+        if (CHANNEL_CURRENT == "none" && which != "none") {
+          _chat.show();
+        }
+        if(which == "none") {
+          _chat.hide();
+        } else if(CHANNEL_CURRENT != "none") {
+          lastindex = _chat.data.length - 1;
+          addmessage("Switched to channel: " + which);
+        }
+        CHANNEL_CURRENT = which;
+      }).appendTo("#language_tab");
+      if(channel == which) {
+        unit.addClass("selected");
       }
-      if(which == "none") {
-        _chat.hide();
-      } else if(CHANNEL_CURRENT != "none") {
-        lastindex = _chat.data.length - 1;
-        addmessage("Switched to language:" + which);
-      }
-      CHANNEL_CURRENT = which;
-    }).appendTo("#language_tab");
-    if(CHANNEL_CURRENT == which) {
-      unit.addClass("selected");
-    }
-    $("#language_tab").css('opacity', 0.7);
+      $("#language_tab").css('opacity', 0.7);
+    });
   });
 
   function showmessage() {
@@ -1029,6 +1023,14 @@ function processCommand(text) {
         Store("uid", self.UID);
         addmessage("Set user to " + self.UID);
         break;
+
+      case 'channel':
+        send("channel", {
+          action: arguments.shift(),
+          params: arguments.shift()
+        });
+        break;
+
       default: 
         addmessage("Unknown command: " + command);
         break;
