@@ -34,7 +34,7 @@ function uidgen() {
 function add(key, data) {
   _db.multi([
    [ "rpush", key, JSON.stringify(data) ],
-   [ "lPop", key]
+   [ "ltrim", key, 0, 15]
   ]).exec();
 }
 
@@ -57,6 +57,7 @@ var _channel = {
 io.sockets.on('connection', function (socket) {
   var 
     _user = {}, 
+    _song = {},
     _online = -1,
     _ival = {};
 
@@ -78,26 +79,26 @@ io.sockets.on('connection', function (socket) {
   function song() {
     _db.get("mt80s:play:" + _user.channel, function(err, last) {
       var song = JSON.parse(last);
+      if(song.rid == _song.rid) {
+        return;
+      } else {
+        _song = song;
+      }
       socket.emit("song", [
         song.rid,
         song.length,
-        0,
+        song.offset.toFixed(3),
         0,
         song.volume,
         song.artist,
         song.title,
-        "",
-        song.offset
+        ""
       ]);
     });
   }
 
   function poll() {
     _db.get("mt80s:ix", function(err, last) {
-
-      if(last <= _user.lastid) {
-        return;
-      }
 
       _db.lrange(
         "mt80s:log:" + _user.channel, 
@@ -119,8 +120,8 @@ io.sockets.on('connection', function (socket) {
           })
           if(chat.length) {
             socket.emit("chat", chat);
+            _user.lastid = last;
           }
-          _user.lastid = last;
         });
     });
 
@@ -140,7 +141,10 @@ io.sockets.on('connection', function (socket) {
     console.log("greet", p);
 
     _user = p;
-    _user.channel = 1;
+
+    _mysql.query("select name from channel where cid = " + _mysql.escape(_user.channel), function(err, res, fields) {
+      socket.emit("channel-name", res[0].name);
+    });
 
     if(_user.uid == 0) {
       _user.uid = uidgen();
@@ -151,6 +155,7 @@ io.sockets.on('connection', function (socket) {
       _ival.poll = setInterval(poll, 50);
       _ival.hb = setInterval(hb, 5000);
       _ival.song = setInterval(song, 1000);
+      song();
       hb();
     }
   });
@@ -168,7 +173,7 @@ io.sockets.on('connection', function (socket) {
 
     _db.incr("mt80s:ix", function(err, id) {
       var payload = [ id, p.d, p.c, p.uid ];
-      add("mt80s:log:" + p.chan, payload);
+      add("mt80s:log:" + _user.channel, payload);
       add("mt80s:log:all", payload);
     });
 
