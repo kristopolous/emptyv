@@ -267,7 +267,7 @@ function secondarySwap(){
 
       // Nows our time to shine
       _playerById[_index].playVideo();
-      _playerById[_index].setVolume(_duration[_index][VOLUME] * _volume);
+      _playerById[_index].setVolume(_song[VOLUME] * _volume);
      
       // Bring the volume up of the higher quality player and mute the current
       _player[EXTRA].setVolume(0);
