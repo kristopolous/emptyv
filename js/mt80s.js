@@ -22,8 +22,6 @@ if(!self.console) {
 }
 
 var
-  DUMMYFUNCTION = function(){},
-
   CHANNEL = 1/*(document.location.search.length > 0) ? 
      document.location.search.substr(1)
    : (navigator.language ? 
@@ -103,13 +101,6 @@ self.indexOf = function(array, item) {
 }
 
 // Utils {{
-function linkify(f) {
-  if (f && f.replace) {
-    return f.replace(/[a-z]+:\/\/[^\s^<]+/g, '<a href="$&" target=_blank>$&</a>').replace(/\n/g, '<br>');
-  }
-  return f;
-}
-
 function getNow(offset) {
   return +(new Date() / 1000) + (offset || 0);
 }
@@ -211,6 +202,7 @@ var
   // the emit from the server of course (which we assume to be fairly
   // constant).
   _start = getNow(),
+  _referenceTime = _start,
   _epoch = 1325778000 + ( _start - _referenceTime ),
 
   _offsetIval,
@@ -366,14 +358,14 @@ function setQuality(direction) {
       // If we are upsampling, then do it seemlessly.
     } else if( 
       _playerById[_index].getDuration() - 
-      _duration[_index][STOP] - 
+      _song[STOP] - 
       _playerById[_index].getCurrentTime() > LOADTIME_sec * 2.5
     ) {
 
       // First, load the active video in the extra player,
       // setting the volume to 0
       _player[EXTRA].loadVideoById(
-        _duration[_index][ID].split(":")[1], 
+        _song[ID].split(":")[1], 
         _playerById[_index].getCurrentTime() + LOADTIME_sec
       );
 
@@ -401,7 +393,7 @@ function setQuality(direction) {
             show(_player[EXTRA]);
 
             // Bring the volume up of the higher quality player and mute the current
-            _player[EXTRA].setVolume(_duration[_index][VOLUME] * _volume);
+            _player[EXTRA].setVolume(_song[VOLUME] * _volume);
             myplayer.setVolume(0);
             myplayer.seekTo(_player[EXTRA].getCurrentTime() + 3.5);
             myplayer.setPlaybackQuality(newQualityWord);
@@ -741,9 +733,9 @@ function addmessage(data) {
   _chat.data.push([_chat.lastid, data]);
 }
 
-function doPlay(id) {
+function verb(command, id) {
   send("channel", {
-    action: "play",
+    action: command,
     params: {
       channel: 1,
       ytid: id
@@ -858,9 +850,10 @@ function showchat(){
     if(kc == 13) {
       dochat();
     } else {
-      var message = this.value.split(' ');
+      var message = this.value.split(' '), command;
 
-      if (message[0] == '/play') {
+      if (message[0] == '/play' || message[0] == '/queue') {
+        command = message[0].slice(1);
         message.shift();
         message = message.join(" ");
 
@@ -869,7 +862,7 @@ function showchat(){
             .find('full', DB.like(message));
 
           if(res.length > 0) {
-            $("#autocomplete").empty().css('display','block');
+            $("#autocomplete").empty().show();
 
             _.each(res.slice(0, 8), function(which) {
               var ytid = which.id.split(":").pop();
@@ -877,12 +870,17 @@ function showchat(){
               $("<a />")
                .append("<img src=" + image(ytid))
                .append("<span><b>" + which.artist + "</b><br>" + which.title + "</span>")
-               .click(function(){ doPlay(ytid); })
+               .click(function(){ 
+                 addmessage(command + ": " + which.artist + " - " + which.title);
+                 verb(command, ytid); 
+               })
                .appendTo("#autocomplete");  
             });
           } else {
-            $("#autocomplete").empty().css('display','none');
+            $("#autocomplete").empty().hide();
           }
+        } else {
+          $("#autocomplete").empty().hide();
         }
       }
     }
@@ -937,7 +935,7 @@ function showchat(){
   });
 
 
-  _ev.on("channel", function(channel) {
+  _ev.isset("channel", function(channel) {
     _.each([ channel, 'none' ], function(which) {
       var unit = $("<a>" + which + "</a>").click(function(){
         $(this).addClass('selected').siblings().removeClass('selected');
@@ -1057,10 +1055,6 @@ function dochat() {
     });
   }
   $("#talk").val("");
-}
-
-function pickcolor(){
-  MYCOLOR = Math.floor(Math.random() * COLORS.length);
 }
 
 function volumeSlider() {
