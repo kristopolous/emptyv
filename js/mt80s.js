@@ -266,7 +266,7 @@ function setVolume(amount, animate) {
   var volume = 100;
 
   if ("index" in _player[_active]) {
-    volume = _duration[_player[_active].index][VOLUME] * _volume;
+    volume = _song[VOLUME] * _volume;
   }
   if(animate) {
     $("#mute").animate({top: (1 - _volume) * 100});
@@ -441,7 +441,6 @@ function doTitle(){
      "</a>";
 
     $("#song").html(dom);
-    addmessage(dom);
   }
   document.title = newtitle + " | " + toTime(getNow() - _start);
 }
@@ -937,7 +936,7 @@ function showchat(){
 
 
   _ev.on("channel", function(channel) {
-    _.each([ channel, 'all', 'none' ], function(which) {
+    _.each([ channel, 'none' ], function(which) {
       var unit = $("<a>" + which + "</a>").click(function(){
         $(this).addClass('selected').siblings().removeClass('selected');
         if (CHANNEL_CURRENT == "none" && which != "none") {
@@ -951,7 +950,7 @@ function showchat(){
         }
         CHANNEL_CURRENT = which;
       }).appendTo("#language_tab");
-      if(CHANNEL_CURRENT == which) {
+      if(channel == which) {
         unit.addClass("selected");
       }
       $("#language_tab").css('opacity', 0.7);

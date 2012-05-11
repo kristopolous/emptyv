@@ -34,7 +34,7 @@ function uidgen() {
 function add(key, data) {
   _db.multi([
    [ "rpush", key, JSON.stringify(data) ],
-   [ "ltrim", key, 0, 15]
+   [ "ltrim", key, -15, -1]
   ]).exec();
 }
 
@@ -111,16 +111,13 @@ io.sockets.on('connection', function (socket) {
           data.forEach(function(rowRaw) {
             row = JSON.parse(rowRaw);
             if(row[0] > _user.lastid) {
-              row[1] = _md(row[1]
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-              );
+              _user.lastid = row[0];
               chat.push(row);
             }
           })
           if(chat.length) {
+            console.log(chat);
             socket.emit("chat", chat);
-            _user.lastid = last;
           }
         });
     });
@@ -172,7 +169,15 @@ io.sockets.on('connection', function (socket) {
     }
 
     _db.incr("mt80s:ix", function(err, id) {
-      var payload = [ id, p.d, p.c, p.uid ];
+      var payload = [ 
+        id, 
+        _md(p.d
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')),
+        p.c, 
+        p.uid 
+      ];
+      console.log("mt80s:log:" + _user.channel, payload);
       add("mt80s:log:" + _user.channel, payload);
       add("mt80s:log:all", payload);
     });

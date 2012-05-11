@@ -29,6 +29,13 @@ function setVideo(video) {
   });
 }
 
+function add(key, data) {
+  _db.multi([
+   [ "rpush", key, JSON.stringify(data) ],
+   [ "ltrim", key, -15, -1]
+  ]).exec();
+}
+
 function loadVideo(video) {
 
   var cid = video.cid;
@@ -36,6 +43,23 @@ function loadVideo(video) {
   _state[cid].offset = 0;
   _state[cid].volume = 100;
   _mysql.query("update channel set currentsong = " + video.vid + " where cid = " + video.cid);
+
+  _db.incr("mt80s:ix", function(err, chat_id) {
+    var id = video.rid.split(':').pop();
+
+    add("mt80s:log:" + video.cid, [
+      chat_id,
+        "<a class=title target=_blank href=http://youtube.com/watch?v=" + id + ">" + 
+         "<img src=http://i3.ytimg.com/vi/" + id + "/default.jpg>" +
+         "<span>" +
+           "<b>" + video.artist + "</b>" +  
+           video.title +
+         "</span>" +
+       "</a>",
+     0,
+     ""
+    ]);
+  });
 }
 
 var qstr = [
