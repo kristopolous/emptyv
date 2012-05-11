@@ -18,7 +18,7 @@ for(var i = 0; i < scripts.length; i++) {
 }
 
 if(!self.console) {
-  self.console = function(){}
+  self.console = {log:function(){}};
 }
 
 var
@@ -95,11 +95,6 @@ var
   LEVELS = ["small", "medium", "large"]; //, "hd720", "hd1080", "highres"];
 
 // }} // Constants
-
-// This is for IE
-if (typeof console == "undefined") {
-  self.console = {log: new Function()}
-}
 
 self.indexOf = function(array, item) {
   for(var ix = 0; ix < array.length; ix++) {

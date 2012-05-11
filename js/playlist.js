@@ -371,7 +371,7 @@ var _duration = [
 ["yt:bDbpzjbXUZI", 246, 0, 0, 100, 1985, "Eddie Murphy", "Party All The Time", "logo ytad"],
 ["yt:bEea624OBzM", 220, 0, 0, 100, 1978, "Billy Joel", "Big Shot", "ve"],
 ["yt:bHoPYLQvnQM", 215, 0, 0, 100, 1983, "Slade", "Run Runaway", ""],
-["yt:bNZoLGkvxLs", 553, 0, 0, 100, 1981, "Stevie Nick", "Edge of Seventeen", ""],
+["yt:AAVA_8bjdl8", 299, 0, 0, 100, 1981, "Stevie Nick", "Edge of Seventeen", ""],
 ["yt:n6p5Q6_JBes", 260, 0, 0, 100, 1983, "Duran Duran", "Union Of The Snake", "ve"],
 ["yt:bPjfD8ulnpw", 205, 0, 0, 100, 1980, "Adam and The Ants", "Antmusic", "clean ytad"],
 ["yt:b_KBnY-2F4Y", 272, 0, 0, 100, 1984, "Taxi-Girl", "Paris", ""],
