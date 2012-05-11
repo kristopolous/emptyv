@@ -24,13 +24,11 @@ if(!self.console) {
 var
   DUMMYFUNCTION = function(){},
 
-  ID = 0,
-
-  CHANNEL = (document.location.search.length > 0) ? 
+  CHANNEL = 1/*(document.location.search.length > 0) ? 
      document.location.search.substr(1)
    : (navigator.language ? 
         navigator.language
-      : this.clientInformation.browserLanguage).split('-')[0]
+      : this.clientInformation.browserLanguage).split('-')[0])*/,
 
   CHANNEL_CURRENT = CHANNEL,
 
@@ -42,6 +40,8 @@ var
   // the start and stop, as determined through visual inspection.
   // These are the transitions put on by different uploaders, things
   // like "THIS IS A JJ COOLGUY RIP" etc.
+  ID = 0,
+
   RUNTIME = 1,
   START = 2,
   STOP = 3,
@@ -50,14 +50,11 @@ var
   // basis
   VOLUME = 4,
 
-  // The year of release
-  YEAR = 5,
+  ARTIST = 5,
 
-  ARTIST = 6,
+  TITLE = 6,
 
-  TITLE = 7,
-
-  NOTES = 8,
+  NOTES = 7,
 
   OFFSET = 9,
 
@@ -236,6 +233,7 @@ var
 
   _lastTime = 0,
 
+  _song,
   _next = 0,
   _runtime = 0;
 
@@ -298,6 +296,16 @@ function secondarySwap(){
       clearInterval(swapInterval);
     }
   }, 10);
+}
+
+function onYouTubePlayerReady(id) { onReady("yt", id); }
+function onDailymotionPlayerReady (id) { onReady("dm", id); }
+
+function force(index){
+  clearInterval(_offsetIval);
+  _index = index;
+  transition(index, 0, true);
+  doTitle();
 }
 
 // This sets the quality of the video along with
@@ -569,9 +577,9 @@ function onReady(domain, id) {
 
   if(++_loaded === 1) {
     show(_next);
-    findOffset();
+   // findOffset();
 
-    _offsetIval = setInterval(findOffset, LOADTIME_sec * 1000 / 10);
+   // _offsetIval = setInterval(findOffset, LOADTIME_sec * 1000 / 10);
 
     showchat();
 
@@ -582,20 +590,6 @@ function onReady(domain, id) {
   } 
 }
 
-self.onYouTubePlayerReady = function(id) {
-  onReady("yt", id);
-}
-
-self.onDailymotionPlayerReady = function(id) {
-  onReady("dm", id);
-}
-
-self.force = function(index){
-  clearInterval(_offsetIval);
-  _index = index;
-  transition(index, 0, true);
-  doTitle();
-}
 
 function transition(index, offset, force) {
   if(index === _lastLoaded) {
@@ -715,14 +709,6 @@ function transition(index, offset, force) {
   });
 }
 
-self.append = function(data){
-  for(var ix = 0; ix < data.length; ix++) {
-    _duration[ix] = [].concat(_duration[ix].slice(0,5), data[ix]);
-  }
-  _bAppend = true;
-  doTitle();
-}
-
 function loadPlayer(domain, ix) {
 
   swfobject.embedSWF({
@@ -760,9 +746,12 @@ function addmessage(data) {
 }
 
 function doPlay(id) {
-  send("play", {
-    chan: CHANNEL,
-    id: id
+  send("channel", {
+    action: "play",
+    params: {
+      channel: 1,
+      ytid: id
+    }
   });
   $("#talk").val("");
   $("#autocomplete").css('display','none');
@@ -891,7 +880,7 @@ function showchat(){
               var ytid = which.id.split(":").pop();
 
               $("<a />")
-               .append("<img src=http://i3.ytimg.com/vi/" + ytid + "/default.jpg>")
+               .append("<img src=" + image(ytid))
                .append("<span><b>" + which.artist + "</b><br>" + which.title + "</span>")
                .click(function(){ doPlay(ytid); })
                .appendTo("#autocomplete");  
@@ -923,6 +912,10 @@ function showchat(){
 
   _socket.on("code", eval);
 
+  _socket.on("song", function(d) {
+    _song = d;
+  });
+
   _socket.on("uid", function(d) {
     UID = d;
     Store("uid", UID);
@@ -938,6 +931,7 @@ function showchat(){
   });
 
   _socket.on("chat", function(d) {
+    console.log(_chat);
     _chat.data = _chat.data.concat(d);
     _chat.lastid = _chat.data[_chat.data.length - 1][0];
   });
@@ -1034,6 +1028,14 @@ function processCommand(text) {
         Store("uid", self.UID);
         addmessage("Set user to " + self.UID);
         break;
+
+      case 'channel':
+        send("channel", {
+          action: arguments.shift(),
+          params: arguments.shift()
+        });
+        break;
+
       default: 
         addmessage("Unknown command: " + command);
         break;

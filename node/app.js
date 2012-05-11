@@ -1,9 +1,16 @@
 var app = require('http').createServer(handler)
+  , mysql = require('mysql')
   , redis = require('redis')
   , _db = redis.createClient()
   , io = require('socket.io').listen(app)
   , _md = require("node-markdown").Markdown
-  , fs = require('fs');
+  , fs = require('fs')
+  , _mysql = mysql.createClient({
+    user: 'php',
+    password: 'fixy2k'
+  });
+
+_mysql.query("USE mt80s");
 
 app.listen(1985);
 
@@ -31,6 +38,22 @@ function add(key, data) {
   ]).exec();
 }
 
+var _channel = {
+  create: function(params){
+    console.log("Creating ", params);
+    _mysql.query("insert into channel (name) values(" + _mysql.escape(params) + ")");
+  },
+  list: function(params) {
+    _mysql.query("select cid, name from channel", function(err, res, fields) {
+      console.log(res);
+      console.log(fields);
+    });
+  },
+  play: function(params) {
+    _db.set("mt80s:request", JSON.stringify(params));
+  }
+};
+
 io.sockets.on('connection', function (socket) {
   var 
     _user = {}, 
@@ -50,6 +73,23 @@ io.sockets.on('connection', function (socket) {
       ["set", hb, 1],
       ["expire", hb, 10]
     ]).exec();
+  }
+
+  function song() {
+    _db.get("mt80s:play:" + _user.channel, function(err, last) {
+      var song = JSON.parse(last);
+      socket.emit("song", [
+        song.rid,
+        song.length,
+        0,
+        0,
+        song.volume,
+        song.artist,
+        song.title,
+        "",
+        song.offset
+      ]);
+    });
   }
 
   function poll() {
@@ -77,7 +117,9 @@ io.sockets.on('connection', function (socket) {
               chat.push(row);
             }
           })
-          socket.emit("chat", chat);
+          if(chat.length) {
+            socket.emit("chat", chat);
+          }
           _user.lastid = last;
         });
     });
@@ -98,6 +140,7 @@ io.sockets.on('connection', function (socket) {
     console.log("greet", p);
 
     _user = p;
+    _user.channel = 1;
 
     if(_user.uid == 0) {
       _user.uid = uidgen();
@@ -107,7 +150,14 @@ io.sockets.on('connection', function (socket) {
     if(!_ival.poll) {
       _ival.poll = setInterval(poll, 50);
       _ival.hb = setInterval(hb, 5000);
+      _ival.song = setInterval(song, 1000);
       hb();
+    }
+  });
+
+  socket.on("channel", function(p) {
+    if(_channel[p.action]) {
+      _channel[p.action](p.params);
     }
   });
 
