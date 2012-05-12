@@ -32,7 +32,7 @@ var
 
   UID = Store("uid") || 0,
 
-  MYCOLOR = Math.floor(Math.random() * 9),
+  MYCOLOR = Math.floor(Math.random() * 10),
 
   // This is the duration of the video minus the offsets in
   // the start and stop, as determined through visual inspection.
@@ -83,7 +83,6 @@ var
 
   NEXTVIDEO_PRELOAD = 3,
 
-  LASTMESSAGE = "",
   LASTTITLE = "",
 
   // @ref: http://code.google.com/apis/youtube/flash_api_reference.html
@@ -156,6 +155,8 @@ var
   _active = -1,
 
   _chat = {
+    lastentry: false,
+    lastauthor: false,
     data: [],
     lastid: 0,
     datatimeout: null
@@ -887,7 +888,6 @@ function showchat(){
   });
 
   _chat.hide = function() {
-    LASTMESSAGE = "";
     $("#talk").slideUp();
     $("#message").slideUp();
     $("#stats").fadeOut();
@@ -960,9 +960,6 @@ function showchat(){
   function showmessage() {
     var entry;
     while(_chat.data.length > lastindex) {
-      if(_chat.data[lastindex][1].search("<b>Playing:</b>") == -1) {
-        LASTMESSAGE = _chat.data[lastindex][1] + " - ";
-      }
 
       if(lastEntry != _chat.data[lastindex][1]) {
         lastEntry = _chat.data[lastindex][1];
@@ -970,25 +967,31 @@ function showchat(){
           entryList.shift().remove();
         }
 
-        entry = $("<div>")
-          .html(lastEntry)
-          .attr({title: _chat.data[lastindex][3]});
+        if(_chat.data[lastindex][3] != _chat.lastauthor || _chat.lastauthor == false) {
+          entry = $("<div>").html(lastEntry);
 
-        entryList.push(entry);
+          _chat.lastauthor = _chat.data[lastindex][3];
+          entry.prepend("<div class=author>" + _chat.lastauthor + "</div>");
 
-        if(_chat.data[lastindex].length > 2) {
-          entry.addClass("c" + _chat.data[lastindex][2]);
+          entryList.push(entry);
+
+          if(_chat.data[lastindex].length > 2) {
+            entry.addClass("c" + _chat.data[lastindex][2]);
+          } else {
+            entry.addClass("c");
+          }
+          $("#message").append(entry);
+          _chat.lastentry = entry;
         } else {
-          entry.addClass("c");
+          _chat.lastentry.append(lastEntry);
         }
         $("a", entry).attr("target", "_blank");
          
-        $("#message").append(entry);
         entryCount++;
       } 
       lastindex++;
     }
-    setTimeout(showmessage, 400);
+    setTimeout(showmessage, 100);
   }
   showmessage();
   volumeSlider();

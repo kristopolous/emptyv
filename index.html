@@ -19,7 +19,12 @@ img{border:0}
 #chatbar{background:url("css/chat-bg.png");display:none;position:absolute;bottom:1em;left:0.75em}
 #chatbar img{max-width:204px}
 #message{font-family:Tahoma,Geneva;font-size:0.95em;color:#ccc}
-#message div{box-shadow:1px 0 1px 0 #444;width:205px;padding:0.25em 0.2em;overflow:hidden;margin:0 0.25em}
+#message > div{
+  box-shadow:1px 0 1px 0 #444;
+  width:205px;padding:0.25em 0.2em;overflow:hidden;margin:0 0.25em}
+#message div.author{
+  color:#555;font-size:0.65em;text-transform:uppercase;letter-spacing:0.35em;margin:-0.25em 0 0em 0}
+#message p {margin-left:0.25em;font-size:0.9em;line-height:1.30em}
 #autocomplete{display:none;width:220px;position:absolute;bottom:0em;left:220px;background:url("css/chat-bg.png");color:#ccc;padding:0 0.15em}
 #autocomplete a{display:block;font-size:0.75em;cursor:pointer;margin:0.2em 0;padding:0.20em 0 0.20em 0.25em;background:url("css/chat-bg.png")}
 #autocomplete a:hover{background:#444;color:#fff}
@@ -35,7 +40,8 @@ input{display:block;box-shadow:0 0 2px 2px #444;background:#333;color:#ccc;borde
 .c5,.c5 a{color:#F4E557}
 .c6,.c6 a{color:#b86db0}
 .c7,.c7 a{color:#9cff7b}
-.c8,.c8 a{color:#b3b3b9}
+.c8,.c8 a{color:#b3b3e9}
+.c9,.c9 a{color:#83C3F0}
 .title {text-decoration:none}
 .title span{display:inline-block;width:154px;margin-left:6px;font-size:0.8em;color:#ccc}
 .title img{width:45px;vertical-align:top}
