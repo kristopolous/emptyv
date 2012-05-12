@@ -629,7 +629,7 @@ function transition(song) {
     log("video loaded");
 
     var 
-      step1Timeout = Math.min(8000, (remainingTime(_playerPrev[_active]) - NEXTVIDEO_PRELOAD) * 1000),
+      step1Timeout = Math.min(800000, (remainingTime(_playerPrev[_active]) - NEXTVIDEO_PRELOAD) * 1000),
       step2Timeout = step1Timeout + 2000;
 
     // This is when the audio for the video starts; some small

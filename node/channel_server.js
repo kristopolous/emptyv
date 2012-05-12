@@ -102,7 +102,7 @@ setInterval(function(){
     delta = (now - _last) / 1000;
 
   _db.get("mt80s:request", function(err, req) {
-    if(req.length) {
+    if(req && req.length) {
       req = JSON.parse(req);
       getVideo(req.ytid, function(video) {
         video.cid = req.channel;
