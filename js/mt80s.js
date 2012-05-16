@@ -961,37 +961,35 @@ function showchat(){
     var entry;
     while(_chat.data.length > lastindex) {
 
-      if(lastEntry != _chat.data[lastindex][1]) {
-        lastEntry = _chat.data[lastindex][1];
-        if(entryCount > 10) {
-          entryList.shift().remove();
-        }
+      lastEntry = _chat.data[lastindex][1];
+      if(entryList.length > 10) {
+        entryList.shift().remove();
+      }
 
-        if(_chat.data[lastindex][3] != _chat.lastauthor || _chat.lastauthor == false) {
-          entry = $("<div>").html(lastEntry);
+      if(_chat.data[lastindex][3] != _chat.lastauthor || _chat.lastauthor == false) {
+        entry = $("<div>").html(lastEntry);
 
-          _chat.lastauthor = _chat.data[lastindex][3];
-          entry.prepend("<div class=author>" + _chat.lastauthor + "</div>");
+        _chat.lastauthor = _chat.data[lastindex][3];
+        entry.prepend("<div class=author>" + _chat.lastauthor + "</div>");
 
-          entryList.push(entry);
+        entryList.push(entry);
 
-          if(_chat.data[lastindex].length > 2) {
-            entry.addClass("c" + _chat.data[lastindex][2]);
-          } else {
-            entry.addClass("c");
-          }
-          $("#message").append(entry);
-          _chat.lastentry = entry;
+        if(_chat.data[lastindex].length > 2) {
+          entry.addClass("c" + _chat.data[lastindex][2]);
         } else {
-          _chat.lastentry.append(lastEntry);
+          entry.addClass("c");
         }
-        $("a", entry).attr("target", "_blank");
-         
-        entryCount++;
-      } 
+        $("#message").append(entry);
+        _chat.lastentry = entry;
+      } else {
+        _chat.lastentry.append(lastEntry);
+      }
+      $("a", entry).attr("target", "_blank");
+       
+      entryCount++;
       lastindex++;
     }
-    setTimeout(showmessage, 100);
+    setTimeout(showmessage, 50);
   }
   showmessage();
   volumeSlider();
