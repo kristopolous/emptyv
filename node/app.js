@@ -78,22 +78,24 @@ io.sockets.on('connection', function (socket) {
 
   function song() {
     _db.get("mt80s:play:" + _user.channel, function(err, last) {
-      var song = JSON.parse(last);
-      if(song.rid == _song.rid) {
-        return;
-      } else {
-        _song = song;
+      if(last) {
+        var song = JSON.parse(last);
+        if(song.rid == _song.rid) {
+          return;
+        } else {
+          _song = song;
+        }
+        socket.emit("song", [
+          song.rid,
+          song.length,
+          song.offset.toFixed(3),
+          0,
+          song.volume,
+          song.artist,
+          song.title,
+          ""
+        ]);
       }
-      socket.emit("song", [
-        song.rid,
-        song.length,
-        song.offset.toFixed(3),
-        0,
-        song.volume,
-        song.artist,
-        song.title,
-        ""
-      ]);
     });
   }
 
@@ -140,7 +142,11 @@ io.sockets.on('connection', function (socket) {
     _user = p;
 
     _mysql.query("select name from channel where cid = " + _mysql.escape(_user.channel), function(err, res, fields) {
-      socket.emit("channel-name", res[0].name);
+      try {
+       socket.emit("channel-name", res[0].name);
+      } catch (ex){
+       socket.emit("channel-name", "80smtv");
+      }
     });
 
     if(_user.uid == 0) {
