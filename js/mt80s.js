@@ -770,7 +770,7 @@ var User = {
       }
     } else {
       User.loggedin = true;
-      $("#display-username").html(who);
+      $("#display-username").html("You are " + who + ".");
       $("#login-button").html("Log out");
     }
   },
