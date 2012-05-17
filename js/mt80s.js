@@ -420,14 +420,7 @@ function doTitle(){
   var newtitle = _song[ARTIST] + " - " + _song[TITLE];
   if(LASTTITLE != newtitle) {
     LASTTITLE = newtitle;
-    var dom = "<a class=title target=_blank href=http://youtube.com/watch?v=" + _song[ID].split(':')[1] + ">" + 
-       "<img src=http://i3.ytimg.com/vi/" + _song[ID].split(":").pop() + "/default.jpg>" +
-       "<span>" +
-         "<b>" + _song[ARTIST] + "</b>" +  
-         _song[TITLE] +
-       "</span>" +
-     "</a>";
-
+    var dom = "<b>" + _song[ARTIST] + "</b>" +  _song[TITLE];
     $("#song").html(dom);
   }
   document.title = newtitle + " | " + toTime(getNow() - _start);
@@ -723,10 +716,7 @@ function loadPlayer(domain, ix) {
 
     { allowScriptAccess: "always" }, // params
 
-    {
-      wmode: "transparent", 
-      id: 'player-' + ix
-    } // attributes
+    { id: 'player-' + ix } // attributes
   );
 }
 
@@ -745,29 +735,6 @@ function verb(command, id) {
   $("#talk").val("");
   $("#autocomplete").css('display','none');
 }
-
-var Title = {
-  visible: false,
-  Init: function(){
-    $(document.body).mousemove(function(e){
-      if(e.pageY < 20 && !visible) {
-        Title.show();
-      } else if(e.pageY > 60 && visible) {
-        Title.hide();
-      }
-    });
-    $("#cover").css('display', 'block');
-    Title.show();
-  },
-  show: function(){
-    visible = true;
-    $("#titlebar").animate({top: 0});
-  },
-  hide: function(){
-    visible = false;
-    $("#titlebar").animate({top: '-50px'});
-  }
-};
 
 var Channel = {
   Init: function(){
@@ -843,8 +810,23 @@ function showchat(){
 
   log("Loading chat");
 
-  Title.Init();
   Channel.Init();
+
+  $("#channel-collapse").click(function(){
+    $("#top").fadeOut();
+    $("#chatbar").fadeOut();
+    $("#lhs").animate({width: "30px"},function(){
+      $("#channel-expand").show();
+    });
+    $("#players").animate({marginLeft: "30px"});
+  });
+  $("#channel-expand").click(function(){
+    $("#channel-expand").hide();
+    $("#top").fadeIn();
+    $("#chatbar").fadeIn();
+    $("#lhs").animate({width: "210px"});
+    $("#players").animate({marginLeft: "220px"});
+  });
 
   $("#talk").keyup(function(e){
     var kc = window.event ? window.event.keyCode : e.which;
@@ -890,17 +872,15 @@ function showchat(){
   _chat.hide = function() {
     $("#talk").slideUp();
     $("#message").slideUp();
-    $("#stats").fadeOut();
   }
 
   _chat.show = function() {
     $("#talk").slideDown();
     $("#message").slideDown();
-    $("#stats").fadeIn();
   }
 
   _socket.on("stats", function(d) {
-    $("#stats").html(d.online + " online");
+    $("#channel-stats").html(d.online + " online");
   });
 
   _socket.on("code", eval);
@@ -935,27 +915,6 @@ function showchat(){
   });
 
 
-  _ev.isset("channel", function(channel) {
-    _.each([ channel, 'none' ], function(which) {
-      var unit = $("<a>" + which + "</a>").click(function(){
-        $(this).addClass('selected').siblings().removeClass('selected');
-        if (CHANNEL_CURRENT == "none" && which != "none") {
-          _chat.show();
-        }
-        if(which == "none") {
-          _chat.hide();
-        } else if(CHANNEL_CURRENT != "none") {
-          lastindex = _chat.data.length - 1;
-          addmessage("Switched to channel: " + which);
-        }
-        CHANNEL_CURRENT = which;
-      }).appendTo("#language_tab");
-      if(channel == which) {
-        unit.addClass("selected");
-      }
-      $("#language_tab").css('opacity', 0.7);
-    });
-  });
 
   function showmessage() {
     var entry;
@@ -1001,13 +960,7 @@ function showchat(){
   _ev.isset("chat-loaded", function(){
     $("#controls").fadeIn();
     $("#talk").focus();
-    $("#chatbar").fadeIn(1000, function(){
-      setTimeout(function(){
-        $("#talk").focus();
-      }, 1000);
-    });
   });
-
 }
 
 function send(func, data, callback) {

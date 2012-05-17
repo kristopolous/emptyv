@@ -1,36 +1,29 @@
 <!doctype html><html><head><meta name=description content="Non-stop back-to-back music videos from the 1980s"><title>1980s MTV</title>
 <style>
-body{background:#000;font-family:Verdana,sans-serif}
+body{position:absolute;top:0;left:0;height:100%;width:100%;background:#000;font-family:Verdana,sans-serif;margin:0;color:#aaa}
+a{color:#aaa}
 p,h1,h2,h3,h4,h5,h6{margin:0}
 img{border:0}
+#talk{display:block;box-shadow:0 0 2px 2px #444;background:#333;color:#ccc;border-width:0;font-size:0.85em;width:200px;padding:0.15em 3px;margin: 0 0 0 0.5em}
 #loader{width:100%;text-align:center;line-height:0.6em;position:absolute;top:0;left:0;font-size:3em;padding-top:4em;text-shadow:0px 0px 4px #AAF;color:#5FA}
-#stats{color:#666;height:0;font-size:0.6em;margin:-0.2em 0 0 0.3em}
-#language_tab {float:right;margin-top:-0.2em;height:0}
-#language_tab a{background:#222;color:#888;padding:0.05em 0.4em;margin-left:0.15em;cursor:pointer;font-size:0.75em}
-#language_tab a:hover{box-shadow:0 0 2px 2px #444}
-#language_tab a.selected{background:#333;color:#fff}
-#players object,#players embed{position:absolute;top:0;left:0%;width:100%;height:100%;z-index:0}
-#mute-control{height:132px;position:relative}
+#players{margin-left:220px;height:100%;position:relative}
+#players object,#players embed{position:absolute;top:0;left:0;width:100%;height:100%}
+#mute-control{height:132px;position:absolute;right:48px;top:3.75em}
 #mute-bg{position:absolute;background:url("css/chat-bg.png");top:10px;height:122px;left:20px;width:10px}
 #mute{cursor:pointer;position:absolute;left:10px}
-#controls{display:none;position:fixed;top:0;right:0;z-index:9;opacity:0.7;width:50px}
-#controls >*{display:block;padding:5px}
-#description{box-shadow:0px 0px 4px 4px #333;width:190px;background:#222;padding:0.75em;font-family:Tahoma,Geneva;position:absolute;bottom:1.3em;left:1em;font-size:0.95em;color:#fff}
-#chatbar{background:url("css/chat-bg.png");display:none;position:absolute;bottom:1em;left:0.75em}
-#chatbar img{max-width:204px}
-#message{font-family:Tahoma,Geneva;font-size:0.95em;color:#ccc}
+#lhs{float:left;width:210px;position:relative;height:100%}
+#message img{max-width:202px}
+#message{font-family:Tahoma,Geneva;font-size:0.96em;color:#ccc; padding:0 0.5em}
 #message > div{
-  box-shadow:1px 0 1px 0 #444;
-  width:205px;padding:0.25em 0.2em;overflow:hidden;margin:0 0.25em}
+  padding:0.25em 0;overflow:hidden}
 #message div.author{
   color:#555;font-size:0.65em;text-transform:uppercase;letter-spacing:0.35em;margin:-0.25em 0 0em 0}
 #message p {margin-left:0.25em;font-size:0.9em;line-height:1.30em}
-#autocomplete{display:none;width:220px;position:absolute;bottom:0em;left:220px;background:url("css/chat-bg.png");color:#ccc;padding:0 0.15em}
-#autocomplete a{display:block;font-size:0.75em;cursor:pointer;margin:0.2em 0;padding:0.20em 0 0.20em 0.25em;background:url("css/chat-bg.png")}
+#autocomplete{display:none;width:220px;position:absolute;bottom:0em;left:220px;color:#ccc;padding:0 0.15em}
+#autocomplete a{display:block;font-size:0.75em;cursor:pointer;margin:0.2em 0;padding:0.20em 0 0.20em 0.25em}
 #autocomplete a:hover{background:#444;color:#fff}
 #autocomplete img{height:50px;vertical-align:top}
 #autocomplete span{cursor:pointer;display:inline-block;width:130px;margin-left:6px;color:#aaa;margin-top:0.25em}
-input{display:block;box-shadow:0 0 2px 2px #444;background:#333;color:#ccc;border-width:0;font-size:0.85em;width:202px;padding:0.15em 3px;margin: 0 0 6px 6px}
 .c a{color:#fff}
 .c0,.c0 a{color:#DC92A8}
 .c1,.c1 a{color:#9aa6e4}
@@ -43,70 +36,54 @@ input{display:block;box-shadow:0 0 2px 2px #444;background:#333;color:#ccc;borde
 .c8,.c8 a{color:#b3b3e9}
 .c9,.c9 a{color:#83C3F0}
 .title {text-decoration:none}
-.title span{display:inline-block;width:154px;margin-left:6px;font-size:0.8em;color:#ccc}
+.title span{display:inline-block;margin-left:6px;font-size:0.75em;color:#ccc;width:150px}
 .title img{width:45px;vertical-align:top}
 .title b{background:none;display:block;font-size:1.2em;color:#fff;font-weight:normal}
-#titlebar{width:100%;position:absolute;top:-50px;left:0;height:50px;background:url("css/chat-bg.png");}
-#titlebar > div{display:inline-block}
-#song{margin:6px 0 0 6px;width:210px;vertical-align:top;font-size:0.75em}
-#channel{width:40%;text-align:left;font-size:1.5em;color:#aaa;box-shadow: 0 0 2px 0px #555;padding:0.15em 0.15em 0 0.15em;margin-top:0.25em}
-#channel-description{font-size:0.4em;color:#888;margin-top:-.15em}
+#song{font-size:0.46em;margin-top:-0.25em}
+#song b{display:block;font-size:1.25em;margin-bottom:-.1em}
+#top{border-bottom:2px solid #282828;position:relative;padding:1em 0.25em 0.5em;background:#000;z-index:3;width:212px}
+#channel{font-size:1.25em}
+#channel-search{float:left}
+#channel-collapse{float:right}
+#channel-expand{display:none}
+#channel-expand,#channel-search,#channel-collapse{font-size:0.5em;padding:0.75em;
+  margin:0.25em;
+  background:#333;cursor:pointer
+}
 #channel-title{color:#ccc;margin-top:-0.28em}
-#channel-wrap{display:inline-block}
-#channel-wrap *{display:block}
-#cover{display:none;position:absolute;top:0;left:0;height:50%;width:100%}
-.button {cursor:pointer;color:#aaa}
-.button {float:right;display:inline-block;font-size:12px;line-height:0.9em;background:#222;padding:0.25em 0.5em; width:55px;height:25px;vertical-align:middle}
-.button:hover{background:#444}
-.button span{display:inline-block}
-
-#channel-selector-wrapper {display:none;position:absolute;top:-80%;left:0;width:100%;height:0;text-align:center;z-index:10}
-#channel-selector{padding:0.5em;display:inline-block;margin-top:100px;width:500px;height:300px;background:url("css/chat-bg.png")}
-#channel-query{width:490px;margin:0}
-#channel-search-results{background:url("css/chat-bg.png");height:230px;width:500px;margin:9px 0}
-#channel-selector .button{margin-left:6px}
-.vcenter{height:100%;width:0;display:inline-block;vertical-align:middle}
+#channel-stats{color:#666;font-size:0.4em}
+#chatbar{position:absolute;bottom:0;left:0;z-index:0;width:220px}
+#channel-wrap{display:inline-block;margin-left:0.25em}
 </style>
 <!--[if IE]><link rel=stylesheet href=css/ie.css><![endif]-->
 </head>
 <body>
-<div id=loader>loading<br>
-<img src=css/l.gif>
+<div id=loader>loading<br><img src=css/l.gif></div>
+
+<div id=lhs> 
+  <span id=channel-expand>&gt;&gt;</span>
+  <div id=chatbar>
+    <div id=message></div>
+    <input id=talk onenter=dochat maxlength=200 autocomplete=off>
+    <div id=autocomplete></div>
+  </div>
+  <div id=top>
+    <div id=titlebar>
+      <div id=channel>
+        <span id=channel-search>&gt;&gt;</span>
+        <span id=channel-collapse>&lt;&lt;</span>
+        <span id=channel-wrap>
+          <div id=channel-title></div>
+          <div id=song></div>
+          <div id=channel-stats></div>
+        </span>
+      </div>
+    </div>
+    <div id=mute-control><div id=mute-bg></div><img id=mute src=images/mute_off_32.png></div>
+  </div>
 </div>
 <div id=players><div id=p2></div><div id=p1></div><div id=p0></div></div>
-<div id=cover></div>
-<div id=titlebar>
-  <div id=song></div>
-  <div id=channel>
-    <div id=channel-wrap>
-      <span id=channel-description>Current Channel</span>
-      <span id=channel-title></span>
-      <span id=channel-stats></span>
-    </div>
-    <!-- <a class=button id=channel-change>Change Channel</a> -->
-  </div>
-</div>
-<div id=controls>
-<a style=text-align:center target=_blank href="%20# suggest"><img src=images/mt80s_cyber.png></a>
-<div id=mute-control><div id=mute-bg></div><img id=mute src=images/mute_off_32.png></div>
-</div>
 
-<div id=channel-selector-wrapper>
-  <div id=channel-selector>
-    <input id=channel-query></input>
-    <div id=channel-search-results></div>
-    <a class=button id=channel-cancel><div class=vcenter></div><span>Cancel</span></a>
-    <a class=button id=channel-create><div class=vcenter></div><span>Create Channel</span></a>
-  </div>
-</div>
-
-<div id=chatbar> 
-  <div id=message></div>
-  <input id=talk onenter=dochat maxlength=200 autocomplete=off>
-  <div id=stats></div>
-  <div id=language_tab></div>
-  <div id=autocomplete></div>
-</div>
 </body>
 <script>
 var _gaq=[['_setAccount','UA-28399789-1'],['_trackPageview']];
