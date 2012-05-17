@@ -812,16 +812,16 @@ function showchat(){
 
   Channel.Init();
 
-  $("#channel-collapse").click(function(){
+  $("#lhs-collapse").click(function(){
     $("#top").fadeOut();
     $("#chatbar").fadeOut();
-    $("#lhs").animate({width: "30px"},function(){
-      $("#channel-expand").show();
+    $("#lhs").animate({width: "20px"},function(){
+      $("#lhs-expand").show();
     });
-    $("#players").animate({marginLeft: "30px"});
+    $("#players").animate({marginLeft: "20px"});
   });
-  $("#channel-expand").click(function(){
-    $("#channel-expand").hide();
+  $("#lhs-expand").click(function(){
+    $("#lhs-expand").hide();
     $("#top").fadeIn();
     $("#chatbar").fadeIn();
     $("#lhs").animate({width: "210px"});
