@@ -128,7 +128,7 @@ function toTime(sec) {
 
 function hide(player) {
   if(player && player.style) {
-    player.style.left = "-200%";
+    player.style.left = "-2000%";
   }
 }
 
@@ -891,8 +891,8 @@ var Panel = {
       width: "220px"
     });
 
-    $("#panels").animate({width: (Panel.visible.count * 223) + "px"});
-    $("#players").animate({marginLeft: (Panel.visible.count * 223) + "px"});
+    $("#panels").animate({width: (Panel.visible.count * 224) + "px"});
+    $("#players").animate({marginLeft: (Panel.visible.count * 224) + "px"});
   },
   hide: function(which) {
     if(!Panel.visible[which]) {
@@ -910,7 +910,7 @@ var Panel = {
       } 
     });
 
-    var width = Math.max(20, Panel.visible.count * 223);
+    var width = Math.max(20, Panel.visible.count * 224);
     $("#panels").animate({width: width + "px"});
     $("#players").animate({marginLeft: width + "px"});
   }
@@ -933,12 +933,20 @@ function showchat(){
   Channel.Init();
   User.Init();
 
-  $("#lhs-collapse").click(function(){
-    Panel.hide("chat");
+  $(".btn.collapse").click(function(){
+    Panel.hide(this.parentNode.id);
   });
 
   $("#lhs-expand").click(function(){
     Panel.show("chat");
+  });
+
+  $("#channel-expand").click(function(){
+    Panel.show("channel");
+  });
+
+  $("#song-expand").click(function(){
+    Panel.show("song");
   });
 
   $("#talk").keyup(function(e){

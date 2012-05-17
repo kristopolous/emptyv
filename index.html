@@ -10,7 +10,7 @@ label{margin-bottom:-0.5em}
 input{width:150px;margin:1em 0}
 #loader{width:100%;text-align:center;line-height:0.6em;position:absolute;top:0;left:0;font-size:3em;padding-top:4em;text-shadow:0px 0px 4px #AAF;color:#5FA}
 #players{margin-left:220px;height:100%;position:relative}
-#players object,#players embed{position:absolute;top:0;left:-200%;width:100%;height:100%}
+#players object,#players embed{position:absolute;top:0;left:-2000%;width:100%;height:100%}
 #mute-control{height:132px;position:absolute;right:36px;top:2.5em;z-index:8}
 #mute-bg{position:absolute;background:url("css/chat-bg.png");top:10px;height:122px;left:20px;width:10px}
 #mute{cursor:pointer;position:absolute;left:10px}
@@ -44,16 +44,16 @@ input{width:150px;margin:1em 0}
 #current-song b{display:block;font-size:1.25em;margin-bottom:-.1em}
 #top{border-bottom:2px solid #282828;position:relative;padding:0 0.25em 0.5em;background:#000;z-index:3;width:212px;height:78px;font-size:1.25em}
 #lhs-controls{float:left;margin-top:0.5em}
-#lhs-collapse{float:right}
 #lhs-expand{display:none}
-#lhs-expand,#lhs-controls *,#lhs-collapse{text-align:center;font-size:0.5em;padding:0.75em;margin:0.25em;background:#333;cursor:pointer}
+.btn{text-align:center;font-size:0.5em;padding:0.5em;margin:0.25em;background:#333;cursor:pointer;border:0.25em solid #333}
+.btn:hover{border-color:#555;color:#eee}
 #lhs-expand,#lhs-collapse{padding:0.5em 0.25em;font-size:0.6em;width:1em}
-#lhs-collapse{position:absolute;top:0.25em;right:0em}
+.collapse{position:absolute;top:0.25em;right:0em;z-index:12}
 #channel-title{color:#ccc;margin-top:-0.28em}
 #channel-stats{color:#666;font-size:0.4em}
 #chatbar{position:absolute;bottom:0.5em;left:0;z-index:0;width:220px}
 #channel-wrap{display:inline-block;margin-left:0.25em;padding-top:1em}
-#panels > span{width:220px;display:none;position:relative;height:100%;vertical-align:top;overflow:hidden}
+#panels > span{width:220px;display:none;position:relative;height:100%;vertical-align:top;overflow:hidden;border-left:1px solid #333}
 .panel-title{color:#aaa;font-size:1.2em;padding:1em 0.5em;line-height:0.8em}
 #display-username {float:left;font-size:0.7em;margin-left:0.75em;display:inline-block;width:120px;color:#555}
 #login-button{float:right;margin-right:10px;font-size:0.7em;text-decoration:underline;cursor:pointer}
@@ -65,15 +65,24 @@ input{width:150px;margin:1em 0}
 <body>
 <div id=loader>loading<br><img src=css/l.gif></div>
 <div id=panels>
-  <div id=lhs-expand>&gt;</div>
+  <div class=btn id=lhs-expand>&gt;</div>
   <div id=mute-control><div id=mute-bg></div><img id=mute src=images/mute_off_32.png></div>
   <span id=channel>
+    <span class="btn collapse">X</span>
     <div class=panel-title>Channel Selection</div>
-  </span>
-  <span id=song>
+    <span class=panel-content>
+      <label>Search</label>
+      <input id=input-channel-search autocomplete=off>
+    </span>
+  </span><span id=song>
+    <span class="btn collapse">X</span>
     <div class=panel-title>Song Selection</div>
-  </span>
-  <span id=user>
+    <span class=panel-content>
+      <label>Search</label>
+      <input id=input-song-search autocomplete=off>
+    </span>
+  </span><span id=user>
+    <span class="btn collapse">X</span>
     <div class=panel-title>Register And Login</div>
     <span class=panel-content>
       <label>Username</label>
@@ -83,6 +92,7 @@ input{width:150px;margin:1em 0}
     </span>
   </span>
   <span id=chat>
+    <span class="btn collapse">X</span>
     <div id=chatbar>
       <div id=message></div>
       <input id=talk autocomplete=off>
@@ -93,10 +103,9 @@ input{width:150px;margin:1em 0}
     </div>
     <div id=top>
       <div id=lhs-controls>
-        <div id=channel-expand>&gt;&gt;</div>
-        <div id=song-expand>+</div>
+        <div class=btn id=channel-expand>&gt;&gt;</div>
+        <div class=btn id=song-expand>+</div>
       </div>
-      <span id=lhs-collapse>X</span>
       <span id=channel-wrap>
         <div id=channel-title></div>
         <div id=current-song></div>
