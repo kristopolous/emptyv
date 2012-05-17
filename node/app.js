@@ -118,7 +118,6 @@ io.sockets.on('connection', function (socket) {
             }
           })
           if(chat.length) {
-            console.log(chat);
             socket.emit("chat", chat);
           }
         });
@@ -137,22 +136,24 @@ io.sockets.on('connection', function (socket) {
   socket.emit("greet-request");
 
   socket.on("greet-response", function(p) {
-    console.log("greet", p);
-
     _user = p;
+    _user.name = "anonymous";
 
-    _mysql.query("select name from channel where cid = " + _mysql.escape(_user.channel), function(err, res, fields) {
-      try {
-       socket.emit("channel-name", res[0].name);
-      } catch (ex){
-       socket.emit("channel-name", "80smtv");
-      }
-    });
+    socket.emit("channel-name", "80smtv");
 
     if(_user.uid == 0) {
       _user.uid = uidgen();
       socket.emit("uid", _user.uid);
-    } 
+    } else {
+      _db.hget("mt80s:user", _user.uid, function(err, last) {
+        if(last) {
+          _user.name = last;
+          socket.emit("username", _user.name);
+        } else {
+          socket.emit("username", false);
+        }
+      });
+    }
 
     if(!_ival.poll) {
       _ival.poll = setInterval(poll, 50);
@@ -169,6 +170,17 @@ io.sockets.on('connection', function (socket) {
     }
   });
 
+  socket.on("set-user", function(p) {
+    if(p.user) {
+      _user.name = p.user;
+      _db.hset("mt80s:user", _user.uid, p.user);
+      socket.emit("username", _user.name);
+    } else {
+      _user.name = "anonymous";
+      _db.hdel("mt80s:user", _user.uid);
+    }
+  });
+
   socket.on("chat", function(p) {
     if(!p.d) {
       return;
@@ -180,10 +192,9 @@ io.sockets.on('connection', function (socket) {
         _md(p.d
           .replace(/</g, '&lt;')
           .replace(/>/g, '&gt;')),
-        p.c, 
-        p.uid 
+        _user.color,
+        _user.name
       ];
-      console.log("mt80s:log:" + _user.channel, payload);
       add("mt80s:log:" + _user.channel, payload);
       add("mt80s:log:all", payload);
     });

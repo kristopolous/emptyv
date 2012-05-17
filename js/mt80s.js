@@ -30,8 +30,6 @@ var
 
   CHANNEL_CURRENT = CHANNEL,
 
-  UID = Store("uid") || 0,
-
   MYCOLOR = Math.floor(Math.random() * 10),
 
   // This is the duration of the video minus the offsets in
@@ -237,13 +235,14 @@ _db.find().update({ix: function() {return index++ }});
 
 // }} // Globals
 
+if(!self.localStorage) {
+  self.localStorage = {};
+}
 function Store(key, value) {
-  if(self.localStorage) {
-    if(arguments.length == 2) {
-      localStorage[key] = value;
-    }
-    return localStorage[key];
+  if(arguments.length == 2) {
+    localStorage[key] = value;
   }
+  return localStorage[key];
 }
 
 function setVolume(amount, animate) {
@@ -420,8 +419,7 @@ function doTitle(){
   var newtitle = _song[ARTIST] + " - " + _song[TITLE];
   if(LASTTITLE != newtitle) {
     LASTTITLE = newtitle;
-    var dom = "<b>" + _song[ARTIST] + "</b>" +  _song[TITLE];
-    $("#song").html(dom);
+    $("#current-song").html("<b>" + _song[ARTIST] + "</b>" +  _song[TITLE]);
   }
   document.title = newtitle + " | " + toTime(getNow() - _start);
 }
@@ -553,12 +551,7 @@ function onReady(domain, id) {
 
     showchat();
 
-    $("#loader").animate({
-      top: "-100px",
-      opacity: 0
-    }, 1000, function(){
-      $(this).remove();
-    });
+    $("#loader").animate({ opacity: 0 }, 1000, function(){ $(this).remove(); });
 
     setTimeout(function(){ 
       loadPlayer("yt", 1);
@@ -721,7 +714,8 @@ function loadPlayer(domain, ix) {
 }
 
 function addmessage(data) {
-  _chat.data.push([_chat.lastid, data]);
+  _chat.data.push([_chat.lastid, "<p>" + data + "</p>"]);
+  showmessage();
 }
 
 function verb(command, id) {
@@ -736,14 +730,105 @@ function verb(command, id) {
   $("#autocomplete").css('display','none');
 }
 
+var User = {
+  loggedin: false,
+  Init: function(){
+    $("#login-button").click(function(){
+      if(User.loggedin) {
+        User.logout();
+      } else {
+        Panel.show("user");
+        $("#input-username").focus();
+      }
+    });
+    $("#user-cancel").click(function(){
+      Panel.hide("user");
+      $("#talk").focus();
+    });
+    $("#input-username").keyup(function(e){
+      var kc = window.event ? window.event.keyCode : e.which;
+      if(kc == 13) {
+        User.setuser();
+      } 
+    });
+    $("#user-login").click(User.setuser);
+  },
+  setuser: function() {
+    var username = $("#input-username").val();
+    if(username.length > 0) {
+      addmessage("Logging in as " + username);
+      send("set-user", {user: username});
+      Panel.hide("user");
+      $("#talk").focus();
+    }
+  },
+  login: function(who){
+    $("#user-control").css('visibility', 'visible');
+    if(!who) {
+      if(User.loggedin) {
+        User.logout();
+      }
+    } else {
+      User.loggedin = true;
+      $("#display-username").html(who);
+      $("#login-button").html("Log out");
+    }
+  },
+  logout: function(){
+    User.loggedin = false;
+    $("#login-button").html("Log in");
+    $("#display-username").html("");
+    send("set-user", {user: false});
+    addmessage("Logging out");
+  }
+};
+var Song = {
+  Init: function(){
+  },
+  show: function(){
+      var message = this.value.split(' '), command;
+
+      if (message[0] == '/play' || message[0] == '/queue') {
+        command = message[0].slice(1);
+        message.shift();
+        message = message.join(" ");
+
+        if (message.length > 1) {
+          var res = _db
+            .find('full', DB.like(message));
+
+          if(res.length > 0) {
+            $("#autocomplete").empty().show();
+
+            _.each(res.slice(0, 8), function(which) {
+              var ytid = which.id.split(":").pop();
+
+              $("<a />")
+               .append("<img src=" + image(ytid))
+               .append("<span><b>" + which.artist + "</b><br>" + which.title + "</span>")
+               .click(function(){ 
+                 addmessage(command + ": " + which.artist + " - " + which.title);
+                 verb(command, ytid); 
+               })
+               .appendTo("#autocomplete");  
+            });
+          } else {
+            $("#autocomplete").empty().hide();
+          }
+        } else {
+          $("#autocomplete").empty().hide();
+        }
+      }
+  },
+  hide: function(){
+  }
+};
+
 var Channel = {
   Init: function(){
     _ev("channel", function(name) {
       $("#channel-title").html(name);
     });
-
-    $("#channel-cancel").click(Channel.hide);
-    $("#channel-change").click(Channel.show);
 
     $("#channel-query").keyup(function(){
       Channel.search(this.value);
@@ -780,19 +865,54 @@ var Channel = {
   },
 
   hide: function() {
-    $("#channel-selector-wrapper").animate({
-      top: "-80%",
-      opacity: 0
-    }, 1000);
+    $("#channel").animate({width: 0}, function(){
+      $(this).hide();
+    });
   },
 
   show: function() {
-    $("#channel-selector-wrapper").animate({
-      top: "0%",
-      opacity: 100 
-    }, 500, function(){
-      $("#channel-query").focus()
+    $("#channel").show().animate({width: "200px"});
+  }
+};
+
+var Panel = {
+  visible: {count:0},
+  show: function(which) {
+    if(Panel.visible[which]) {
+      return;
+    }
+    Panel.visible[which] = true;
+    Panel.visible.count++;
+    if(Panel.visible.count == 1) {
+      $("#lhs-expand").hide();
+    }
+    $("#" + which).show().animate({
+      opacity: 1,
+      width: "220px"
     });
+
+    $("#panels").animate({width: (Panel.visible.count * 223) + "px"});
+    $("#players").animate({marginLeft: (Panel.visible.count * 223) + "px"});
+  },
+  hide: function(which) {
+    if(!Panel.visible[which]) {
+      return;
+    }
+    Panel.visible[which] = false;
+    Panel.visible.count--;
+    $("#" + which).animate({
+      opacity: 0,
+      width: 0
+    }, function(){
+      $(this).hide();
+      if(Panel.visible.count == 0) {
+        $("#lhs-expand").show();
+      } 
+    });
+
+    var width = Math.max(20, Panel.visible.count * 223);
+    $("#panels").animate({width: width + "px"});
+    $("#players").animate({marginLeft: width + "px"});
   }
 };
 
@@ -811,73 +931,22 @@ function showchat(){
   log("Loading chat");
 
   Channel.Init();
+  User.Init();
 
   $("#lhs-collapse").click(function(){
-    $("#top").fadeOut();
-    $("#chatbar").fadeOut();
-    $("#lhs").animate({width: "20px"},function(){
-      $("#lhs-expand").show();
-    });
-    $("#players").animate({marginLeft: "20px"});
+    Panel.hide("chat");
   });
+
   $("#lhs-expand").click(function(){
-    $("#lhs-expand").hide();
-    $("#top").fadeIn();
-    $("#chatbar").fadeIn();
-    $("#lhs").animate({width: "210px"});
-    $("#players").animate({marginLeft: "220px"});
+    Panel.show("chat");
   });
 
   $("#talk").keyup(function(e){
     var kc = window.event ? window.event.keyCode : e.which;
     if(kc == 13) {
       dochat();
-    } else {
-      var message = this.value.split(' '), command;
-
-      if (message[0] == '/play' || message[0] == '/queue') {
-        command = message[0].slice(1);
-        message.shift();
-        message = message.join(" ");
-
-        if (message.length > 1) {
-          var res = _db
-            .find('full', DB.like(message));
-
-          if(res.length > 0) {
-            $("#autocomplete").empty().show();
-
-            _.each(res.slice(0, 8), function(which) {
-              var ytid = which.id.split(":").pop();
-
-              $("<a />")
-               .append("<img src=" + image(ytid))
-               .append("<span><b>" + which.artist + "</b><br>" + which.title + "</span>")
-               .click(function(){ 
-                 addmessage(command + ": " + which.artist + " - " + which.title);
-                 verb(command, ytid); 
-               })
-               .appendTo("#autocomplete");  
-            });
-          } else {
-            $("#autocomplete").empty().hide();
-          }
-        } else {
-          $("#autocomplete").empty().hide();
-        }
-      }
-    }
+    } 
   });
-
-  _chat.hide = function() {
-    $("#talk").slideUp();
-    $("#message").slideUp();
-  }
-
-  _chat.show = function() {
-    $("#talk").slideDown();
-    $("#message").slideDown();
-  }
 
   _socket.on("stats", function(d) {
     $("#channel-stats").html(d.online + " online");
@@ -890,38 +959,32 @@ function showchat(){
     transition(d);
   });
 
-  _socket.on("uid", function(d) {
-    UID = d;
-    Store("uid", UID);
-    console.log(UID);
-  });
-
-  _socket.on("channel-name", function(d){
-    _ev("channel", d);
-  });
+  _socket.on("uid", function(d) { Store("uid", d); });
+  _socket.on("channel-name", function(d){ _ev("channel", d); });
+  _socket.on("username", User.login);
 
   _socket.on("greet-request", function() {
-    _ev.set("chat-loaded");
+    Panel.show("chat");
     send("greet-response", {
+      color: MYCOLOR,
+      uid: Store("uid"),
       lastid: _chat.lastid,
       channel: CHANNEL_CURRENT
     });
   });
 
   _socket.on("chat", function(d) {
-    console.log(_chat);
     _chat.data = _chat.data.concat(d);
     _chat.lastid = _chat.data[_chat.data.length - 1][0];
+    showmessage();
   });
 
-
-
-  function showmessage() {
+  self.showmessage = function() {
     var entry;
     while(_chat.data.length > lastindex) {
 
       lastEntry = _chat.data[lastindex][1];
-      if(entryList.length > 10) {
+      if(entryList.length > 20) {
         entryList.shift().remove();
       }
 
@@ -929,7 +992,9 @@ function showchat(){
         entry = $("<div>").html(lastEntry);
 
         _chat.lastauthor = _chat.data[lastindex][3];
-        entry.prepend("<div class=author>" + _chat.lastauthor + "</div>");
+        if(_chat.lastauthor) {
+          entry.prepend("<div class=author>" + _chat.lastauthor + "</div>");
+        } 
 
         entryList.push(entry);
 
@@ -948,7 +1013,6 @@ function showchat(){
       entryCount++;
       lastindex++;
     }
-    setTimeout(showmessage, 50);
   }
   showmessage();
   volumeSlider();
@@ -957,17 +1021,11 @@ function showchat(){
     function(){ $("#mute-bg").css('background', 'url("css/chat-bg.png")'); }
   );
 
-  _ev.isset("chat-loaded", function(){
-    $("#controls").fadeIn();
-    $("#talk").focus();
-  });
+  $("#talk").focus();
 }
 
 function send(func, data, callback) {
-  _socket.emit(func, _.extend(data, {
-    f: func,
-    uid: UID
-  }));
+  _socket.emit(func, data);
 }
 
 function processCommand(text) {
@@ -978,9 +1036,9 @@ function processCommand(text) {
       arguments = tokens;
     switch(command) {
       case 'user':
-        self.UID = arguments.join('-');
-        Store("uid", self.UID);
-        addmessage("Set user to " + self.UID);
+        var user = arguments.join('-');
+        send("set-user", {user: user});
+        addmessage("Set user to " + user);
         break;
 
       case 'channel':
@@ -1004,7 +1062,6 @@ function dochat() {
   if(message.length && !processCommand(message)) {
     send("chat", {
       chan: CHANNEL,
-      c: MYCOLOR,
       d: message
     });
   }
