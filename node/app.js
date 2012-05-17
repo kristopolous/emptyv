@@ -62,6 +62,9 @@ io.sockets.on('connection', function (socket) {
     _ival = {};
 
   socket.on("disconnect", function(){
+    if(_user.name && _user.name != "anonymous") {
+      announce(_user.name + " logged out");
+    }
     for(var which in _ival) {
       clearInterval(_ival[which]);
     };
@@ -133,7 +136,11 @@ io.sockets.on('connection', function (socket) {
     });
   }
 
-  socket.emit("greet-request");
+  setTimeout(function(){
+    if(!_user.color) {
+      socket.emit("greet-request");
+    }
+  }, 1000);
 
   socket.on("greet-response", function(p) {
     _user = p;
@@ -149,6 +156,7 @@ io.sockets.on('connection', function (socket) {
         if(last) {
           _user.name = last;
           socket.emit("username", _user.name);
+          announce(_user.name + " logged in");
         } else {
           socket.emit("username", false);
         }
@@ -172,16 +180,33 @@ io.sockets.on('connection', function (socket) {
 
   socket.on("set-user", function(p) {
     if(p.user) {
+      if(_user.name != "anonymous") {
+        announce(_user.name + " is now known as " + p.user);
+      } else {
+        announce(p.user + " logged in");
+      }
       _user.name = p.user;
       _db.hset("mt80s:user", _user.uid, p.user);
       socket.emit("username", _user.name);
     } else {
+      announce(_user.name + " logged out");
       _user.name = "anonymous";
       _db.hdel("mt80s:user", _user.uid);
     }
   });
 
-  socket.on("chat", function(p) {
+  function announce(message) {
+    _db.incr("mt80s:ix", function(err, id) {
+      var payload = [ 
+        id, 
+        "<p class=announce>" + message + "</p>"
+      ];
+      add("mt80s:log:" + _user.channel, payload);
+      add("mt80s:log:all", payload);
+    });
+  }
+
+  function chat(p) {
     if(!p.d) {
       return;
     }
@@ -198,6 +223,7 @@ io.sockets.on('connection', function (socket) {
       add("mt80s:log:" + _user.channel, payload);
       add("mt80s:log:all", payload);
     });
+  }
 
-  });
+  socket.on("chat", chat);
 });
