@@ -84,7 +84,7 @@ var
   LASTTITLE = "",
 
   // @ref: http://code.google.com/apis/youtube/flash_api_reference.html
-  LEVELS = ["small", "medium", "large"]; //, "hd720", "hd1080", "highres"];
+  LEVELS = ["small", "medium"];//, "large"]; //, "hd720", "hd1080", "highres"];
 
 // }} // Constants
 
@@ -426,7 +426,7 @@ function onReady(domain, id) {
 
    // _offsetIval = setInterval(findOffset, LOADTIME_sec * 1000 / 10);
 
-    $("#loader").remove();
+    $("#loader").hide().remove();
 
     setTimeout(function(){ 
       loadPlayer("yt", 1);
@@ -608,6 +608,13 @@ function verb(command, id) {
 var User = {
   loggedin: false,
   Init: function(){
+    _ev.on("panel:user", function(which) {
+      if(which == "show") {
+        $("#login-button").fadeOut();
+      } else {
+        $("#login-button").fadeIn();
+      }
+    });
     $("#login-button").click(function(){
       if(User.loggedin) {
         User.logout();
@@ -754,6 +761,7 @@ var Panel = {
     if(Panel.visible[which]) {
       return;
     }
+    _ev.set("panel:" + which, "show");
     Panel.visible[which] = true;
     Panel.visible.count++;
     if(Panel.visible.count == 1) {
@@ -771,6 +779,7 @@ var Panel = {
     if(!Panel.visible[which]) {
       return;
     }
+    _ev.set("panel:" + which, "hide");
     Panel.visible[which] = false;
     Panel.visible.count--;
     $("#" + which).animate({
@@ -789,6 +798,15 @@ var Panel = {
   }
 };
 
+function when(prop, cb) {
+  var ival = setInterval(function(){
+    if(self[prop]) {
+      cb();
+      clearInterval(ival);
+    }
+  }, 25);
+}
+
 function showchat(){
   var 
     row,
@@ -802,32 +820,6 @@ function showchat(){
   _socket = io.connect('http://' + window.location.hostname + ':1985/');
 
   log("Loading chat");
-
-  Channel.Init();
-  User.Init();
-
-  $(".btn.collapse").click(function(){
-    Panel.hide(this.parentNode.id);
-  });
-
-  $("#lhs-expand").click(function(){
-    Panel.show("chat");
-  });
-
-  $("#channel-expand").click(function(){
-    Panel.show("channel");
-  });
-
-  $("#song-expand").click(function(){
-    Panel.show("song");
-  });
-
-  $("#talk").keyup(function(e){
-    var kc = window.event ? window.event.keyCode : e.which;
-    if(kc == 13) {
-      dochat();
-    } 
-  });
 
   _socket.on("stats", function(d) {
     $("#channel-stats").html(d.online + " online");
@@ -844,15 +836,15 @@ function showchat(){
   _socket.on("channel-name", function(d){ _ev("channel", d); });
   _socket.on("username", User.login);
 
-  Panel.show("chat");
   send("greet-response", {
     color: MYCOLOR,
     uid: Store("uid"),
     lastid: _chat.lastid,
     channel: CHANNEL_CURRENT
   });
+
+
   _socket.on("greet-request", function() {
-    Panel.show("chat");
     send("greet-response", {
       color: MYCOLOR,
       uid: Store("uid"),
@@ -902,14 +894,6 @@ function showchat(){
       lastindex++;
     }
   }
-  showmessage();
-  volumeSlider();
-  $("#mute-control").hover(
-    function(){ $("#mute-bg").css('background', '#444'); },
-    function(){ $("#mute-bg").css('background', 'url("css/chat-bg.png")'); }
-  );
-
-  $("#talk").focus();
 }
 
 function send(func, data, callback) {
@@ -988,10 +972,52 @@ function volumeSlider() {
 status("Code Loaded...");
 // Load the first player
 loadPlayer("yt", 0);
-var ioWait = setInterval(function(){
-  if (self.io) {
-    status("Server Contacted");
-    showchat();
-    clearInterval(ioWait);
-  }
-}, 20);
+
+when("io", function(){
+  status("Server Contacted");
+  showchat();
+});
+
+when("$", function (){
+  Panel.show("chat");
+  $(".btn.collapse").click(function(){
+    Panel.hide(this.parentNode.id);
+  });
+
+  $("#lhs-expand").click(function(){
+    Panel.show("chat");
+  });
+
+  $("#channel-expand").click(function(){
+    Panel.show("channel");
+  });
+  _ev.on("panel:channel", function(which) {
+    if(which == "show") {
+      $("#channel-expand").fadeOut();
+    } else {
+      $("#channel-expand").fadeIn();
+    }
+  });
+
+  $("#song-expand").click(function(){
+    Panel.show("song");
+  });
+
+  $("#talk").keyup(function(e){
+    var kc = window.event ? window.event.keyCode : e.which;
+    if(kc == 13) {
+      dochat();
+    } 
+  });
+
+  Channel.Init();
+  User.Init();
+  showmessage();
+  volumeSlider();
+  $("#mute-control").hover(
+    function(){ $("#mute-bg").css('background', '#444'); },
+    function(){ $("#mute-bg").css('background', 'url("css/chat-bg.png")'); }
+  );
+
+  $("#talk").focus();
+});

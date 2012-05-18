@@ -19,8 +19,8 @@ input{width:150px;margin:1em 0}
 #mute-bg{position:absolute;background:url("css/chat-bg.png");top:10px;height:122px;left:20px;width:10px}
 #mute{cursor:pointer;position:absolute;left:10px}
 
-#panels{float:left;width:20px;position:relative;height:100%}
-#panels > span{width:220px;display:none;position:relative;height:100%;vertical-align:top;overflow:hidden;border-left:1px solid #333}
+#panels{float:left;width:20px;position:relative;height:100%;white-space:nowrap}
+#panels > span{width:0px;display:none;position:relative;height:100%;vertical-align:top;overflow:hidden}
 .panel-title{color:#aaa;font-size:1.2em;padding:1em 0.5em;line-height:0.8em;white-space:nowrap}
 .panel-content{margin:0 1em;font-size:0.75em;display:block}
 .collapse{position:absolute;top:0.25em;right:0em;z-index:12}
@@ -49,13 +49,17 @@ input{width:150px;margin:1em 0}
 #current-song{font-size:0.46em;margin-top:-0.25em;width:134px;overflow:hidden;white-space:nowrap}
 #current-song b{display:block;font-size:1.25em;margin-bottom:-.1em}
 #top{border-bottom:2px solid #282828;position:relative;padding:0 0.25em 0.5em;background:#000;z-index:3;width:212px;height:78px;font-size:1.25em}
-#lhs-controls{float:left;margin-top:0.5em}
 #lhs-expand{display:none}
 #lhs-expand,#lhs-collapse{padding:0.5em 0.25em;font-size:0.6em;width:1em}
+#channel{background:#222}
+#channel-expand{position:absolute;top:0;left:0;background:url("images/door_open.png") 0.4em 0.4em no-repeat #222;width:40px;height:45px;
+border-bottom:1px solid #333;
+border-right:1px solid #555;
+}
 #channel-title{color:#ccc;margin-top:-0.28em}
 #channel-stats{color:#666;font-size:0.4em}
 #chatbar{position:absolute;bottom:0.5em;left:0;z-index:0;width:220px}
-#channel-wrap{display:inline-block;margin-left:0.25em;padding-top:1em}
+#channel-wrap{display:inline-block;margin-left:2.25em;padding-top:0.75em}
 #display-username{float:left;font-size:0.7em;margin-left:0.75em;display:inline-block;width:120px;color:#555}
 #login-button{float:right;margin-right:10px;font-size:0.7em;text-decoration:underline;cursor:pointer}
 #user-control{visibility:hidden}
@@ -76,24 +80,7 @@ input{width:150px;margin:1em 0}
       <label>Search</label>
       <input id=input-channel-search autocomplete=off>
     </span>
-  </span><span id=song>
-    <span class="btn collapse">X</span>
-    <div class=panel-title>Song Selection</div>
-    <span class=panel-content>
-      <label>Search</label>
-      <input id=input-song-search autocomplete=off>
-    </span>
-  </span><span id=user>
-    <span class="btn collapse">X</span>
-    <div class=panel-title>Register And Login</div>
-    <span class=panel-content>
-      <label>Username</label>
-      <input id=input-username autocomplete=off>
-      <button id=user-login>Log in</button>
-      <button id=user-cancel>Cancel</button>
-    </span>
-  </span>
-  <span id=chat>
+  </span><span id=chat>
     <span class="btn collapse">X</span>
     <div id=chatbar>
       <div id=message></div>
@@ -104,16 +91,29 @@ input{width:150px;margin:1em 0}
       </div>
     </div>
     <div id=top>
-      <div id=lhs-controls>
-        <div class=btn id=channel-expand>&gt;&gt;</div>
-        <div class=btn id=song-expand>+</div>
-      </div>
+      <div id=channel-expand></div>
       <span id=channel-wrap>
         <div id=channel-title></div>
         <div id=current-song></div>
         <div id=channel-stats></div>
       </span>
     </div>
+  </span><span id=user>
+    <span class="btn collapse">X</span>
+    <div class=panel-title>Register And Login</div>
+    <span class=panel-content>
+      <label>Username</label>
+      <input id=input-username autocomplete=off>
+      <button id=user-login>Log in</button>
+      <button id=user-cancel>Cancel</button>
+    </span>
+  </span><span id=song>
+    <span class="btn collapse">X</span>
+    <div class=panel-title>Song Selection</div>
+    <span class=panel-content>
+      <label>Search</label>
+      <input id=input-song-search autocomplete=off>
+    </span>
   </span>
 </div>
 <div id=players><div id=p2></div><div id=p1></div><div id=p0></div></div>
