@@ -835,6 +835,7 @@ function showchat(){
   _socket.on("uid", function(d) { Store("uid", d); });
   _socket.on("channel-name", function(d){ _ev("channel", d); });
   _socket.on("username", User.login);
+  _socket.on("version", function(v) { self.VERSION = v });
 
   send("greet-response", {
     color: MYCOLOR,
@@ -843,9 +844,9 @@ function showchat(){
     channel: CHANNEL_CURRENT
   });
 
-
-  _socket.on("greet-request", function() {
+  _socket.on("greet-request", function(version) {
     send("greet-response", {
+      v: VERSION,
       color: MYCOLOR,
       uid: Store("uid"),
       lastid: _chat.lastid,
