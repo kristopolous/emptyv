@@ -148,7 +148,7 @@ io.sockets.on('connection', function (socket) {
 
     socket.emit("channel-name", "80smtv");
 
-    if(_user.uid == 0) {
+    if(!_user.uid) {
       _user.uid = uidgen();
       socket.emit("uid", _user.uid);
     } else {
@@ -191,7 +191,7 @@ io.sockets.on('connection', function (socket) {
     } else {
       announce(_user.name + " logged out");
       _user.name = "anonymous";
-      _db.hdel("mt80s:user", _user.uid);
+      // _db.hdel("mt80s:user", _user.uid);
     }
   });
 
