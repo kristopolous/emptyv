@@ -196,6 +196,7 @@ var
 
   _driftcounter = 0,
   _drift,
+  _counter = parseInt(Store("ttl") || 0),
  
   // The epoch time is based off the system time AND the users
   // local clock.  This makes sure that separate clock drifts
@@ -409,13 +410,22 @@ function status(message){
   document.getElementById("loader-status").innerHTML = message;
 }
 
+var _unit = 15 * 60,
+    _goal = _unit;
+
 function doTitle(){
   var newtitle = _song[ARTIST] + " - " + _song[TITLE];
   if(LASTTITLE != newtitle) {
     LASTTITLE = newtitle;
     $("#video-current").html("<b>" + _song[ARTIST] + "</b>" +  _song[TITLE]);
   }
-  document.title = newtitle + " | " + toTime(getNow() - _start);
+  var ttl = _counter + (getNow() - _start);
+  Store("ttl", ttl);
+  if(ttl > _goal) {
+    addmessage("Total Time On Site " + toTime(ttl));
+    _goal = (1 + Math.floor(ttl / _unit)) * _unit;
+  }
+  document.title = newtitle + " | " + toTime(ttl);
 }
 
 function onReady(domain, id) {
@@ -435,6 +445,7 @@ function onReady(domain, id) {
 
    // _offsetIval = setInterval(findOffset, LOADTIME_sec * 1000 / 10);
 
+    setInterval(doTitle, 1000);
     $("#loader").hide().remove();
 
     setTimeout(function(){ 
