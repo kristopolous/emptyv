@@ -6,32 +6,33 @@ p,h1,h2,h3,h4,h5,h6{margin:0}
 button{background:#333;border-color:#222;color:#ccc;border-width:1px}
 img{border:0}
 input,#talk{display:block;box-shadow:0 0 2px 2px #444457;background:#222;color:#ccc;border-width:0;font-size:0.85em;width:200px;padding:0.15em 3px;margin: 0 0 0.5em 0.5em}
-label{margin-bottom:-0.5em;color:#888}
+label{margin-bottom:0.4em;color:#555;font-size:11px;display:block}
+
 input{width:190px;margin:0.25em 0 0.75em}
-.btn{text-align:center;font-size:0.5em;padding:0.5em;margin:0.25em;background:#333;cursor:pointer;border:0.25em solid #333}
+.btn{text-align:center;font-size:0.60em;padding:0.25em;margin:0.25em;background:#222;cursor:pointer;border:0.25em solid #222}
 .btn:hover{border-color:#555;color:#eee}
 
 #loader{width:100%;text-align:center;position:absolute;top:0;left:0;font-size:3em;padding-top:4em;text-shadow:0px 0px 4px #AAF;color:#5FA}
 #loader-status{font-size:0.3em;font-weight:normal;color:#AAF;text-shadow:0}
 #players{margin-left:220px;height:100%;position:relative}
 #players object,#players embed{position:absolute;top:0;left:-2000%;width:100%;height:100%}
-#mute-control{height:132px;position:absolute;right:36px;top:7em;z-index:8}
+#mute-control{height:132px;position:absolute;right:36px;top:10.5em;z-index:8}
 #mute-bg{position:absolute;background:url("images/chat-bg.png");top:10px;height:122px;left:20px;width:6px}
 #mute{cursor:pointer;position:absolute;left:10px}
 
 #panels{float:left;width:20px;position:relative;height:100%;white-space:nowrap}
 #panels > span{width:0px;display:none;position:relative;height:100%;vertical-align:top;overflow:hidden}
 .panel-title{color:#ccc;font-size:1.2em;padding:0.5em;line-height:0.8em;white-space:nowrap}
-.panel-content{margin:0 1em;font-size:0.75em;display:block}
+.panel-content{margin:0 1em;display:block;font-size:0.7em}
 .collapse{position:absolute;top:0.25em;right:0em;z-index:12}
 
 #message img{max-width:195px}
-#message{font-family:Tahoma,Geneva;font-size:0.9em;color:#ccc; padding:0 0.5em}
+#message{border-top:1px solid #222;font-family:Tahoma,Geneva;font-size:0.9em;color:#ccc; padding:0 0.5em}
 #message > div{padding:0.35em 0;overflow:hidden;white-space:normal}
-#message div.author{color:#555;font-size:0.7em;margin:-0.25em 0 0em 0}
+#message div.author{color:#555;font-size:0.7em;margin:-0.25em 0 0}
 #message p {margin-left:0.25em;font-size:0.9em;line-height:1.30em}
-#message p.announce{font-size:0.8em;color:#555;margin:0 inherit;padding:0.15 0}
-#message .delist{float:right;color:#222;cursor:pointer;}
+#message p.announce{font-size:0.7em;color:#555;margin:0;padding:0.15 0}
+#message .delist{float:right;color:#222;cursor:pointer}
 #message .delist:hover{color:#333}
 .c, .c a{color:#ccc}
 .c0,.c0 a{color:#DC92A8}
@@ -48,40 +49,42 @@ input{width:190px;margin:0.25em 0 0.75em}
 .title span{display:inline-block;margin-left:6px;font-size:0.75em;color:#888;width:148px}
 .title img{width:50px;vertical-align:top;height:38px}
 .title b{display:block;font-size:1.2em;color:#ccc;font-weight:normal}
-#top{border-bottom:2px solid #282828;position:relative;padding:0 0.25em 0.5em;background:#000;z-index:3;width:212px;height:90px;font-size:1.25em}
+#top{position:relative;margin-left:6px}
 #lhs-expand{display:none}
 #lhs-expand,#lhs-collapse{padding:0.5em 0.25em;font-size:0.6em;width:1em}
 #channel{background:#222}
-#channel-expand{position:absolute;top:0;left:0;background:url("images/door_open.png") 0.4em 0.4em no-repeat #222;width:40px;height:45px;
-border-bottom:1px solid #333;
-border-right:1px solid #555;
-cursor:pointer;
-}
+
 #video-current-wrapper div{display:inline-block}
 #video-current-wrapper{
-  border-radius:1px;
-  box-shadow:0 0 10px 1px #333;
-  width:195px;
+  box-shadow:0 0 8px 1px #222;
+  width:198px;
   cursor:pointer;
-  font-size:0.6em;margin:1em 0 0 0.4em;padding:0.4em 5px;height:30px;overflow:hidden}
-#video-current{color:#888;width:154px;white-space:normal;font-size:0.85em;line-height:0.83em}
-#video-current b{color:#ccc;display:block;font-size:1.3em;line-height:1em;margin-bottom:0.2em;margin-top:0.1em;white-space:nowrap}
-#video-expand{background:url("images/next_track.png") 5px 5px no-repeat #222;width:41px;height:30px;vertical-align:top;}
+  font-size:0.7em;margin:1.5em 0 0 0;padding:0.4em 5px;height:32px;overflow:hidden}
+#video-current{color:#555;width:157px;white-space:normal;font-size:0.85em;line-height:0.83em}
+#video-current b{color:#aaa;display:block;font-size:1.3em;line-height:1em;margin-bottom:0.2em;margin-top:0.1em;white-space:nowrap}
+#video-expand{background:url("images/next_track.png") 5px 5px no-repeat #222;width:41px;height:32px;vertical-align:top;}
 #video-current-wrapper:hover{box-shadow:0 0 10px 1px #555;}
+#video-current-wrapper #countdown{font-size:2em;overflow:visible;width:1em;display:none}
+
 #input-song-search{font-size:1.25em}
 #song-show-history{display:block;text-decoration:underline;margin-bottom:0.5em;cursor:pointer}
 #song-search-label{margin-top:-.5em;margin-bottom:.5em}
 #song-search-results a{display:block;font-size:1.25em;cursor:pointer;margin:0.25em 0;padding:0.15em}
 #song-search-results a:hover{background:#333;color:#ccc}
 #song-search-results a.title span{white-space:normal}
-#channel-title{color:#ccc;margin-top:-0.58em}
-#channel-stats{color:#888;font-size:0.7em;margin-top:-0.4em}
-#chatbar{position:absolute;bottom:0.5em;left:0;z-index:0;width:220px}
-#channel-wrap{display:inline-block;margin-left:2.25em;padding-top:0.75em}
-#video-current-wrapper #countdown{font-size:2em;overflow:visible;width:1em;display:none}
-#display-username{float:left;font-size:0.7em;margin-left:0.75em;display:inline-block;width:120px;color:#555}
-#login-button{float:right;margin-right:10px;font-size:0.7em;text-decoration:underline;cursor:pointer}
-#user-control{visibility:hidden}
+#chatbar{z-index:0;width:220px;margin-top:1em}
+#channel-wrap{display:inline-block;padding-top:0.5em;font-size:1.2em}
+  #channel-wrap span{display:inline-block;width:150px}
+  #channel-expand{display:inline-block;background:url("images/door_open.png") 0.3em 0.2em no-repeat #222;width:38px;height:40px;
+  cursor:pointer;
+  vertical-align:top;
+  }
+  #channel-title{color:#ccc;margin-top:0}
+  #channel-stats{color:#555;font-size:0.7em;margin-top:-0.3em}
+
+#user-control{margin:0 0.5em 0.4em 0;text-align:right;visibility:hidden}
+  #display-username{margin-left:0.75em;display:inline-block;color:#555}
+  #login-button{text-decoration:underline;cursor:pointer}
 #song-delist{padding:0.5em;background:#222;position:absolute;bottom:0;right:0;text-decoration:underline;cursor:pointer}
 </style>
 <!--[if IE]><link rel=stylesheet href=css/ie.css><![endif]-->
@@ -102,21 +105,23 @@ cursor:pointer;
     </span>
   </span><span id=chat>
     <span class="btn collapse">X</span>
-    <div id=chatbar>
-      <div id=message></div>
-      <input id=talk autocomplete=off>
-      <div id=user-control>
-        <div id=display-username>You are anonymous.</div>
-        <a id=login-button>Log in</a>
-      </div>
-    </div>
     <div id=top>
-      <div id=channel-expand></div>
       <span id=channel-wrap>
-        <div id=channel-title></div>
-        <div id=channel-stats></div>
+        <div id=channel-expand></div>
+        <span>
+          <div id=channel-title></div>
+          <div id=channel-stats></div>
+        </span>
       </span>
       <div id=video-current-wrapper><div id=countdown></div><div id=video-current></div><div id=video-expand></div></div>
+    </div>
+    <div id=chatbar>
+      <label id=user-control>
+        <div id=display-username>You are anonymous.</div>
+        <a id=login-button>Log in</a>
+      </label>
+      <input id=talk autocomplete=off>
+      <div id=message></div>
     </div>
   </span><span id=user>
     <span class="btn collapse">X</span>
@@ -132,7 +137,7 @@ cursor:pointer;
     <div class=panel-title>Video Selection</div>
     <span class=panel-content>
       <a id=song-delist>Skip This Video.</a>
-      <a id=song-show-history>Show Playlist History</a>
+      <!--<a id=song-show-history>Show Playlist History</a>-->
       <label>Search To Choose Next Video</label>
       <input id=input-song-search autocomplete=off>
       <div id=song-search-label></div>

@@ -720,6 +720,7 @@ var Song = {
     _ev.on("panel:song", function(which) {
       if(which == "show") {
         $("#input-song-search").focus();
+        _socket.emit("get-history");
       } else {
         $("#input-song-search").val("");
         $("#song-search-results").empty();
@@ -1016,10 +1017,10 @@ function showchat(){
         } else {
           entry.addClass("c");
         }
-        $("#message").append(entry);
+        $("#message").prepend(entry);
         _chat.lastentry = entry;
       } else {
-        _chat.lastentry.append(lastEntry);
+        _chat.lastentry.prepend(lastEntry);
       }
       $("a", entry).attr("target", "_blank");
        
@@ -1122,13 +1123,13 @@ when("$", function (){
   });
 
   $("#channel-expand").click(function(){
-    Panel.show("channel");
+    Panel.toggle("channel");
   });
   _ev.on("panel:channel", function(which) {
     if(which == "show") {
-      $("#channel-expand").fadeOut();
+     // $("#channel-expand").fadeOut();
     } else {
-      $("#channel-expand").fadeIn();
+     // $("#channel-expand").fadeIn();
     }
   });
 
