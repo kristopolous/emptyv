@@ -335,6 +335,7 @@ IO.sockets.on('connection', function (socket) {
       socket.emit("username", _user.name);
     } else {
       announce(_user.name + " logged out");
+      DB.hdel("user", _user.uid);
       _user.name = "anonymous";
     }
   });
