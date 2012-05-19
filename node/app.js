@@ -246,8 +246,6 @@ IO.sockets.on('connection', function (socket) {
     _user = p;
     _user.name = "anonymous";
 
-    _channel.join("80smtv");
-
     if(!_user.uid) {
       _user.uid = uidgen();
       socket.emit("uid", _user.uid);
@@ -262,6 +260,8 @@ IO.sockets.on('connection', function (socket) {
         }
       });
     }
+
+    _channel.join("80smtv");
 
     if(!_ival.poll) {
       _ival.poll = setInterval(poll, 50);
