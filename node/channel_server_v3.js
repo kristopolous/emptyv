@@ -147,13 +147,16 @@ setInterval(function(){
 
             add("log:" + data.channel, [
               chat_id,
-                "<a class=title target=_blank href=http://youtube.com/watch?v=" + id + ">" + 
-                 "<img src=http://i3.ytimg.com/vi/" + id + "/default.jpg>" +
-                 "<span>" +
-                   "<b>" + data.artist + "</b>" +  
-                   data.title +
-                 "</span>" +
-               "</a>",
+                "<div class=action>" +
+                  "<em>Requested:</em>" +
+                  "<a class=title target=_blank href=http://youtube.com/watch?v=" + id + ">" + 
+                   "<img src=http://i3.ytimg.com/vi/" + id + "/default.jpg>" +
+                   "<span>" +
+                     "<b>" + data.artist + "</b>" +  
+                     data.title +
+                   "</span>" +
+                 "</a>" +
+               "</div>",
              0,
              data.name
             ]);
