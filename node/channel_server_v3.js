@@ -8,7 +8,7 @@ _db.select(1);
 function add(key, data) {
   _db.multi([
    [ "rpush", key, JSON.stringify(data) ],
-   [ "ltrim", key, -9, -1]
+   [ "ltrim", key, -20, -1]
   ]).exec();
 }
 
