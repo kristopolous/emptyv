@@ -628,7 +628,7 @@ function loadPlayer(domain, ix) {
 }
 
 function addmessage(data) {
-  _chat.data.push([_chat.lastid, "<p>" + data + "</p>"]);
+  _chat.data.push([_chat.lastid, "<p class=announce>" + data + "</p>"]);
   showmessage();
 }
 
@@ -1006,9 +1006,6 @@ function showchat(){
         entry = $("<div>").html(lastEntry);
 
         _chat.lastauthor = _chat.data[lastindex][3];
-        if(_chat.lastauthor) {
-          entry.prepend("<div class=author>" + _chat.lastauthor + "</div>");
-        } 
 
         entryList.push(entry);
 
@@ -1018,6 +1015,9 @@ function showchat(){
           entry.addClass("c");
         }
         $("#message").prepend(entry);
+        if(_chat.lastauthor) {
+          entry.append("<div class=author>~ " + _chat.lastauthor + ".</div>");
+        } 
         _chat.lastentry = entry;
       } else {
         _chat.lastentry.prepend(lastEntry);

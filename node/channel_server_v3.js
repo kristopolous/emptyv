@@ -85,8 +85,8 @@ setInterval(function(){
 
             add("log:" + data.channel, [
               chat_id,
-                "<div class=c>" +
-                  "Skipped:" +
+                "<div class=action>" +
+                  "<em>Skipped:</em>" +
                   "<a title='DELIST THIS SONG. Please Use With Caution' class=delist onclick=Song.reallyDelist('" + data.track.vid + "',this)>x</a><br>" +
                   "<a class=title target=_blank href=http://youtube.com/watch?v=" + id + ">" + 
                    "<img src=http://i3.ytimg.com/vi/" + id + "/default.jpg>" +
