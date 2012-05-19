@@ -90,13 +90,6 @@ setInterval(function(){
           // otherwise use the len property
           // to test whether it was a local
           // or a remote result
-          if (data.title.search('-') > 0) {
-            var split = data.title.split('-');
-            data.artist = split[0];
-            data.title = split[1];
-          } else {
-            data.artist = '';
-          }
 
           if (data.len) {
             _db.hset("vid", data.vid, JSON.stringify([

@@ -95,7 +95,8 @@ var search = (function(){
           q: query,
           orderby: 'relevance',
           'max-results': 10,
-          v: 2
+          v: 2,
+          format: 5
         })
       }, function(res) {
         res.setEncoding('utf8');
