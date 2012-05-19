@@ -790,7 +790,7 @@ var Song = {
       }
     } else {
       type = 'history';
-      $("#song-search-label").html("Last played songs on " + data.channel + "</b>");
+      $("#song-search-label").html("Last played videos on " + data.channel + "</b>");
     }
 
     _.each(data.results, function(row) {
