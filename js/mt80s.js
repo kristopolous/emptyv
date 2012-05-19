@@ -102,6 +102,15 @@ function getNow(offset) {
   return +(new Date() / 1000) + (offset || 0);
 }
 
+function onEnter(node, cb) {
+  $(node).keyup(function(e){
+    var kc = window.event ? window.event.keyCode : e.which;
+    if(kc == 13) {
+      cb();
+    } 
+  });
+}
+
 function remainingTime(player) {
   if(player) {
     return Math.max(0,
@@ -404,7 +413,7 @@ function doTitle(){
   var newtitle = _song[ARTIST] + " - " + _song[TITLE];
   if(LASTTITLE != newtitle) {
     LASTTITLE = newtitle;
-    $("#current-song").html("<b>" + _song[ARTIST] + "</b>" +  _song[TITLE]);
+    $("#video-current").html("<b>" + _song[ARTIST] + "</b>" +  _song[TITLE]);
   }
   document.title = newtitle + " | " + toTime(getNow() - _start);
 }
@@ -446,7 +455,6 @@ function transition(song) {
     dom = id.split(':')[0],
     uuid = id.split(':')[1];
 
-  console.log(song);
   // Offset mechanics are throughout, but placing it here
   // make sure that on first load there isn't some brief beginning
   // of video sequence then a seek.
@@ -491,7 +499,7 @@ function transition(song) {
     log("video loaded");
 
     var 
-      step1Timeout = Math.min(800000, (remainingTime(_playerPrev[_active]) - NEXTVIDEO_PRELOAD) * 1000),
+      step1Timeout = Math.min(8000, (remainingTime(_playerPrev[_active]) - NEXTVIDEO_PRELOAD) * 1000),
       step2Timeout = step1Timeout + 2000;
 
     // This is when the audio for the video starts; some small
@@ -555,7 +563,7 @@ function transition(song) {
       _index = index;
       setQuality(0);
       _playerPrev = _player;
-    }, step2Timeout);//force ? 10000 : remainingTime(_playerPrev[_active]) * 1000);
+    }, step2Timeout);
   });
 }
 
@@ -627,12 +635,7 @@ var User = {
       Panel.hide("user");
       $("#talk").focus();
     });
-    $("#input-username").keyup(function(e){
-      var kc = window.event ? window.event.keyCode : e.which;
-      if(kc == 13) {
-        User.setuser();
-      } 
-    });
+    onEnter("#input-username", User.setuser);
     $("#user-login").click(User.setuser);
   },
   setuser: function() {
@@ -664,43 +667,111 @@ var User = {
 };
 var Song = {
   Init: function(){
-  },
-  show: function(){
-      var message = this.value.split(' '), command;
+    $("#video-current-wrapper").click(function(){
+      Panel.toggle("song");
+    });
 
-      if (message[0] == '/play' || message[0] == '/queue') {
-        command = message[0].slice(1);
-        message.shift();
-        message = message.join(" ");
+    $("#song-show-history").click(function(){
+      _socket.emit("get-history");
+    });
 
-        if (message.length > 1) {
-          var res = _db
-            .find('full', DB.like(message));
-
-          if(res.length > 0) {
-            $("#autocomplete").empty().show();
-
-            _.each(res.slice(0, 8), function(which) {
-              var ytid = which.id.split(":").pop();
-
-              $("<a />")
-               .append("<img src=" + image(ytid))
-               .append("<span><b>" + which.artist + "</b><br>" + which.title + "</span>")
-               .click(function(){ 
-                 addmessage(command + ": " + which.artist + " - " + which.title);
-                 verb(command, ytid); 
-               })
-               .appendTo("#autocomplete");  
-            });
-          } else {
-            $("#autocomplete").empty().hide();
-          }
-        } else {
-          $("#autocomplete").empty().hide();
-        }
+    onEnter("#input-song-search", Song.search);
+    _ev.on("panel:song", function(which) {
+      if(which == "show") {
+        $("#input-song-search").focus();
+      } else {
+        $("#input-song-search").val("");
+        $("#song-search-results").empty();
+        $("#song-search-label").html("");
       }
+    });
   },
-  hide: function(){
+
+  countdown: function(){
+    $("#countdown").css('display','inline-block').html("9");
+    var 
+      count = 9,
+      ival = setInterval(function(){
+        count--;
+        $("#countdown").html(count);
+        if(count == 0) {
+          $("#countdown")
+            .html("")
+            .css('display','none');
+          clearInterval(ival);
+        }
+      }, 1000); 
+  },
+
+  format: function(data, type) {
+    var 
+      id = data.vid.split(':').pop(),
+      node;
+    
+    node = $("<a class=title />").append("<img src=http://i3.ytimg.com/vi/" + id + "/default.jpg>")
+
+    if(type == "history") {
+      node.attr({
+        target: "_blank",
+        href: "http://youtube.com/watch?v=" + id
+      })
+    } else {
+      node.click(function(){ 
+        var 
+          iter = 5,
+          ival = setInterval(function(){
+            if(iter == 0) {
+              Panel.hide("song");
+              clearInterval(ival);
+              Song.countdown();
+            }
+            if(iter % 2) {
+              node.css("background", "#888");
+            } else {
+              node.css("background", "#000");
+            }
+            iter--;
+          }, 150);
+          _socket.emit("video-play", data); 
+      });
+    }
+
+    if(data.artist) {
+      node.append("<span><b>" + data.artist + "</b>" + data.title + "</span>");
+    } else {
+      node.append("<span>" + data.title + "</span>")
+    }
+    return node;
+  },
+
+  search: function(q){
+    var qstr = q || $("#input-song-search").val();
+
+    if(qstr && qstr.length) {
+      $("#song-search-results").empty();
+      $("#song-search-label").html("Searching...");
+      _socket.emit("search", qstr);
+    }
+  },
+
+  gen: function(data) {
+    var type;
+    $("#song-search-results").empty();
+    if(data.query) {
+      type = 'search';
+      if(data.results.length) {
+        $("#song-search-label").html("Showing results for <b>" + data.query + "</b>");
+      } else {
+        $("#song-search-label").html("Nothing found for <b>" + data.query + "</b> :-(");
+      }
+    } else {
+      type = 'history';
+      $("#song-search-label").html("Last played songs on " + data.channel + "</b>");
+    }
+
+    _.each(data.results, function(row) {
+      Song.format(row, type).appendTo("#song-search-results");
+    });
   }
 };
 
@@ -757,6 +828,13 @@ var Channel = {
 
 var Panel = {
   visible: {count:0},
+  toggle: function(which) {
+    if(Panel.visible[which]) {
+      Panel.hide(which);
+    } else {
+      Panel.show(which);
+    }
+  },
   show: function(which) {
     if(Panel.visible[which]) {
       return;
@@ -825,6 +903,8 @@ function showchat(){
     $("#channel-stats").html(d.online + " online");
   });
 
+  _socket.on("search-results", Song.gen);
+
   _socket.on("code", eval);
 
   _socket.on("song", function(d) {
@@ -835,7 +915,6 @@ function showchat(){
   _socket.on("uid", function(d) { Store("uid", d); });
   _socket.on("channel-name", function(d){ _ev("channel", d); });
   _socket.on("username", User.login);
-  _socket.on("version", function(v) { self.VERSION = v });
 
   send("greet-response", {
     color: MYCOLOR,
@@ -846,7 +925,6 @@ function showchat(){
 
   _socket.on("greet-request", function(version) {
     send("greet-response", {
-      v: VERSION,
       color: MYCOLOR,
       uid: Store("uid"),
       lastid: _chat.lastid,
@@ -1004,15 +1082,11 @@ when("$", function (){
     Panel.show("song");
   });
 
-  $("#talk").keyup(function(e){
-    var kc = window.event ? window.event.keyCode : e.which;
-    if(kc == 13) {
-      dochat();
-    } 
-  });
+  onEnter("#talk", dochat);
 
   Channel.Init();
   User.Init();
+  Song.Init();
   showmessage();
   volumeSlider();
   $("#mute-control").hover(

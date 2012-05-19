@@ -5,9 +5,9 @@ a{color:#aaa}
 p,h1,h2,h3,h4,h5,h6{margin:0}
 button{background:#333;border-color:#222;color:#ccc;border-width:1px}
 img{border:0}
-input,#talk{display:block;box-shadow:0 0 2px 2px #444;background:#222;color:#ccc;border-width:0;font-size:0.85em;width:200px;padding:0.15em 3px;margin: 0 0 0.5em 0.5em}
-label{margin-bottom:-0.5em}
-input{width:150px;margin:1em 0}
+input,#talk{display:block;box-shadow:0 0 2px 2px #444457;background:#222;color:#ccc;border-width:0;font-size:0.85em;width:200px;padding:0.15em 3px;margin: 0 0 0.5em 0.5em}
+label{margin-bottom:-0.5em;color:#888}
+input{width:190px;margin:0.25em 0 0.75em}
 .btn{text-align:center;font-size:0.5em;padding:0.5em;margin:0.25em;background:#333;cursor:pointer;border:0.25em solid #333}
 .btn:hover{border-color:#555;color:#eee}
 
@@ -21,7 +21,7 @@ input{width:150px;margin:1em 0}
 
 #panels{float:left;width:20px;position:relative;height:100%;white-space:nowrap}
 #panels > span{width:0px;display:none;position:relative;height:100%;vertical-align:top;overflow:hidden}
-.panel-title{color:#aaa;font-size:1.2em;padding:1em 0.5em;line-height:0.8em;white-space:nowrap}
+.panel-title{color:#ccc;font-size:1.2em;padding:0.5em;line-height:0.8em;white-space:nowrap}
 .panel-content{margin:0 1em;font-size:0.75em;display:block}
 .collapse{position:absolute;top:0.25em;right:0em;z-index:12}
 
@@ -43,23 +43,40 @@ input{width:150px;margin:1em 0}
 .c8,.c8 a{color:#b3b3e9}
 .c9,.c9 a{color:#83C3F0}
 .title {text-decoration:none}
-.title span{display:inline-block;margin-left:6px;font-size:0.75em;color:#ccc;width:150px}
-.title img{width:45px;vertical-align:top}
-.title b{background:none;display:block;font-size:1.2em;color:#fff;font-weight:normal}
-#current-song{font-size:0.46em;margin-top:-0.25em;width:134px;overflow:hidden;white-space:nowrap}
-#current-song b{display:block;font-size:1.25em;margin-bottom:-.1em}
-#top{border-bottom:2px solid #282828;position:relative;padding:0 0.25em 0.5em;background:#000;z-index:3;width:212px;height:78px;font-size:1.25em}
+.title span{display:inline-block;margin-left:6px;font-size:0.75em;color:#888;width:150px}
+.title img{width:50px;vertical-align:top;height:38px}
+.title b{display:block;font-size:1.2em;color:#ccc;font-weight:normal}
+#top{border-bottom:2px solid #282828;position:relative;padding:0 0.25em 0.5em;background:#000;z-index:3;width:212px;height:90px;font-size:1.25em}
 #lhs-expand{display:none}
 #lhs-expand,#lhs-collapse{padding:0.5em 0.25em;font-size:0.6em;width:1em}
 #channel{background:#222}
 #channel-expand{position:absolute;top:0;left:0;background:url("images/door_open.png") 0.4em 0.4em no-repeat #222;width:40px;height:45px;
 border-bottom:1px solid #333;
 border-right:1px solid #555;
+cursor:pointer;
 }
-#channel-title{color:#ccc;margin-top:-0.28em}
-#channel-stats{color:#666;font-size:0.4em}
+#video-current-wrapper div{display:inline-block}
+#video-current-wrapper{
+  border-radius:1px;
+  box-shadow:0 0 2px 2px #444;
+  width:195px;
+  cursor:pointer;
+  font-size:0.6em;margin:0.75em 0 0 0.4em;padding:0.4em 5px;height:30px;overflow:hidden}
+#video-current{color:#888;width:154px;white-space:normal;font-size:0.85em;line-height:0.83em}
+#video-current b{color:#ccc;display:block;font-size:1.3em;line-height:1em;margin-bottom:0.2em;margin-top:0.1em;white-space:nowrap}
+#video-expand{background:url("images/next_track.png") 5px 5px no-repeat #222;width:41px;height:30px;vertical-align:top;}
+#video-current-wrapper:hover{background:#222}
+#input-song-search{font-size:1.25em}
+#song-show-history{display:block;text-decoration:underline;margin-bottom:0.5em;cursor:pointer}
+#song-search-label{margin-top:-.5em;margin-bottom:.5em}
+#song-search-results a{display:block;font-size:1.25em;cursor:pointer;margin:0.25em 0;padding:0.15em}
+#song-search-results a:hover{background:#333;color:#ccc}
+#song-search-results a.title span{white-space:normal}
+#channel-title{color:#ccc;margin-top:-0.58em}
+#channel-stats{color:#888;font-size:0.7em;margin-top:-0.4em}
 #chatbar{position:absolute;bottom:0.5em;left:0;z-index:0;width:220px}
 #channel-wrap{display:inline-block;margin-left:2.25em;padding-top:0.75em}
+#video-current-wrapper #countdown{font-size:2em;overflow:visible;width:1em;display:none}
 #display-username{float:left;font-size:0.7em;margin-left:0.75em;display:inline-block;width:120px;color:#555}
 #login-button{float:right;margin-right:10px;font-size:0.7em;text-decoration:underline;cursor:pointer}
 #user-control{visibility:hidden}
@@ -94,9 +111,9 @@ border-right:1px solid #555;
       <div id=channel-expand></div>
       <span id=channel-wrap>
         <div id=channel-title></div>
-        <div id=current-song></div>
         <div id=channel-stats></div>
       </span>
+      <div id=video-current-wrapper><div id=countdown></div><div id=video-current></div><div id=video-expand></div></div>
     </div>
   </span><span id=user>
     <span class="btn collapse">X</span>
@@ -111,8 +128,11 @@ border-right:1px solid #555;
     <span class="btn collapse">X</span>
     <div class=panel-title>Song Selection</div>
     <span class=panel-content>
-      <label>Search</label>
+      <a id=song-show-history>Show Playlist History</a>
+      <label>Search To Choose Next Song</label>
       <input id=input-song-search autocomplete=off>
+      <div id=song-search-label></div>
+      <div id=song-search-results></div>
     </span>
   </span>
 </div>

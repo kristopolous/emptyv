@@ -1,12 +1,13 @@
 var app = require('http').createServer(function(){})
   , redis = require('redis')
-  , _db = redis.createClient()
-  , io = require('socket.io').listen(app)
-  , _md = require("node-markdown").Markdown
-  , VERSION = 2
-  , fs = require('fs');
+  , DB = redis.createClient()
+  , IO = require('socket.io').listen(app)
+  , QS = require('querystring')
+  , HTTP = require('http')
+  , MD = require("node-markdown").Markdown
+  , VERSION = 2;
 
-_db.select(1);
+DB.select(1);
 app.listen(1985);
 
 function uidgen() {
@@ -15,13 +16,126 @@ function uidgen() {
 
 function add(key, data, width) {
   width = width || 20;
-  _db.multi([
-   [ "rpush", key, JSON.stringify(data) ],
-   [ "ltrim", key, -width, -1]
+  DB.multi([
+    [ "rpush", key, JSON.stringify(data) ],
+    [ "ltrim", key, -width, -1]
   ]).exec();
 }
 
-io.sockets.on('connection', function (socket) {
+var search = (function(){
+
+  var _payload;
+
+  function stem(str) {
+    return str
+      .toLowerCase()
+      .replace(/[^a-z\ 0-9@]/g,'')
+      .replace(/\s+/g, ' ')
+  }
+
+  function build(){
+    console.log("[qdb] Building");
+    var 
+      rows = [], 
+      parsed;
+
+    DB.hgetall("vid", function(err, all) {
+      for(var key in all) {
+        parsed = JSON.parse(all[key]);
+        rows.push([
+          key,
+          stem(parsed[4] + '@' + parsed[3])
+        ].join('@'));
+      }
+      _payload = '\n' + rows.join('\n') + '\n';
+      console.log("[qdb] Built");
+    });
+  }
+
+  function process(data, cb) {
+    var results = [], song;
+    if(data.feed.entry) {
+      data.feed.entry.forEach(function(result) {
+        song = result.title.$t.split('-').reverse(); 
+        results.push({
+          vid: 'yt:' + result.media$group.yt$videoid.$t,
+          title: song.shift(),
+          artist: song.reverse().join('-'),
+          len: result.media$group.yt$duration.seconds
+        });
+      });
+    }
+    cb(false, results);
+  }
+
+  function local(query, cb) {
+    var 
+      res,
+      results = [],
+      re = new RegExp("[^\n]*" + stem(query) + "[^\n]*", "g");
+
+    while ( (match = re.exec(_payload) ) != null) {
+      res = match[0].split('@');
+      results.push( {
+        vid: res.shift(),
+        title: res.shift(),
+        artist: res.join('@')
+      });
+    }
+    cb(false, results);
+  }
+
+  function remote(query, cb) {
+    var 
+      results = [],
+      req = HTTP.request({
+        host: 'gdata.youtube.com',
+        path: '/feeds/api/videos?' + QS.stringify({
+          alt: 'json',
+          q: query,
+          orderby: 'relevance',
+          'max-results': 10,
+          v: 2
+        })
+      }, function(res) {
+        res.setEncoding('utf8');
+        res.on('data', function(data) { results.push(data); });
+        res.on('end', function(){ process(JSON.parse(results.join('')), cb); });
+      });
+
+    req.on('error', function(){ cb(arguments, fale); });
+    req.end();
+  }
+
+  build();
+  setInterval(build, 900 * 1000);
+
+  return function(query, cb) {
+    var
+      _remote,
+      _local;
+
+    function verify() {
+      if(_local && _remote) {
+        cb(false, _local.concat(_remote));
+      }
+    }
+
+    local(query, function(err, res) {
+      _local = res;
+      verify();
+    });
+
+    remote(query, function(err, res) {
+      _remote = res;
+      verify();
+    });
+    
+  }
+
+})();
+
+IO.sockets.on('connection', function (socket) {
   var 
     _user = {}, 
     _song = {},
@@ -37,15 +151,17 @@ io.sockets.on('connection', function (socket) {
     join: function(which) {
       _user.channel = which;
       socket.emit("channel-name", which);
-      _db.sadd("user:" + which, _user.uid);
+      DB.sadd("user:" + which, _user.uid);
     },
 
     leave: function() {
-      _db.srem("user:" + _user.channel, _user.uid);
+      if(_user.uid) {
+        DB.srem("user:" + _user.channel, _user.uid);
+      }
     },
 
     play: function(params) {
-      _db.set("request", JSON.stringify(params));
+      DB.set("request", JSON.stringify(params));
     },
     update: function(params) {
     }
@@ -62,7 +178,7 @@ io.sockets.on('connection', function (socket) {
   });
 
   function song() {
-    _db.hget("play", _user.channel, function(err, last) {
+    DB.hget("play", _user.channel, function(err, last) {
       if(!last) {
         return;
       }
@@ -86,9 +202,9 @@ io.sockets.on('connection', function (socket) {
   }
 
   function poll() {
-    _db.get("ix", function(err, last) {
+    DB.get("ix", function(err, last) {
 
-      _db.lrange(
+      DB.lrange(
         "log:" + _user.channel, 
         0, -1, 
         function(err, data) {
@@ -109,7 +225,7 @@ io.sockets.on('connection', function (socket) {
         });
     });
 
-    _db.scard("user:" + _user.channel, function(err, online) {
+    DB.scard("user:" + _user.channel, function(err, online) {
       if(online != _online) {
         _online = online;
         socket.emit("stats", {online: online});
@@ -135,7 +251,7 @@ io.sockets.on('connection', function (socket) {
       _user.uid = uidgen();
       socket.emit("uid", _user.uid);
     } else {
-      _db.hget("user", _user.uid, function(err, last) {
+      DB.hget("user", _user.uid, function(err, last) {
         if(last) {
           _user.name = last;
           socket.emit("username", _user.name);
@@ -153,6 +269,33 @@ io.sockets.on('connection', function (socket) {
     }
   });
 
+  socket.on("search", function(q) {
+    search(q, function(err, res) {
+      socket.emit("search-results", {
+        query: q,
+        results: res
+      });
+    });
+  });
+
+  socket.on("video-play", function(p) {
+    p.channel = _user.channel;
+    DB.lpush("request", JSON.stringify(p));
+  });
+
+  socket.on("get-history", function(p) {
+    var chan = _user.channel;
+    DB.lrange("lastplayed:" + chan, 0, -1, function(err, last){
+      for(var ix = 0; ix < last.length; ix++) {
+        last[ix] = JSON.parse(last[ix]);
+      }
+      socket.emit("search-results", {
+        channel: chan,
+        results: last.reverse()
+      });
+    });
+  });
+
   socket.on("set-user", function(p) {
     if(p.user) {
       if(_user.name != "anonymous") {
@@ -161,7 +304,7 @@ io.sockets.on('connection', function (socket) {
         announce(p.user + " logged in");
       }
       _user.name = p.user;
-      _db.hset("user", _user.uid, p.user);
+      DB.hset("user", _user.uid, p.user);
       socket.emit("username", _user.name);
     } else {
       announce(_user.name + " logged out");
@@ -170,7 +313,7 @@ io.sockets.on('connection', function (socket) {
   });
 
   function announce(message) {
-    _db.incr("ix", function(err, id) {
+    DB.incr("ix", function(err, id) {
       var payload = [ 
         id, 
         "<p class=announce>" + message + "</p>"
@@ -185,10 +328,10 @@ io.sockets.on('connection', function (socket) {
       return;
     }
 
-    _db.incr("ix", function(err, id) {
+    DB.incr("ix", function(err, id) {
       var payload = [ 
         id, 
-        _md(p.d
+        MD(p.d
           .replace(/</g, '&lt;')
           .replace(/>/g, '&gt;')),
         _user.color,
