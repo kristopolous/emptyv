@@ -561,7 +561,7 @@ function transition(song) {
       _playerById[index] = _player[_active];
 
       _index = index;
-      setQuality(0);
+      //setQuality(0);
       _playerPrev = _player;
     }, step2Timeout);
   });
