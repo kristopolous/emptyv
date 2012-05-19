@@ -127,12 +127,31 @@ function image(id) {
   return "http://i3.ytimg.com/vi/" + id.split(":").pop() + "/default.jpg>";
 }
 
-function toTime(sec) {
-  return [
-    Math.floor(sec / 3600),
-    (Math.floor(sec / 60) % 60 + 100).toString().substr(1),
-    ((Math.floor(sec) % 60) + 100).toString().substr(1)
-  ].join(':');
+function secondsToTime(count) {
+  var stack = [];
+
+  stack.push((Math.floor(count) % 60) + " sec");
+
+  // seconds
+  count = Math.floor(count / 60);
+
+  // minutes
+  if (count > 1) {
+    stack.push((count % 60) + " min");
+    count = Math.floor(count / 60);
+  }
+
+  // hours
+  if (count > 1) {
+    stack.push((count % 24) + " hours");
+    count = Math.floor(count / 24);
+  }
+
+  // days
+  if (count > 1) {
+    stack.push(count.toFixed(0) + " days");
+  }
+  return stack.reverse().join(' ').replace(/^0/,'');
 }
 
 function hide(player) {
@@ -422,10 +441,10 @@ function doTitle(){
   var ttl = _counter + (getNow() - _start);
   Store("ttl", ttl);
   if(ttl > _goal) {
-    addmessage("Total Time On Site " + toTime(ttl));
+    addmessage("Total Time On Site " + secondsToTime(ttl));
     _goal = (1 + Math.floor(ttl / _unit)) * _unit;
   }
-  document.title = newtitle + " | " + toTime(ttl);
+  document.title = newtitle + " | " + secondsToTime(ttl);
 }
 
 function onReady(domain, id) {
@@ -1125,7 +1144,7 @@ when("$", function (){
   showmessage();
   volumeSlider();
   $("#mute-control").hover(
-    function(){ $("#mute-bg").css('background', '#444'); },
+    function(){ $("#mute-bg").css('background', '#333'); },
     function(){ $("#mute-bg").css('background', 'url("css/chat-bg.png")'); }
   );
 
