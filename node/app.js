@@ -15,7 +15,7 @@ function uidgen() {
 }
 
 function add(key, data, width) {
-  width = width || 20;
+  width = width || 100;
   DB.multi([
     [ "rpush", key, JSON.stringify(data) ],
     [ "ltrim", key, -width, -1]
@@ -346,7 +346,7 @@ IO.sockets.on('connection', function (socket) {
         "<p class=announce>" + message + "</p>"
       ];
       add("log:" + _user.channel, payload);
-      add("logall", payload, 80);
+      add("logall", payload, 400);
     });
   }
 
@@ -365,7 +365,7 @@ IO.sockets.on('connection', function (socket) {
         _user.name
       ];
       add("log:" + _user.channel, payload);
-      add("logall", payload, 80);
+      add("logall", payload, 400);
     });
   }
 
