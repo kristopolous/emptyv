@@ -714,7 +714,14 @@ var Song = {
       node.attr({
         target: "_blank",
         href: "http://youtube.com/watch?v=" + id
-      })
+      }).click(function(){
+        var oldvolume = _volume;
+        setVolume(0, true);
+        $(document.body).bind('mousemove', function(){
+          $(document.body).unbind('mousemove');
+          setVolume(oldvolume, true);
+        });
+      });
     } else {
       node.click(function(){ 
         var 
