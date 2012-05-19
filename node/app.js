@@ -53,14 +53,21 @@ var search = (function(){
   }
 
   function process(data, cb) {
-    var results = [], song;
+    var results = [], title, artist, split;
     if(data.feed.entry) {
       data.feed.entry.forEach(function(result) {
-        song = result.title.$t.split('-').reverse(); 
+        split = result.title.$t.split('-');
+        if(split.length == 1) {
+          artist = "";
+          title = split[0];
+        } else {
+          artist = split.shift();
+          title = split.join('-');
+        }
         results.push({
           vid: 'yt:' + result.media$group.yt$videoid.$t,
-          title: song.shift(),
-          artist: song.reverse().join('-'),
+          title: title,
+          artist: artist,
           len: result.media$group.yt$duration.seconds
         });
       });
