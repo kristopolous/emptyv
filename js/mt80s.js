@@ -1145,7 +1145,7 @@ when("$", function (){
   volumeSlider();
   $("#mute-control").hover(
     function(){ $("#mute-bg").css('background', '#333'); },
-    function(){ $("#mute-bg").css('background', 'url("css/chat-bg.png")'); }
+    function(){ $("#mute-bg").css('background', 'url("images/chat-bg.png")'); }
   );
 
   $("#talk").focus();
