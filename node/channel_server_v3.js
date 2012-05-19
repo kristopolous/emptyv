@@ -78,43 +78,88 @@ setInterval(function(){
     request.forEach(function(row) {
       var data = JSON.parse(row);
 
-      _db.lrange("pl:" + data.channel, 0, -1, function(res, list) {
-        var offset = list.indexOf(data.vid);
+      if(data.action) {
+        if(data.action == 'delist') {
+          _db.incr("ix", function(err, chat_id) {
+            var id = data.track.vid.split(':').pop();
 
-        // See if its in thie channels playlist
-        if(offset > -1) {
+            add("log:" + data.channel, [
+              chat_id,
+                "<div class=c>" +
+                  "Skipped:" +
+                  "<a title='DELIST THIS SONG. Please Use With Caution' class=delist onclick=Song.reallyDelist('" + data.track.vid + "',this)>x</a><br>" +
+                  "<a class=title target=_blank href=http://youtube.com/watch?v=" + id + ">" + 
+                   "<img src=http://i3.ytimg.com/vi/" + id + "/default.jpg>" +
+                   "<span>" +
+                     "<b>" + data.track.artist + "</b>" +  
+                     data.track.title +
+                   "</span>" +
+                 "</a>" +
+               "</div>",
+              0,
+              data.name
+            ]);
 
-          go2(_state[data.channel], offset);
+            getNext(_state[data.channel]);
+          });
+        } else if (data.action == "really-delist") {
+          _db.lrem("pl:" + data.channel, 0, data.track.vid);
+        }
+      } else {
+        _db.lrange("pl:" + data.channel, 0, -1, function(res, list) {
+          var offset = list.indexOf(data.vid);
 
-        } else {
-          // otherwise use the len property
-          // to test whether it was a local
-          // or a remote result
+          // See if its in thie channels playlist
+          if(offset > -1) {
 
-          if (data.len) {
-            _db.hset("vid", data.vid, JSON.stringify([
-              data.len,   // Length of video
-              0,          // Start at 0 for now 
-              100,        // Full volume
-              data.artist,// Put everything in the artist
-              data.title, // Empty title
-              ""          // Empty notes.
-            ]));
-          }
+            go2(_state[data.channel], offset);
 
-          // Now put it in our playlist
-          // AFTER the current video.
-          _db.linsert(
-            "pl:" + data.channel,
-            "AFTER",
-            _state[data.channel].video.vid,
-            data.vid, function(res, list) {
-              // And then go to it.
-              getNext(_state[data.channel]);
+          } else {
+            // otherwise use the len property
+            // to test whether it was a local
+            // or a remote result
+
+            if (data.len) {
+              _db.hset("vid", data.vid, JSON.stringify([
+                data.len,   // Length of video
+                0,          // Start at 0 for now 
+                100,        // Full volume
+                data.artist,// Put everything in the artist
+                data.title, // Empty title
+                ""          // Empty notes.
+              ]));
             }
-          );
-        } 
-      });
+
+            // Now put it in our playlist
+            // AFTER the current video.
+            _db.linsert(
+              "pl:" + data.channel,
+              "AFTER",
+              _state[data.channel].video.vid,
+              data.vid, function(res, list) {
+                // And then go to it.
+                getNext(_state[data.channel]);
+              }
+            );
+          } 
+          _db.incr("ix", function(err, chat_id) {
+            var id = data.vid.split(':').pop();
+
+            add("log:" + data.channel, [
+              chat_id,
+                "<a class=title target=_blank href=http://youtube.com/watch?v=" + id + ">" + 
+                 "<img src=http://i3.ytimg.com/vi/" + id + "/default.jpg>" +
+                 "<span>" +
+                   "<b>" + data.artist + "</b>" +  
+                   data.title +
+                 "</span>" +
+               "</a>",
+             0,
+             data.name
+            ]);
+          });
+        });
+      }
     });
   });
 

@@ -26,12 +26,14 @@ input{width:190px;margin:0.25em 0 0.75em}
 .collapse{position:absolute;top:0.25em;right:0em;z-index:12}
 
 #message img{max-width:195px}
-#message{font-family:Tahoma,Geneva;font-size:0.96em;color:#ccc; padding:0 0.5em}
+#message{font-family:Tahoma,Geneva;font-size:0.9em;color:#ccc; padding:0 0.5em}
 #message > div{padding:0.35em 0;overflow:hidden;white-space:normal}
 #message div.author{color:#555;font-size:0.7em;margin:-0.25em 0 0em 0}
 #message p {margin-left:0.25em;font-size:0.9em;line-height:1.30em}
 #message p.announce{font-size:0.8em;color:#555;margin:0 inherit;padding:0.15 0}
-.c a{color:#fff}
+#message .delist{float:right;color:#222;cursor:pointer;}
+#message .delist:hover{color:#333}
+.c, .c a{color:#ccc}
 .c0,.c0 a{color:#DC92A8}
 .c1,.c1 a{color:#9aa6e4}
 .c2,.c2 a{color:#E0A298}
@@ -80,6 +82,7 @@ cursor:pointer;
 #display-username{float:left;font-size:0.7em;margin-left:0.75em;display:inline-block;width:120px;color:#555}
 #login-button{float:right;margin-right:10px;font-size:0.7em;text-decoration:underline;cursor:pointer}
 #user-control{visibility:hidden}
+#song-delist{padding:0.5em;background:#222;position:absolute;bottom:0;right:0;text-decoration:underline;cursor:pointer}
 </style>
 <!--[if IE]><link rel=stylesheet href=css/ie.css><![endif]-->
 </head>
@@ -128,6 +131,7 @@ cursor:pointer;
     <span class="btn collapse">X</span>
     <div class=panel-title>Song Selection</div>
     <span class=panel-content>
+      <a id=song-delist>Skip This.</a>
       <a id=song-show-history>Show Playlist History</a>
       <label>Search To Choose Next Song</label>
       <input id=input-song-search autocomplete=off>

@@ -559,9 +559,10 @@ function transition(song) {
 
       _player[_active].index = index;
       _playerById[index] = _player[_active];
+      _playerById[index].setPlaybackQuality("medium");
 
       _index = index;
-      //setQuality(0);
+      setQuality(0);
       _playerPrev = _player;
     }, step2Timeout);
   });
@@ -675,6 +676,16 @@ var Song = {
       _socket.emit("get-history");
     });
 
+    $("#song-delist").click(function(){
+      Song.countdown();
+      Panel.hide("song");
+      _socket.emit("delist", {
+        vid: _song[ID],
+        title: _song[TITLE],
+        artist: _song[ARTIST]
+      });
+    });
+
     onEnter("#input-song-search", Song.search);
     _ev.on("panel:song", function(which) {
       if(which == "show") {
@@ -749,6 +760,12 @@ var Song = {
       node.append("<span>" + data.title + "</span>")
     }
     return node;
+  },
+
+  reallyDelist: function(q,el) {
+    _socket.emit("really-delist", { vid: q });
+    addmessage("Delisted");
+    $(el.parentNode).slideUp();
   },
 
   search: function(q){

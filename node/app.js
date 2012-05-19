@@ -288,7 +288,26 @@ IO.sockets.on('connection', function (socket) {
 
   socket.on("video-play", function(p) {
     p.channel = _user.channel;
+    p.name = _user.name;
     DB.lpush("request", JSON.stringify(p));
+  });
+
+  socket.on("really-delist", function(p) {
+    DB.lpush("request", JSON.stringify({
+      track: p,
+      action: "really-delist",
+      name: _user.name,
+      channel: _user.channel
+    }));
+  });
+
+  socket.on("delist", function(p) {
+    DB.lpush("request", JSON.stringify({
+      track: p,
+      action: "delist",
+      name: _user.name,
+      channel: _user.channel
+    }));
   });
 
   socket.on("get-history", function(p) {
