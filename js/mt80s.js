@@ -183,6 +183,7 @@ var
   _chat = {
     lastentry: false,
     lastauthor: false,
+    lastcolor: -1,
     data: [],
     lastid: 0,
     datatimeout: null
@@ -994,7 +995,8 @@ function showchat(){
   });
 
   self.showmessage = function() {
-    var entry;
+    var entry, color;
+
     while(_chat.data.length > lastindex) {
 
       lastEntry = _chat.data[lastindex][1];
@@ -1002,7 +1004,16 @@ function showchat(){
         entryList.shift().remove();
       }
 
-      if(_chat.data[lastindex][3] != _chat.lastauthor || _chat.lastauthor == false) {
+      if(_chat.data[lastindex].length > 2) {
+        color = _chat.data[lastindex][2];
+      }
+
+      if(
+          (_chat.data[lastindex][3] != _chat.lastauthor) || 
+          (_chat.lastauthor == false) ||
+          (_chat.lastcolor == -1 ) ||
+          (_chat.lastcolor !== color)
+        ) {
         entry = $("<div>").html(lastEntry);
 
         _chat.lastauthor = _chat.data[lastindex][3];
@@ -1014,13 +1025,15 @@ function showchat(){
         } else {
           entry.addClass("c");
         }
+        _chat.lastcolor = color;
+
         $("#message").prepend(entry);
         if(_chat.lastauthor) {
           entry.append("<div class=author>~ " + _chat.lastauthor + ".</div>");
         } 
         _chat.lastentry = entry;
       } else {
-        _chat.lastentry.prepend(lastEntry);
+        $(lastEntry).insertAfter(_chat.lastentry.get(0).lastChild.previousSibling);
       }
       $("a", entry).attr("target", "_blank");
        
