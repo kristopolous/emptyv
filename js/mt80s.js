@@ -257,7 +257,7 @@ function Store(key, value) {
 }
 
 function setVolume(amount, animate) {
-  _volume = amount;
+  _volume = Math.max(0, amount);
 
   Store("volume", _volume);
 
@@ -1096,7 +1096,7 @@ function volumeSlider() {
         axis: "y",
         containment: $("#mute-control"),
         drag: function(e, ui) {
-          setVolume((100 - (ui.position.top - 5)) / 100);
+          setVolume(1 - ui.position.top / 100);
         } 
       });
       $("#mute").click(function(){
