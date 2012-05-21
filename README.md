@@ -18,6 +18,7 @@ Thanks to (alphabetically listed):
  * [sox](http://sox.sourceforge.net/)
  * [swfobject](http://code.google.com/p/swfobject/)
  * [underscore](https://github.com/documentcloud/underscore)
+ * [xml2js](https://github.com/Leonidas-from-XIV/node-xml2js)
  * [youtube-dl](https://github.com/rg3/youtube-dl)
 
 If you want to get everything here working, you should know how all this
