@@ -22,14 +22,6 @@ if(!self.console) {
 }
 
 var
-  CHANNEL = 1/*(document.location.search.length > 0) ? 
-     document.location.search.substr(1)
-   : (navigator.language ? 
-        navigator.language
-      : this.clientInformation.browserLanguage).split('-')[0])*/,
-
-  CHANNEL_CURRENT = CHANNEL,
-
   MYCOLOR = Math.floor(Math.random() * 10),
 
   // This is the duration of the video minus the offsets in
@@ -102,11 +94,28 @@ function getNow(offset) {
   return +(new Date() / 1000) + (offset || 0);
 }
 
+function blink(node, cb) {
+  var 
+    iter = 5,
+    ival = setInterval(function(){
+      if(iter == 0) {
+        cb();
+        clearInterval(ival);
+      }
+      if(iter % 2) {
+        node.css("background", "#888");
+      } else {
+        node.css("background", "#000");
+      }
+      iter--;
+    }, 150);
+}
+
 function onEnter(node, cb) {
   $(node).keyup(function(e){
     var kc = window.event ? window.event.keyCode : e.which;
     if(kc == 13) {
-      cb();
+      cb($(node).val());
     } 
   });
 }
@@ -180,14 +189,7 @@ function log() {
 var 
   _active = -1,
 
-  _chat = {
-    lastentry: false,
-    lastauthor: false,
-    lastcolor: -1,
-    data: [],
-    lastid: 0,
-    datatimeout: null
-  },
+  _channel = Store("channel") || "80smtv",
 
   // This the the current playback quality index, which can be triggered
   // in a direction (either up or down) based on how successful we can
@@ -196,6 +198,7 @@ var
   // We start at medium quality and then the skies the limit, I guess.
   _currentLevel = 1,
   
+
   // The lag counter is a token system that gets set by an interval.  If
   // we accumulate a certain negative or positive balance, then we can exchange
   // the negative or positive units for a quality shift. This makes sure that 
@@ -237,8 +240,6 @@ var
   _playerPrev, 
   _playerByDom = {yt:[], dm:[]},
   _playerById = {},
-
-  _lastTime = 0,
 
   _song,
   _next = 0,
@@ -442,7 +443,7 @@ function doTitle(){
   var ttl = _counter + (getNow() - _start);
   Store("ttl", ttl);
   if(ttl > _goal) {
-    addmessage("Total Time On Site " + secondsToTime(ttl));
+    Chat.addmessage("Total Time On Site " + secondsToTime(ttl));
     _goal = (1 + Math.floor(ttl / _unit)) * _unit;
   }
   document.title = newtitle + " | " + secondsToTime(ttl);
@@ -520,7 +521,6 @@ function transition(song) {
         myplayer = _player[_next], 
         ival = setInterval(function(){
           if(myplayer.getCurrentTime() > 0) {
-            log("DONE");
             myplayer.unMute();
             myplayer.setVolume(0);
             clearInterval(ival);
@@ -628,10 +628,6 @@ function loadPlayer(domain, ix) {
   );
 }
 
-function addmessage(data) {
-  _chat.data.push([_chat.lastid, "<p class=announce>" + data + "</p>"]);
-  showmessage();
-}
 
 function verb(command, id) {
   send("channel", {
@@ -767,22 +763,11 @@ var Song = {
       });
     } else {
       node.click(function(){ 
-        var 
-          iter = 5,
-          ival = setInterval(function(){
-            if(iter == 0) {
-              Panel.hide("song");
-              clearInterval(ival);
-              Song.countdown();
-            }
-            if(iter % 2) {
-              node.css("background", "#888");
-            } else {
-              node.css("background", "#000");
-            }
-            iter--;
-          }, 150);
-          _socket.emit("video-play", data); 
+        blink(node, function(){
+          Panel.hide("song");
+          Song.countdown();
+        });
+        _socket.emit("video-play", data); 
       });
     }
 
@@ -796,7 +781,7 @@ var Song = {
 
   reallyDelist: function(q,el) {
     _socket.emit("really-delist", { vid: q });
-    addmessage("Delisted");
+    Chat.addmessage("Delisted");
     $(el.parentNode).slideUp();
   },
 
@@ -837,6 +822,14 @@ var Channel = {
       $("#channel-title").html(name);
     });
 
+    _ev("panel:channel", function(which){
+      if(which == "show") {
+        send("get-channels", {query: false});
+      }
+    });
+
+    onEnter("#input-channel-search", Channel.search);
+
     $("#channel-query").keyup(function(){
       Channel.search(this.value);
     });
@@ -847,40 +840,198 @@ var Channel = {
   },
 
   set: function(which) {
+    Store("channel", which);
+    send("channel-join", {channel: which});
   },
 
-  gen: function(data) {
-    $("#channel-search-results").empty();
+  gen: function(res) {
+    $("#channel-results").empty();
 
-    _.each(data, function(which) {
+    _.each(res.data, function(which) {
       $("<a />")
+        .append(which)
+        .appendTo("#channel-results")
+        .click(function(){ 
+          blink($(this), function(){
+            Panel.hide("channel");
+          });
+          Channel.set(which); 
+          Song.countdown();
+        });
+      /*
         .append("<img src=" + image(which.current) + ">")
         .append("<span>" +
             "<b>" + which.title + "</b>" +
             Channel.stats(which.stats) +
             "</span>"
         ).click(function(){ Channel.set(which.uid); })
-        .appendTo("#channel-search-results");
+        */
     });
+    if(res.data.length == 0) {
+      Panel.hide("channel");
+      send("channel-create", {channel: res.query});
+    }
   },
 
   search: function(q) {
     send(
-      "channel_search", 
+      "get-channels",
       {query: q}
     );
-  },
-
-  hide: function() {
-    $("#channel").animate({width: 0}, function(){
-      $(this).hide();
-    });
-  },
-
-  show: function() {
-    $("#channel").show().animate({width: "200px"});
   }
 };
+
+var Chat = (function(){
+  var 
+    row,
+    lastEntry, 
+    entryCount,
+    entryList,
+    lastindex = 0;
+
+  function reset() {
+
+    self._chat = {
+      lastentry: false,
+      lastauthor: false,
+      lastcolor: -1,
+      data: [],
+      lastid: 0
+    };
+
+    lastEntry = "";
+    entryCount = 0;
+    entryList = [],
+    lastindex = 0;
+    $("#message").empty();
+  }
+
+  function Init(){
+    when("$", function(){
+      log("Loading chat");
+      reset();
+
+      _socket.on("chat", function(d) {
+        _chat.data = _chat.data.concat(d);
+        _chat.lastid = _chat.data[_chat.data.length - 1][0];
+        showmessage();
+      });
+      send("greet-response", {
+        color: MYCOLOR,
+        uid: Store("uid"),
+        lastid: _chat.lastid,
+        channel: _channel
+      });
+
+      _socket.on("greet-request", function(version) {
+        send("greet-response", {
+          color: MYCOLOR,
+          uid: Store("uid"),
+          lastid: _chat.lastid,
+          channel: _channel
+        });
+      });
+    });
+  }
+
+  function addmessage(data) {
+    _chat.data.push([_chat.lastid, "<p class=announce>" + data + "</p>"]);
+    showmessage();
+  }
+
+  function processCommand(text) {
+    if(text.substr(0, 1) == '/') {
+      var 
+        tokens = text.slice(1).split(' '),
+        command = tokens.shift(),
+        arguments = tokens;
+      switch(command) {
+        case 'user':
+          var user = arguments.join('-');
+          send("set-user", {user: user});
+          Chat.addmessage("Set user to " + user);
+          break;
+
+        case 'channel':
+          send("channel", {
+            action: arguments.shift(),
+            params: arguments.shift()
+          });
+          break;
+
+        default: 
+          Chat.addmessage("Unknown command: " + command);
+          break;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  function showmessage() {
+    var 
+      entry, 
+      color;
+
+    while(_chat.data.length > lastindex) {
+
+      lastEntry = _chat.data[lastindex][1];
+      if(entryList.length > 20) {
+        entryList.shift().remove();
+      }
+
+      if(_chat.data[lastindex].length > 2) {
+        color = _chat.data[lastindex][2];
+      }
+
+      if(
+          (_chat.data[lastindex][3] != _chat.lastauthor) || 
+          (_chat.lastauthor == false) ||
+          (_chat.lastcolor == -1 ) ||
+          (_chat.lastcolor !== color)
+        ) {
+        entry = $("<div>").html(lastEntry);
+
+        _chat.lastauthor = _chat.data[lastindex][3];
+
+        entryList.push(entry);
+
+        if(_chat.data[lastindex].length > 2) {
+          entry.addClass("c" + _chat.data[lastindex][2]);
+        } else {
+          entry.addClass("c");
+        }
+        _chat.lastcolor = color;
+
+        $("#message").prepend(entry);
+        if(_chat.lastauthor) {
+          entry.append("<div class=author>~ " + _chat.lastauthor + ".</div>");
+        } 
+        _chat.lastentry = entry;
+      } else {
+        $(lastEntry).insertAfter(_chat.lastentry.get(0).lastChild.previousSibling);
+      }
+      $("a", entry).attr("target", "_blank");
+       
+      entryCount++;
+      lastindex++;
+    }
+  }
+
+  return {
+    Init: Init,
+    showmessage: showmessage,
+    addmessage: addmessage,
+    send: function(){
+      var message = $("#talk").val();
+      if(message.length && !processCommand(message)) {
+        send("chat", { d: message });
+      }
+      $("#talk").val("");
+    },
+    reset: reset
+  };
+})();
 
 var Panel = {
   visible: {count:0},
@@ -941,150 +1092,8 @@ function when(prop, cb) {
   }, 25);
 }
 
-function showchat(){
-  var 
-    row,
-    lastEntry = "",
-    entryCount = 0,
-    entryList = [],
-    lastindex = 0, 
-    lastTime = new Date(),
-    lastmessageid = 0;
-
-  _socket = io.connect('http://' + window.location.hostname + ':1985/');
-
-  log("Loading chat");
-
-  _socket.on("stats", function(d) {
-    $("#channel-stats").html(d.online + " online");
-  });
-
-  _socket.on("search-results", Song.gen);
-
-  _socket.on("code", eval);
-
-  _socket.on("song", function(d) {
-    _song = d;
-    transition(d);
-  });
-
-  _socket.on("uid", function(d) { Store("uid", d); });
-  _socket.on("channel-name", function(d){ _ev("channel", d); });
-  _socket.on("username", User.login);
-
-  send("greet-response", {
-    color: MYCOLOR,
-    uid: Store("uid"),
-    lastid: _chat.lastid,
-    channel: CHANNEL_CURRENT
-  });
-
-  _socket.on("greet-request", function(version) {
-    send("greet-response", {
-      color: MYCOLOR,
-      uid: Store("uid"),
-      lastid: _chat.lastid,
-      channel: CHANNEL_CURRENT
-    });
-  });
-
-  _socket.on("chat", function(d) {
-    _chat.data = _chat.data.concat(d);
-    _chat.lastid = _chat.data[_chat.data.length - 1][0];
-    showmessage();
-  });
-
-  self.showmessage = function() {
-    var entry, color;
-
-    while(_chat.data.length > lastindex) {
-
-      lastEntry = _chat.data[lastindex][1];
-      if(entryList.length > 20) {
-        entryList.shift().remove();
-      }
-
-      if(_chat.data[lastindex].length > 2) {
-        color = _chat.data[lastindex][2];
-      }
-
-      if(
-          (_chat.data[lastindex][3] != _chat.lastauthor) || 
-          (_chat.lastauthor == false) ||
-          (_chat.lastcolor == -1 ) ||
-          (_chat.lastcolor !== color)
-        ) {
-        entry = $("<div>").html(lastEntry);
-
-        _chat.lastauthor = _chat.data[lastindex][3];
-
-        entryList.push(entry);
-
-        if(_chat.data[lastindex].length > 2) {
-          entry.addClass("c" + _chat.data[lastindex][2]);
-        } else {
-          entry.addClass("c");
-        }
-        _chat.lastcolor = color;
-
-        $("#message").prepend(entry);
-        if(_chat.lastauthor) {
-          entry.append("<div class=author>~ " + _chat.lastauthor + ".</div>");
-        } 
-        _chat.lastentry = entry;
-      } else {
-        $(lastEntry).insertAfter(_chat.lastentry.get(0).lastChild.previousSibling);
-      }
-      $("a", entry).attr("target", "_blank");
-       
-      entryCount++;
-      lastindex++;
-    }
-  }
-}
-
 function send(func, data, callback) {
   _socket.emit(func, data);
-}
-
-function processCommand(text) {
-  if(text.substr(0, 1) == '/') {
-    var 
-      tokens = text.slice(1).split(' '),
-      command = tokens.shift(),
-      arguments = tokens;
-    switch(command) {
-      case 'user':
-        var user = arguments.join('-');
-        send("set-user", {user: user});
-        addmessage("Set user to " + user);
-        break;
-
-      case 'channel':
-        send("channel", {
-          action: arguments.shift(),
-          params: arguments.shift()
-        });
-        break;
-
-      default: 
-        addmessage("Unknown command: " + command);
-        break;
-    }
-    return true;
-  }
-  return false;
-}
-
-function dochat() {
-  var message = $("#talk").val();
-  if(message.length && !processCommand(message)) {
-    send("chat", {
-      chan: CHANNEL,
-      d: message
-    });
-  }
-  $("#talk").val("");
 }
 
 function volumeSlider() {
@@ -1122,7 +1131,20 @@ loadPlayer("yt", 0);
 
 when("io", function(){
   status("Server Contacted");
-  showchat();
+  _socket = io.connect('http://' + window.location.hostname + ':1985/');
+  _socket.on("stats", function(d) { $("#channel-stats").html(d.online + " online"); });
+  _socket.on("channel-results", Channel.gen);
+  _socket.on("song-results", Song.gen);
+
+  _socket.on("song", function(d) {
+    _song = d;
+    transition(d);
+  });
+
+  _socket.on("uid", function(d) { Store("uid", d); });
+  _socket.on("channel-name", function(d){ _ev("channel", d); });
+  _socket.on("username", User.login);
+  Chat.Init();
 });
 
 when("$", function (){
@@ -1131,13 +1153,9 @@ when("$", function (){
     Panel.hide(this.parentNode.id);
   });
 
-  $("#lhs-expand").click(function(){
-    Panel.show("chat");
-  });
+  $("#lhs-expand").click(function(){ Panel.show("chat"); });
 
-  $("#channel-expand").click(function(){
-    Panel.toggle("channel");
-  });
+  $("#channel-expand").click(function(){ Panel.toggle("channel"); });
   _ev.on("panel:channel", function(which) {
     if(which == "show") {
      // $("#channel-expand").fadeOut();
@@ -1150,13 +1168,13 @@ when("$", function (){
     Panel.show("song");
   });
 
-  onEnter("#talk", dochat);
+  onEnter("#talk", Chat.send);
 
   Channel.Init();
   User.Init();
   Song.Init();
-  showmessage();
   volumeSlider();
+
   $("#mute-control").hover(
     function(){ $("#mute-bg").css('background', '#333'); },
     function(){ $("#mute-bg").css('background', 'url("images/chat-bg.png")'); }

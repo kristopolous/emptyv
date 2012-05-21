@@ -16,6 +16,10 @@ function loadVideo(channel, index, offset, quiet) {
   _db.lindex("pl:" + channel, index, function(err, vid) {
     _db.hget("vid", vid, function(err, raw) {
       var full = JSON.parse(raw);
+      if(!full) {
+        console.log("error reading from " + channel);
+        return;
+      }
       console.log(vid, raw);
       _state[channel] = {
         name: channel,

@@ -57,6 +57,9 @@ input{width:190px;margin:0.25em 0 0.75em}
 #lhs-expand{display:none}
 #lhs-expand,#lhs-collapse{padding:0.5em 0.25em;font-size:0.6em;width:1em}
 #channel{background:#222}
+#input-channel-search{font-size:1.25em}
+
+#channel-results a{display:block;cursor:pointer;margin:0.5em 6px 0.5em 12px}
 
 #video-current-wrapper div{display:inline-block}
 #video-current-wrapper{
@@ -107,6 +110,7 @@ input{width:190px;margin:0.25em 0 0.75em}
       <label>Search</label>
       <input id=input-channel-search autocomplete=off>
     </span>
+    <div id=channel-results></div>
   </span><span id=chat>
     <span class="btn collapse">X</span>
     <div id=top>

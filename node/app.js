@@ -124,8 +124,19 @@ var search = (function(){
       _local;
 
     function verify() {
+      var 
+        check = {}, 
+        res = [];
+
       if(_local && _remote) {
-        cb(false, _local.concat(_remote));
+        _local.concat(_remote).forEach(function(row) {
+          if(!check[row.vid]) {
+            check[row.vid] = true;
+            res.push(row);
+          }
+        });
+
+        cb(false, res);
       }
     }
 
@@ -138,7 +149,6 @@ var search = (function(){
       _remote = res;
       verify();
     });
-    
   }
 
 })();
@@ -151,11 +161,14 @@ IO.sockets.on('connection', function (socket) {
     _ival = {};
 
   var _channel = {
-    create: function(params){
-      console.log("Creating ", params);
+    create: function(name){
+      console.log("Creating ", name);
+      DB.hset("channel", name, JSON.stringify({}));
     },
+
     list: function(params) {
     },
+
     join: function(which) {
       _user.channel = which;
       socket.emit("channel-name", which);
@@ -183,6 +196,33 @@ IO.sockets.on('connection', function (socket) {
       clearInterval(_ival[which]);
     };
     _channel.leave();
+  });
+
+  socket.on("channel-join", function(obj){
+    console.log(obj);
+    _channel.join(obj.channel);
+  });
+
+  socket.on("channel-create", function(obj) {
+    _channel.create(obj.channel);
+  });
+
+  socket.on("get-channels", function(obj) {
+    if(!obj.query) {
+      DB.hkeys("channel", function(err, last) {
+        socket.emit("channel-results", {
+          query: obj.query,
+          data: last
+        });
+      });
+    } else {
+      DB.hkeys("channel", function(err, last) {
+        socket.emit("channel-results", {
+          query: obj.query,
+          data: []
+        });
+      });
+    }
   });
 
   function song() {
@@ -268,7 +308,7 @@ IO.sockets.on('connection', function (socket) {
       });
     }
 
-    _channel.join("80smtv");
+    _channel.join(_user.channel);
 
     if(!_ival.poll) {
       _ival.poll = setInterval(poll, 50);
@@ -279,7 +319,7 @@ IO.sockets.on('connection', function (socket) {
 
   socket.on("search", function(q) {
     search(q, function(err, res) {
-      socket.emit("search-results", {
+      socket.emit("song-results", {
         query: q,
         results: res
       });
@@ -316,7 +356,7 @@ IO.sockets.on('connection', function (socket) {
       for(var ix = 0; ix < last.length; ix++) {
         last[ix] = JSON.parse(last[ix]);
       }
-      socket.emit("search-results", {
+      socket.emit("song-results", {
         channel: chan,
         results: last.reverse()
       });
