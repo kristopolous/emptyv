@@ -189,8 +189,6 @@ function log() {
 var 
   _active = -1,
 
-  _channel = Store("channel") || "80smtv",
-
   // This the the current playback quality index, which can be triggered
   // in a direction (either up or down) based on how successful we can
   // combat drift (basically by playing without hitting a buffer interval)
@@ -246,6 +244,8 @@ var
   _runtime = 0;
 
 // }} // Globals
+
+
 
 if(!self.localStorage) {
   self.localStorage = {};
@@ -857,6 +857,8 @@ var Channel = {
   set: function(which) {
     Store("channel", which);
     send("channel-join", {channel: which});
+    document.location.hash = which;
+    Chat.reset();
   },
 
   gen: function(res) {
@@ -919,6 +921,13 @@ var Chat = (function(){
     entryList = [],
     lastindex = 0;
     $("#message").empty();
+
+    send("greet-response", {
+      color: MYCOLOR,
+      uid: Store("uid"),
+      lastid: _chat.lastid,
+      channel: Store("channel")
+    });
   }
 
   function Init(){
@@ -931,19 +940,13 @@ var Chat = (function(){
         _chat.lastid = _chat.data[_chat.data.length - 1][0];
         showmessage();
       });
-      send("greet-response", {
-        color: MYCOLOR,
-        uid: Store("uid"),
-        lastid: _chat.lastid,
-        channel: _channel
-      });
 
       _socket.on("greet-request", function(version) {
         send("greet-response", {
           color: MYCOLOR,
           uid: Store("uid"),
           lastid: _chat.lastid,
-          channel: _channel
+          channel: Store("channel")
         });
       });
     });
@@ -1140,6 +1143,7 @@ function volumeSlider() {
   }, 100);
 }
 
+Store("channel", document.location.hash.slice(1) || Store("channel") || "80smtv");
 status("Code Loaded...");
 // Load the first player
 loadPlayer("yt", 0);
