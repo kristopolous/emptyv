@@ -44,8 +44,6 @@ var
 
   NOTES = 7,
 
-  OFFSET = 9,
-
   COMMERCIAL_sec = 30, 
 
   // If there is a hash value (there should not be regularly)
@@ -210,6 +208,7 @@ var
 
   _index = -1,
 
+  _loader = true,
   _socket = false,
 
   _seekTimeout = 0,
@@ -428,7 +427,9 @@ function setQuality(direction) {
 }
 
 function status(message){
-  document.getElementById("loader-status").innerHTML = message;
+  if(_loader) {
+    document.getElementById("loader-status").innerHTML = message;
+  }
 }
 
 var _unit = 15 * 60,
@@ -462,21 +463,17 @@ function onReady(domain, id) {
   if(++_loaded === 1) {
     status("Video Player Loaded...");
     show(_next);
-   // findOffset();
-
-   // _offsetIval = setInterval(findOffset, LOADTIME_sec * 1000 / 10);
-
-    when("_song", function(){
-      setInterval(doTitle, 1000);
-    });
 
     setTimeout(function(){ 
       loadPlayer("yt", 1);
       loadPlayer("yt", 2); 
     }, 2000);
+
+    when("_song", function(){
+      setInterval(doTitle, 1000);
+    });
   } 
 }
-
 
 function transition(song) {
 
@@ -934,6 +931,7 @@ var Chat = (function(){
     when("$", function(){
       log("Loading chat");
       reset();
+      $("#talk").focus();
 
       _socket.on("chat", function(d) {
         _chat.data = _chat.data.concat(d);
@@ -1156,7 +1154,7 @@ when("io", function(){
   _socket.on("song-results", Song.gen);
 
   _socket.on("song", function(d) {
-    self._song = d;
+    _song = d;
     transition(d);
   });
 
@@ -1168,24 +1166,10 @@ when("io", function(){
 
 when("$", function (){
   Panel.show("chat");
-  $(".btn.collapse").click(function(){
-    Panel.hide(this.parentNode.id);
-  });
-
+  $(".btn.collapse").click(function(){ Panel.hide(this.parentNode.id); });
   $("#lhs-expand").click(function(){ Panel.show("chat"); });
-
   $("#channel-expand").click(function(){ Panel.toggle("channel"); });
-  _ev.on("panel:channel", function(which) {
-    if(which == "show") {
-     // $("#channel-expand").fadeOut();
-    } else {
-     // $("#channel-expand").fadeIn();
-    }
-  });
-
-  $("#song-expand").click(function(){
-    Panel.show("song");
-  });
+  $("#song-expand").click(function(){ Panel.show("song"); });
 
   onEnter("#talk", Chat.send);
 
@@ -1199,6 +1183,6 @@ when("$", function (){
     function(){ $("#mute-bg").css('background', 'url("images/chat-bg.png")'); }
   );
 
-  $("#talk").focus();
+  _loader = false;
   $("#loader").hide().remove();
 });
