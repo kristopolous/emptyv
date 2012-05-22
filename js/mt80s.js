@@ -466,8 +466,9 @@ function onReady(domain, id) {
 
    // _offsetIval = setInterval(findOffset, LOADTIME_sec * 1000 / 10);
 
-    setInterval(doTitle, 1000);
-    $("#loader").hide().remove();
+    when("_song", function(){
+      setInterval(doTitle, 1000);
+    });
 
     setTimeout(function(){ 
       loadPlayer("yt", 1);
@@ -796,11 +797,18 @@ var Song = {
   },
 
   gen: function(data) {
-    var type;
+    var 
+      type,
+      titles = {
+        local: "Existing",
+        remote: "New",
+        history: ""
+      };
+
     $("#song-search-results").empty();
     if(data.query) {
       type = 'search';
-      if(data.results.length) {
+      if(data.results.total) {
         $("#song-search-label").html("Showing results for <b>" + data.query + "</b>");
       } else {
         $("#song-search-label").html("Nothing found for <b>" + data.query + "</b> :-(");
@@ -810,8 +818,15 @@ var Song = {
       $("#song-search-label").html("Last played videos on " + data.channel + "</b>");
     }
 
-    _.each(data.results, function(row) {
-      Song.format(row, type).appendTo("#song-search-results");
+    _.each(_.keys(titles), function(which) {
+      if(data.results[which] && data.results[which].length) {
+        if(titles[which]) {
+          $("<h3>" + titles[which] + "</h3>").appendTo("#song-search-results");
+        }
+        _.each(data.results[which], function(row) {
+          Song.format(row, type).appendTo("#song-search-results");
+        });
+      }
     });
   }
 };
@@ -1137,7 +1152,7 @@ when("io", function(){
   _socket.on("song-results", Song.gen);
 
   _socket.on("song", function(d) {
-    _song = d;
+    self._song = d;
     transition(d);
   });
 
@@ -1181,4 +1196,5 @@ when("$", function (){
   );
 
   $("#talk").focus();
+  $("#loader").hide().remove();
 });

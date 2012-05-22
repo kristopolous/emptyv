@@ -24,34 +24,6 @@ function add(key, data, width) {
 
 var search = (function(){
 
-  var _payload;
-
-  function stem(str) {
-    return str
-      .toLowerCase()
-      .replace(/[^a-z\ 0-9@]/g,'')
-      .replace(/\s+/g, ' ')
-  }
-
-  function build(){
-    console.log("[qdb] Building");
-    var 
-      rows = [], 
-      parsed;
-
-    DB.hgetall("vid", function(err, all) {
-      for(var key in all) {
-        parsed = JSON.parse(all[key]);
-        rows.push([
-          key,
-          stem(parsed[4] + '@' + parsed[3])
-        ].join('@'));
-      }
-      _payload = '\n' + rows.join('\n') + '\n';
-      console.log("[qdb] Built");
-    });
-  }
-
   function process(data, cb) {
     var results = [], title, artist, split;
     if(data.feed.entry) {
@@ -70,23 +42,6 @@ var search = (function(){
           artist: artist,
           len: result.media$group.yt$duration.seconds
         });
-      });
-    }
-    cb(false, results);
-  }
-
-  function local(query, cb) {
-    var 
-      res,
-      results = [],
-      re = new RegExp("[^\n]*" + stem(query) + "[^\n]*", "g");
-
-    while ( (match = re.exec(_payload) ) != null) {
-      res = match[0].split('@');
-      results.push( {
-        vid: res.shift(),
-        title: res.shift(),
-        artist: res.join('@')
       });
     }
     cb(false, results);
@@ -115,39 +70,23 @@ var search = (function(){
     req.end();
   }
 
-  build();
-  setInterval(build, 900 * 1000);
-
   return function(query, cb) {
-    var
-      _remote,
-      _local;
-
-    function verify() {
-      var 
-        check = {}, 
-        res = [];
-
-      if(_local && _remote) {
-        _local.concat(_remote).forEach(function(row) {
-          if(!check[row.vid]) {
-            check[row.vid] = true;
-            res.push(row);
-          }
-        });
-
-        cb(false, res);
-      }
-    }
-
-    local(query, function(err, res) {
-      _local = res;
-      verify();
-    });
-
+    var local = [];
     remote(query, function(err, res) {
-      _remote = res;
-      verify();
+      var idList = res.map(function(row) { return row.vid });
+      DB.hmget("vid", idList, function(err, data) {
+        for(var ix = data.length - 1; ix >= 0; ix--) {
+          if(data[ix]) {
+            local.push(res[ix]);
+            res.splice(ix, 1);
+          }
+        }
+        cb(false, {
+          local: local,
+          remote: res,
+          total: local.length + res.length
+        });
+      });
     });
   }
 
@@ -358,7 +297,10 @@ IO.sockets.on('connection', function (socket) {
       }
       socket.emit("song-results", {
         channel: chan,
-        results: last.reverse()
+        results: {
+          total: last.length,
+          history: last.reverse()
+        }
       });
     });
   });
