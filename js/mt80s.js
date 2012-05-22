@@ -777,7 +777,6 @@ var Song = {
       node.click(function(){ 
         blink(node, function(){
           Panel.hide("song");
-          Song.countdown();
         });
         _socket.emit("video-play", data); 
       });

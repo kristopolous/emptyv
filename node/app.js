@@ -100,6 +100,17 @@ IO.sockets.on('connection', function (socket) {
     _ival = {};
 
   var _channel = {
+    get: function(name, cb) {
+      DB.hget("channel", name, function(err, chan) {
+        if(!chan) {
+          console.log("Creating " + name);
+          DB.hset("tick", name, [0,0].join());
+          DB.hset("channel", name, JSON.stringify({}));
+        }
+        cb();
+      })
+    },
+
     create: function(name){
       console.log("Creating ", name);
       DB.hset("channel", name, JSON.stringify({}));
@@ -109,9 +120,11 @@ IO.sockets.on('connection', function (socket) {
     },
 
     join: function(which) {
-      _user.channel = which;
-      socket.emit("channel-name", which);
-      DB.sadd("user:" + which, _user.uid);
+      _channel.get(which, function(){
+        _user.channel = which;
+        socket.emit("channel-name", which);
+        DB.sadd("user:" + which, _user.uid);
+      });
     },
 
     leave: function() {

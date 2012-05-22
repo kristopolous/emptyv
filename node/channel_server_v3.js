@@ -12,6 +12,13 @@ function add(key, data) {
   ]).exec();
 }
 
+function build(channel) {
+  _state[channel] = {
+    name: channel,
+    index: 0,
+  };
+}
+
 function loadVideo(channel, index, offset, quiet) {
   _db.lindex("pl:" + channel, index, function(err, vid) {
     _db.hget("vid", vid, function(err, raw) {
@@ -134,18 +141,26 @@ setInterval(function(){
               ]));
             }
 
-            // Now put it in our playlist
-            // AFTER the current video.
-            _db.linsert(
-              "pl:" + data.channel,
-              "AFTER",
-              _state[data.channel].video.vid,
-              data.vid, function(res, list) {
-                // And then go to it.
-                getNext(_state[data.channel]);
-              }
-            );
+            if(!_state[data.channel]) {
+              // This is a channel boot-strap
+              build(data.channel);
+              _db.lpush(
+                "pl:" + data.channel,
+                data.vid
+              );
+              loadVideo(data.channel, 0, 0);
+            } else {
+              // Now put it in our playlist
+              // AFTER the current video.
+              _db.linsert(
+                "pl:" + data.channel,
+                "AFTER",
+                _state[data.channel].video.vid,
+                data.vid
+              );
+            }
           } 
+
           _db.incr("ix", function(err, chat_id) {
             var id = data.vid.split(':').pop();
 
