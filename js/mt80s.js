@@ -161,13 +161,13 @@ function secondsToTime(count) {
   return stack.reverse().join(' ').replace(/^0/,'');
 }
 
-function hide(player) {
+function hide(player, transition) {
   if(player && player.style) {
     player.style.left = "-2000%";
   }
 }
 
-function show(player) {
+function show(player, transition) {
   if(player && player.style) {
     player.style.left = 0;
   }
@@ -582,8 +582,8 @@ function transition(song) {
       // When you toggle the visibility, there is still an annoying spinner.
       // So to avoid this we just "move" the players off screen that aren't
       // being used.
-      show(_player[_active]);
-      hide(_playerPrev[_next]);
+      show(_player[_active], 'slide');
+      hide(_playerPrev[_next], 'slide');
       hide(_playerPrev[EXTRA]);
 
       _player[_active].index = index;
@@ -722,6 +722,20 @@ var Song = {
         $("#song-search-label").html("");
       }
     });
+
+    var panel = 1;
+    setInterval(function(){
+      $("#song-search-results img").each(function() {
+        var pieces = this.src.split('/');
+        pieces.pop();
+        pieces.push(panel + '.jpg');
+        this.src = pieces.join('/');
+      });
+      panel ++;
+      if(panel == 4) {
+        panel = 1;
+      }
+    }, 2000);
   },
 
   countdown: function(){
@@ -745,7 +759,7 @@ var Song = {
       id = data.vid.split(':').pop(),
       node;
     
-    node = $("<a class=title />").append("<img src=http://i3.ytimg.com/vi/" + id + "/default.jpg>")
+    node = $("<a class=title />").append("<img src=http://i3.ytimg.com/vi/" + id + "/1.jpg>")
 
     if(type == "history") {
       node.attr({
