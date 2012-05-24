@@ -875,7 +875,7 @@ var Channel = {
   display: function(obj, cb) {
     return $("<div class=channel />").append(
       "<em>" + obj.name + "</em>" +
-      "<small>" + (obj.count ? ( obj.count + " partying" ) : "") + "</small>"
+      "<small>" + (obj.count ? ( obj.count + " partying" ) : "Be the first") + "</small>"
     ).append(Song.format(obj.lastplayed)).click(cb);
   },
 
