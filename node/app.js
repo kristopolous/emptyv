@@ -126,7 +126,9 @@ IO.sockets.on('connection', function (socket) {
         }
         _user.channel = which;
         socket.emit("channel-name", which);
-        DB.sadd("user:" + which, _user.uid);
+        if(_user.uid) {
+          DB.sadd("user:" + which, _user.uid);
+        }
       });
     },
 
@@ -163,22 +165,44 @@ IO.sockets.on('connection', function (socket) {
   });
 
   socket.on("get-channels", function(obj) {
-    if(!obj.query) {
-      DB.hkeys("channel", function(err, last) {
-        socket.emit("channel-results", {
-          query: obj.query,
-          data: last
+    DB.hgetall("channel", function(err, channelMap) {
+      var 
+        channelNameList = Object.keys(channelMap),
+        channelObjList = [],
+        playCount = channelNameList.length,
+        userCount = channelNameList.length;
+
+      function check() {
+        if(playCount === 0 && userCount === 0) {
+          socket.emit("channel-results", 
+            channelObjList.sort(function(a, b) {
+              return a.count - b.count;
+            })
+          );
+        }
+      }
+      channelNameList.forEach(function(channel) {
+        if(channel.length == 0) {
+          playCount --;
+          userCount --;
+          return;
+        }
+        channelMap[channel] = JSON.parse(channelMap[channel]);
+        channelMap[channel].name = channel;
+        channelObjList.push(channelMap[channel]);
+        DB.lrange("lastplayed:" + channel, 0, 0, function(er, lastplayed) {
+          if(lastplayed && lastplayed.length && lastplayed[0].length) {
+            channelMap[channel].lastplayed = JSON.parse(lastplayed[0]); 
+          }
+          check(--playCount);
         });
-      });
-    } else {
-      DB.hkeys("channel", function(err, last) {
-        socket.emit("channel-results", {
-          query: obj.query,
-          data: []
-        });
-      });
-    }
-  });
+        DB.scard("user:" + channel, function(er, count) {
+          channelMap[channel].count = count;
+          check(--userCount);
+        }); // scard user
+      }); // foreach
+    }); // hget channel
+  }); // socket-on
 
   function song() {
     DB.hget("play", _user.channel, function(err, last) {

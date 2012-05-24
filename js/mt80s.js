@@ -208,6 +208,7 @@ var
 
   _index = -1,
 
+  _channel,
   _loader = true,
   _socket = false,
 
@@ -663,6 +664,9 @@ var User = {
     });
     onEnter("#input-username", User.setuser);
     $("#user-login").click(User.setuser);
+    $("#register-button").click(function(){
+      $("#email-wrap").slideDown();
+    });
   },
   setuser: function() {
     var username = $("#input-username").val();
@@ -761,25 +765,29 @@ var Song = {
     
     node = $("<a class=title />").append("<img src=http://i3.ytimg.com/vi/" + id + "/1.jpg>")
 
-    if(type == "history") {
-      node.attr({
-        target: "_blank",
-        href: "http://youtube.com/watch?v=" + id
-      }).click(function(){
-        var oldvolume = _volume;
-        setVolume(0, true);
-        $(document.body).bind('mousemove', function(){
-          $(document.body).unbind('mousemove');
-          setVolume(oldvolume, true);
+    switch (type) {
+      case 'history':
+        node.attr({
+          target: "_blank",
+          href: "http://youtube.com/watch?v=" + id
+        }).click(function(){
+          var oldvolume = _volume;
+          setVolume(0, true);
+          $(document.body).bind('mousemove', function(){
+            $(document.body).unbind('mousemove');
+            setVolume(oldvolume, true);
+          });
         });
-      });
-    } else {
-      node.click(function(){ 
-        blink(node, function(){
-          Panel.hide("song");
+        break;
+
+      case 'search':
+        node.click(function(){ 
+          blink(node, function(){
+            Panel.hide("song");
+          });
+          _socket.emit("video-play", data); 
         });
-        _socket.emit("video-play", data); 
-      });
+        break;
     }
 
     if(data.artist) {
@@ -865,39 +873,35 @@ var Channel = {
   },
 
   set: function(which) {
-    Store("channel", which);
+    _ev('app-state', 'channel');
+    _channel = which;
     send("channel-join", {channel: which});
     document.location.hash = which;
     Chat.reset();
   },
 
+  display: function(obj, cb) {
+    return $("<div class=channel />").append(
+      "<em>" + obj.name + "</em>" +
+      "<small>" + (obj.count ? ( obj.count + " partying" ) : "") + "</small>"
+    ).append(Song.format(obj.lastplayed)).click(cb);
+  },
+
   gen: function(res) {
+    if(_ev("app-state")== "splash") {
+      return;
+    }
     $("#channel-results").empty();
 
-    _.each(res.data, function(which) {
-      $("<a />")
-        .append(which)
-        .appendTo("#channel-results")
-        .click(function(){ 
-          blink($(this), function(){
-            Panel.hide("channel");
-          });
-          Channel.set(which); 
-          Song.countdown();
+    _.each(res, function(which) {
+      Channel.display(which, function(){
+        blink($(this), function(){
+          Panel.hide("channel");
         });
-      /*
-        .append("<img src=" + image(which.current) + ">")
-        .append("<span>" +
-            "<b>" + which.title + "</b>" +
-            Channel.stats(which.stats) +
-            "</span>"
-        ).click(function(){ Channel.set(which.uid); })
-        */
+        Channel.set(which.name); 
+        Song.countdown();
+      }).appendTo("#channel-results")
     });
-    if(res.data.length == 0) {
-      Panel.hide("channel");
-      send("channel-create", {channel: res.query});
-    }
   },
 
   search: function(q) {
@@ -936,8 +940,9 @@ var Chat = (function(){
       color: MYCOLOR,
       uid: Store("uid"),
       lastid: _chat.lastid,
-      channel: Store("channel")
+      channel: _channel
     });
+    _ev.set("greeted");
   }
 
   function Init(){
@@ -957,7 +962,7 @@ var Chat = (function(){
           color: MYCOLOR,
           uid: Store("uid"),
           lastid: _chat.lastid,
-          channel: Store("channel")
+          channel: _channel
         });
       });
     });
@@ -1121,8 +1126,11 @@ function when(prop, cb) {
   }, 25);
 }
 
-function send(func, data, callback) {
-  _socket.emit(func, data);
+function send(func, data) {
+  when("_socket", function(){
+    console.log("emitting " + func);
+    _socket.emit(func, data);
+  });
 }
 
 function volumeSlider() {
@@ -1154,15 +1162,15 @@ function volumeSlider() {
   }, 100);
 }
 
-Store("channel", document.location.hash.slice(1) || Store("channel") || "80smtv");
-status("Code Loaded...");
+_channel = document.location.hash.slice(1);
+
 // Load the first player
 loadPlayer("yt", 0);
 
 when("io", function(){
   status("Server Contacted");
   _socket = io.connect('http://' + window.location.hostname + ':1985/');
-  _socket.on("stats", function(d) { $("#channel-stats").html(d.online + " online"); });
+  _socket.on("stats", function(d) { $("#channel-stats").html(d.online + " partying"); });
   _socket.on("channel-results", Channel.gen);
   _socket.on("song-results", Song.gen);
 
@@ -1178,7 +1186,34 @@ when("io", function(){
 });
 
 when("$", function (){
-  Panel.show("chat");
+  when("io", function(){
+    _socket.on("channel-results", function(all) {
+      if(_ev("app-state") != "splash") {
+        return;
+      }
+      $("#videoList").empty();
+      _.each(all, function(row) {
+        $("#videoList").append( 
+          Channel.display(row, function(){ Channel.set(row.name); })
+        );
+      });
+    });
+  });
+  _ev("app-state", function(state) {
+    if(state == "channel") {
+      $("#splash").hide();
+      $("#app").show();
+      Panel.show("chat");
+    } else if (state == "splash") {
+      $("#splash").show();
+      $("#app").hide();
+      _ev.isset("greeted", function(){
+        send( "get-channels", {query: false});
+      });
+    }
+  });
+
+
   $(".btn.collapse").click(function(){ Panel.hide(this.parentNode.id); });
   $("#lhs-expand").click(function(){ Panel.show("chat"); });
   $("#channel-expand").click(function(){ Panel.toggle("channel"); });
@@ -1195,6 +1230,24 @@ when("$", function (){
     function(){ $("#mute-bg").css('background', '#333'); },
     function(){ $("#mute-bg").css('background', 'url("images/chat-bg.png")'); }
   );
+
+  if(_channel) {
+    Channel.set(_channel);
+  } else {
+    _ev.set('app-state','splash');
+  }
+
+  var hash = window.location.hash;
+  setInterval(function(){
+    if(window.location.hash != hash) {
+      hash = window.location.hash;
+      if(hash.slice(1).length) {
+        Channel.set(hash.slice(1));
+      } else {
+        _ev('app-state', 'splash');
+      }
+    }
+  }, 1000);
 
   _loader = false;
   $("#loader").hide().remove();
