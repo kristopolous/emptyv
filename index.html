@@ -1,6 +1,6 @@
 <!doctype html><html><head><meta name=description content="Non-stop back-to-back videos with Chat"><title>Chat With Videos</title>
 <style>
-body{position:absolute;top:0;left:0;height:100%;width:100%;background:url("css/bg.jpg") #000;font-family:Verdana,sans-serif;margin:0;color:#aaa}
+body{overflow-x:hidden;position:absolute;top:0;left:0;height:100%;width:100%;background:#000;font-family:Verdana,sans-serif;margin:0;color:#aaa}
 a{color:#aaa}
 p,h1,h2,h3,h4,h5,h6{margin:0}
 button{background:#333;border-color:#222;color:#ccc;border-width:1px}
@@ -9,31 +9,33 @@ input,#talk{display:block;box-shadow:0 0 2px 2px #444457;background:#000;color:#
 label{margin-bottom:0.4em;color:#555;font-size:11px;display:block}
 
 input{width:190px;margin:0.25em 0 0.75em}
-.btn{text-align:center;font-size:0.60em;padding:0.25em;margin:0.25em;background:#222;cursor:pointer;border:0.25em solid #222}
+.btn{text-align:center;font-size:0.60em;padding:0.25em;margin:0.25em;cursor:pointer;border:0.25em solid #222}
 .btn:hover{border-color:#555;color:#eee}
 
-#splash{text-align:center}
+#splash{text-align:center;background:#000;height:100%}
 #splash a{color:#90a0af}
-#splash h2,#loader{width:100%;text-align:center;position:absolute;top:0;left:0;font-size:3em;padding-top:4em;text-shadow:0px 0px 4px #959;color:#90a0af}
-#splash h2{padding-top:0.5em;position:relative}
+h2 b{display:block;font-size:1.5em;color:#90a0af}
+#splash h2{
+  font-weight:normal;color:#608088;
+  width:100%;text-align:center;font-size:2em;padding:0.5em 0;text-shadow:0px 0px 4px #959;
+  background:#000;position:relative}
 #bottom{position:fixed;bottom:0;right:0}
 
 #bottom{float:right}
-#loader-status{font-size:0.3em;font-weight:normal;color:#AAF;text-shadow:0}
-#players{margin-left:220px;height:100%;position:relative}
+#players{margin-right:220px;height:100%;position:relative}
 #players object,#players embed{position:absolute;top:0;left:-2000%;width:100%;height:100%}
 #mute-control{height:132px;position:absolute;right:36px;top:10.5em;z-index:8}
 #mute-bg{position:absolute;background:url("images/chat-bg.png");top:10px;height:122px;left:20px;width:6px}
 #mute{cursor:pointer;position:absolute;left:10px}
 
-#panels{float:left;width:20px;position:relative;height:100%;white-space:nowrap}
+#panels{float:right;width:20px;position:relative;height:100%;white-space:nowrap}
 #panels > span{width:0px;display:none;position:relative;height:100%;vertical-align:top;overflow:hidden;background:url('css/chat-bg.png')}
 .panel-title{color:#ccc;font-size:1.2em;padding:0.5em;line-height:0.8em;white-space:nowrap}
 .panel-content{margin:0 1em;display:block;font-size:0.7em}
 .collapse{position:absolute;top:0.25em;right:0em;z-index:12}
 
 #message img{max-width:195px}
-#message{border-top:1px solid #222;font-size:0.9em;color:#ccc; padding:0 0.5em}
+#message{border-top:1px solid #222;font-size:0.9em;color:#ccc; padding:0 0.5em;overflow-y:auto}
 #message > div{padding:0.35em 0;overflow:hidden;white-space:normal}
 #message div.author{color:#555;font-size:0.7em;margin:-0.1em 0 0;text-align:right;border-bottom:1px solid #222}
 #message p {margin-left:0.25em;font-size:0.9em}
@@ -74,8 +76,8 @@ input{width:190px;margin:0.25em 0 0.75em}
   width:198px;
   cursor:pointer;
   font-size:0.7em;margin:1.5em 0 0 0;padding:0.4em 5px;height:32px;overflow:hidden}
-#video-current{color:#555;width:157px;white-space:normal;font-size:0.85em;line-height:0.83em}
-#video-current b{color:#aaa;display:block;font-size:1.3em;line-height:1em;margin-bottom:0.2em;margin-top:0.1em;white-space:nowrap}
+#video-current{color:#888;width:157px;white-space:normal;font-size:0.85em;line-height:0.83em}
+#video-current b{color:#ccc;display:block;font-size:1.3em;line-height:1em;margin-bottom:0.2em;margin-top:0.1em;white-space:nowrap}
 #video-expand{background:url("images/next_track.png") 5px 5px no-repeat;width:41px;height:32px;vertical-align:top;}
 #video-current-wrapper:hover{box-shadow:0 0 10px 3px #35393a}
 #video-current-wrapper #countdown{font-size:2em;overflow:visible;width:1em;display:none}
@@ -103,11 +105,11 @@ input{width:190px;margin:0.25em 0 0.75em}
 #song-delist{padding:0.5em;background:#222;position:absolute;bottom:0;right:0;text-decoration:underline;cursor:pointer}
 #app{display:none;height:100%}
 
-#videoList{width:580px;display:inline-block;text-align:left;margin-top:18px}
+#videoList{width:550px;display:inline-block;text-align:center;margin-top:1em;}
 #videoList .channel{
   width:220px;
   height:85px;
-  display:inline-block;padding:8px;margin:12px
+  display:inline-block;padding:0.5em;margin:1em
 }
 .channel:hover{box-shadow: 0 0 5px 3px #555}
 .channel { text-align:left; 
@@ -117,29 +119,23 @@ input{width:190px;margin:0.25em 0 0.75em}
   color:#fff;
   vertical-align:top;
   box-shadow:0 0 5px 3px #35393a;
-  border-radius:6px;
+  border-radius:3px;
   background:url("css/button-bg.jpg");
 }
 .channel .title{display:block;margin-top:6px;font-size:14px}
-.channel em { display:inline-block;margin-right:9px;font-style:normal;font-size:1.25em}
+.channel em { margin-top:-0.15em;display:inline-block;margin-right:9px;font-style:normal;font-size:1.25em}
 .channel small { color:#ccc;display:block;margin-top:-0.25em}
 </style>
 <!--[if IE]><link rel=stylesheet href=css/ie.css><![endif]-->
 </head>
 <body>
 <div id=splash>
-<h2>Join a Party Be The VJ</h2>
+  <h2><b>Join a Party</b>You're The VJ</h2>
 <div id=videoList></div>
 <div id=bottom><a href=about.html target=_blank>about</a></div>
 </div>
 <div id=app>
-  <div id=loader>loading
-    <div id=loader-status></div>
-  </div>
-  <div id=panels>
-    <div class=btn id=lhs-expand>&gt;</div>
-    <div id=mute-control><div id=mute-bg></div><img id=mute src=images/mute_off_32.png></div>
-    <span id=channel>
+  <div id=panels><div class=btn id=lhs-expand>&gt;</div><div id=mute-control><div id=mute-bg></div><img id=mute src=images/mute_off_32.png></div><span id=channel>
       <span class="btn collapse">X</span>
       <div class=panel-title>Party Hopper</div>
       <span class=panel-content>
@@ -192,11 +188,7 @@ input{width:190px;margin:0.25em 0 0.75em}
         <div id=song-search-label></div>
         <div id=song-search-results></div>
       </span>
-    </span>
-  </div>
-  <div id=players><div id=p2></div><div id=p1></div><div id=p0></div></div>
-</div>
-</body>
+    </span></div><div id=players><div id=p2></div><div id=p1></div><div id=p0></div></div></div></body>
 <script>
 var _gaq=[['_setAccount','UA-28399789-1'],['_trackPageview']];
 (function(){

@@ -209,7 +209,6 @@ var
   _index = -1,
 
   _channel,
-  _loader = true,
   _socket = false,
 
   _seekTimeout = 0,
@@ -427,12 +426,6 @@ function setQuality(direction) {
   }
 }
 
-function status(message){
-  if(_loader) {
-    document.getElementById("loader-status").innerHTML = message;
-  }
-}
-
 var _unit = 15 * 60,
     _goal = _unit;
 
@@ -462,7 +455,6 @@ function onReady(domain, id) {
   _ev.set(key);
 
   if(++_loaded === 1) {
-    status("Video Player Loaded...");
     show(_next);
 
     setTimeout(function(){ 
@@ -1092,7 +1084,7 @@ var Panel = {
     });
 
     $("#panels").animate({width: (Panel.visible.count * 224) + "px"});
-    $("#players").animate({marginLeft: (Panel.visible.count * 224) + "px"});
+    $("#players").animate({marginRight: (Panel.visible.count * 224) + "px"});
   },
   hide: function(which) {
     if(!Panel.visible[which]) {
@@ -1113,7 +1105,7 @@ var Panel = {
 
     var width = Math.max(20, Panel.visible.count * 224);
     $("#panels").animate({width: width + "px"});
-    $("#players").animate({marginLeft: width + "px"});
+    $("#players").animate({marginRight: width + "px"});
   }
 };
 
@@ -1168,7 +1160,6 @@ _channel = document.location.hash.slice(1);
 loadPlayer("yt", 0);
 
 when("io", function(){
-  status("Server Contacted");
   _socket = io.connect('http://' + window.location.hostname + ':1985/');
   _socket.on("stats", function(d) { $("#channel-stats").html(d.online + " partying"); });
   _socket.on("channel-results", Channel.gen);
@@ -1248,7 +1239,4 @@ when("$", function (){
       }
     }
   }, 1000);
-
-  _loader = false;
-  $("#loader").hide().remove();
 });
