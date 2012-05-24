@@ -176,7 +176,7 @@ IO.sockets.on('connection', function (socket) {
         if(playCount === 0 && userCount === 0) {
           socket.emit("channel-results", 
             channelObjList.sort(function(a, b) {
-              return a.count - b.count;
+              return b.count - a.count;
             })
           );
         }
