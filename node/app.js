@@ -190,7 +190,7 @@ IO.sockets.on('connection', function (socket) {
         channelMap[channel] = JSON.parse(channelMap[channel]);
         channelMap[channel].name = channel;
         channelObjList.push(channelMap[channel]);
-        DB.lrange("lastplayed:" + channel, 0, 0, function(er, lastplayed) {
+        DB.lrange("lastplayed:" + channel, -1, -1, function(er, lastplayed) {
           if(lastplayed && lastplayed.length && lastplayed[0].length) {
             channelMap[channel].lastplayed = JSON.parse(lastplayed[0]); 
           }
