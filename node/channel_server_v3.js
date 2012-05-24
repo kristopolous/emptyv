@@ -193,13 +193,13 @@ setInterval(function(){
       getNext(row);
     }
 
-    console.log(row);
     // this is to survive a server crash
     _db.hset("tick", row.name, [row.index, row.video.offset].join(','));
 
     // this is for the consumer.
     _db.hset("play", row.name, JSON.stringify(row.video));
   }
+    console.log(now);
 
   _last = now;
 }, 1000);

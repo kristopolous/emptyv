@@ -121,6 +121,9 @@ IO.sockets.on('connection', function (socket) {
 
     join: function(which) {
       _channel.get(which, function(){
+        if(_user.channel) {
+          _channel.leave();
+        }
         _user.channel = which;
         socket.emit("channel-name", which);
         DB.sadd("user:" + which, _user.uid);
