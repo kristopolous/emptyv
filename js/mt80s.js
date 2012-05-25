@@ -1269,7 +1269,7 @@ var Panel = {
     if(!_letterBoxed) {
       $("#players").animate({marginLeft: Panel.currentWidth + "px"}, interval);
     } else {
-      $("#players").animate({marginLeft: "6px"}, interval);
+      $("#players").css({marginLeft: "6px"});
     }
   },
   hide: function(which, _interval) {
