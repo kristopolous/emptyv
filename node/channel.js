@@ -35,7 +35,7 @@ function count(channel) {
 
 function update(name, newData) {
   _db.hget('channel', name, function(err, data) {
-    var oldData = JSON.parse(data);
+    var oldData = JSON.parse(data) || {};
     for(var key in newData) {
       oldData[key] = newData[key];
     }
