@@ -763,7 +763,7 @@ var Song = (function(){
         _socket.emit("get-history");
       });
 
-      $("#song-select-cancel").click(function(){
+      $("#song-cancel,#song-select-cancel").click(function(){
         Panel.hide("song");
       });
 
