@@ -232,8 +232,10 @@ function setVolume(amount, animate, nostore) {
 
   var volume = 100;
 
-  if ("index" in _player[_active]) {
-    volume = _song[VOLUME] * _volume;
+  if(_player[_active]) {
+    if (_player[_active].index) {
+      volume = _song[VOLUME] * _volume;
+    }
   }
   if(animate) {
     $("#mute").animate({top: (1 - _volume) * 100});
