@@ -5,12 +5,13 @@ module.exports = {
   update: update,
   count: count,
   join: function(name, user) {
-    _db.sadd("user:" + name, user);
+    _db.set("user:" + name + ":" + user, 1);
+    _db.expire("user:" + name + ":" + user, 10);
     count(name);
   },
   leave: function(name, user) {
     if(name) {
-      _db.srem("user:" + name, user);
+      _db.del("user:" + name + ":" + user);
       count(name);
     }
   },
@@ -28,7 +29,8 @@ module.exports = {
 };
 
 function count(channel) {
-  _db.scard("user:" + channel, function(er, count) {
+  _db.keys("user:" + channel + ":*", function(err, all) {
+    var count = all.length;
     update(channel, {count: count});
   });
 }

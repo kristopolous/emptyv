@@ -121,6 +121,9 @@ IO.sockets.on('connection', function (socket) {
     if(!_user.channel) {
       return;
     }
+    _db.set("user:" + _user.channel + ":" + _user.uid, 1);
+    _db.expire("user:" + _user.channel + ":" + _user.uid, 10);
+
     _db.hget("play", _user.channel, function(err, last) {
       if(!last) {
         return;
@@ -171,7 +174,8 @@ IO.sockets.on('connection', function (socket) {
         });
     });
 
-    _db.scard("user:" + _user.channel, function(err, online) {
+    _db.keys("user:" + _user.channel + ":*", function(err, all) {
+      var online = all.length;
       if(online != _online) {
         _online = online;
         socket.emit("stats", {online: online});
