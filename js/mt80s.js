@@ -484,7 +484,7 @@ var Player = (function(){
         marginTop: "6px",
         marginLeft: "6px" 
       });
-      $("#top").animate({
+      $("#top").css({
         marginTop: "160px"
       });
     },
@@ -499,7 +499,7 @@ var Player = (function(){
           width: "auto",
           marginTop: 0
         });
-        $("#top").animate({
+        $("#top").css({
           marginTop: "12px"
         });
       }

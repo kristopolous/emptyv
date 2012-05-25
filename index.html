@@ -86,10 +86,13 @@ h2 b{display:block;font-size:1.5em;color:#90a0af}
 #song-search-label{margin-top:-.5em;margin-bottom:.5em;white-space:normal}
 #song-results {overflow:auto}
 #song-results a{display:block;font-size:1.25em;margin:0.25em 0;padding:0.15em}
-#song-results a:hover{background:#333;color:#ccc}
+#song-results a:hover{background:#333;color:#fff}
 #song-results a.title span{white-space:normal}
 #song-preview .bigbtn{display:none;margin:0.25em 0.5em;font-size:1em}
-#song-skip{display:block;margin-top:6px}
+#song-top-buttons{
+display:block;margin-top:6px;
+position:absolute;font-size:1.4em;top:2px;left:238px
+}
 
 #chatbar{z-index:0;width:220px;margin-top:1em}
 #channel-wrap{display:inline-block;padding-top:0.5em;font-size:1.2em}
@@ -114,14 +117,12 @@ h2 b{display:block;font-size:1.5em;color:#90a0af}
   height:85px;
   display:inline-block;padding:0.5em;margin:1em
 }
-#song-skip{
-position:absolute;font-size:1.4em;top:2px;left:238px;display:block}
-#song-skip,.bigbtn,.channel:hover{box-shadow: 0 0 5px 3px #555}
-#song-skip,.bigbtn,.channel { text-align:left; 
+button.bigbtn:hover,.channel:hover{box-shadow: 0 0 5px 3px #555;color:#fff}
+button.bigbtn,.channel { text-align:left; 
   cursor:pointer;
   padding:3px 6px;
   margin:15px 0;
-  color:#fff;
+  color:#ddd;
   vertical-align:top;
   box-shadow:0 0 5px 3px #35393a;
   border-radius:3px;
@@ -166,7 +167,7 @@ position:absolute;font-size:1.4em;top:2px;left:238px;display:block}
 
 #embedder{width:500px;height:400px}
 #song-lhs{display:inline-block;overflow:hidden;width:240px;vertical-align:top}
-#song-delist{float:left}
+a#song-delist.bigbtn{float:right;font-size:0.7em;color:#555}
 </style>
 <!--[if IE]><link rel=stylesheet href=css/ie.css><![endif]-->
 </head>
@@ -223,7 +224,10 @@ position:absolute;font-size:1.4em;top:2px;left:238px;display:block}
       <span class="btn collapse">X</span>
       <div class=panel-title>Video Selection</div>
       <span class=panel-content>
-        <button id=song-skip>Skip Over The Current Video.</button>
+        <div id=song-top-buttons>
+          <button class=bigbtn id=song-skip>Skip Over The Current Video</button>
+          <button class=bigbtn id=song-cancel>Cancel</button>
+        </div>
         <ul class=tabs>
           <li>Everything</li>
           <li class=selected>History</li>
@@ -238,7 +242,7 @@ position:absolute;font-size:1.4em;top:2px;left:238px;display:block}
           <div id=song-preview>
             <b>Video Preview</b>
             <div id=embedder></div>
-            <button class=bigbtn id=song-delist>Delist</button>
+            <a class=bigbtn id=song-delist>delist</a>
             <button class=bigbtn id=song-select-cancel>Cancel</button>
             <button class=bigbtn id=song-select-next>Play Next</button>
             <button class=bigbtn id=song-select-now>Play Now!</button>
