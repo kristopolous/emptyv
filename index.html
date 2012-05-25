@@ -88,7 +88,7 @@ h2 b{display:block;font-size:1.5em;color:#90a0af}
 #song-results a{display:block;font-size:1.25em;margin:0.25em 0;padding:0.15em}
 #song-results a:hover{background:#333;color:#ccc}
 #song-results a.title span{white-space:normal}
-#song-preview .bigbtn{display:none;margin:1em 0.5em;font-size:1em}
+#song-preview .bigbtn{display:none;margin:0.25em 0.5em;font-size:1em}
 #song-skip{display:block;margin-top:6px}
 
 #chatbar{z-index:0;width:220px;margin-top:1em}
@@ -162,16 +162,17 @@ position:absolute;font-size:1.4em;top:2px;left:238px;display:block}
   position:relative;
 }
 #song-preview{display:inline-block;text-align:center;margin-left:6px;font-size:1.4em}
-#song-preview b{display:block;text-align:center;color:#ccc}
+#song-preview b{display:block;text-align:center;color:#ccc;margin-bottom:1em}
 
-#embedder{width:600px;height:400px}
+#embedder{width:500px;height:400px}
 #song-lhs{display:inline-block;overflow:hidden;width:240px;vertical-align:top}
+#song-delist{float:left}
 </style>
 <!--[if IE]><link rel=stylesheet href=css/ie.css><![endif]-->
 </head>
 <body>
 <div id=splash>
-  <h2><b>Join a Party</b>You're The VJ</h2>
+  <h2><b>Join a Party</b>You Be The VJ</h2>
 <div id=videoList></div>
 <div id=bottom><a href=about.html target=_blank>about</a></div>
 </div>
@@ -237,8 +238,10 @@ position:absolute;font-size:1.4em;top:2px;left:238px;display:block}
           <div id=song-preview>
             <b>Video Preview</b>
             <div id=embedder></div>
+            <button class=bigbtn id=song-delist>Delist</button>
             <button class=bigbtn id=song-select-cancel>Cancel</button>
-            <button class=bigbtn id=song-select>Select Video</button>
+            <button class=bigbtn id=song-select-next>Play Next</button>
+            <button class=bigbtn id=song-select-now>Play Now!</button>
           </div>
         </div>
       </span>

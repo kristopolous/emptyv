@@ -1,6 +1,7 @@
 var scripts = [
   [0, 'js/underscore-min.js'],
   [10, 'js/jquery-1.7.1.min.js'],
+  [2000, 'js/db.min.js'],
   [5000, 'js/jquery-ui-1.8.20.custom.min.js']
 ];
 
@@ -88,12 +89,12 @@ function blink(node, cb) {
     iter = 5,
     ival = setInterval(function(){
       if(iter == 0) {
+        node.css('background','none');
         if (cb) {
-          cb();
+          cb(node);
         }
         clearInterval(ival);
-      }
-      if(iter % 2) {
+      } else if(iter % 2) {
         node.css("background", "#888");
       } else {
         node.css("background", "#000");
@@ -698,17 +699,55 @@ var User = {
   }
 };
 var Song = (function(){
-  var _lastSong = false;
+  var 
+    _lastSong = false,
+    _db = {};
+
+  self._DB = _db;
 
   function preview(obj) {
     _lastSong = obj;
-    var id = obj.vid.split(':').pop();
-    $("#embedder").html('<object width="600" height="400"><param name="movie" value="http://www.youtube.com/v/' + id + '?version=3&amp;hl=en_GB&amp;autoplay=1"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/' + id + '?version=3&amp;hl=en_GB&amp;autoplay=1" type="application/x-shockwave-flash" width="600" height="400" allowscriptaccess="always" allowfullscreen="true"></embed></object>');
+    var id = obj.vid.split(':').pop(),
+      width = 500,
+      height = width * 3 / 4;
+    
+    $("#embedder").html('<object width=' + width + ' height=' + height + '>' +
+      '<param name="movie" value="http://www.youtube.com/v/' + id + '?version=3&amp;hl=en_GB&amp;autoplay=1"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/' + id + '?version=3&amp;hl=en_GB&amp;autoplay=1" type="application/x-shockwave-flash" width=' + width + ' height=' + height + ' allowscriptaccess="always"></embed></object>');
     $("#song-preview .bigbtn").show();
   }
 
+  function panelFlash() {
+    switch(_ev("song-tab")) {
+      case 'Everything':
+        if(!_db[_channel]) {
+          _socket.emit("get-all-videos");
+        } else {
+          Song.search();
+        }
+        break;
+      case 'History':
+        _socket.emit("get-history");
+        break;
+    }
+  }
   return {
     Init: function(){
+
+      _socket.on("history", Song.gen);
+
+      _socket.on("all-videos", function(res) {
+        _db[res.channel] = DB().insert(
+          DB.objectify([
+           "id", 
+           "length", 
+           "start", 
+           "volume", 
+           "artist", 
+           "title"
+          ], res.data));
+        Song.search();
+      });
+
       $("#video-current-wrapper").click(function(){
         Panel.toggle("song");
       });
@@ -726,17 +765,25 @@ var Song = (function(){
         Panel.hide("song");
       });
 
-      $("#song-select").click(function(){
+      $("#song-select-next").click(function(){
         Panel.hide("song");
         _socket.emit("video-play", _lastSong); 
+      });
+
+      $("#song-select-now").click(function(){
+        Panel.hide("song");
+        _socket.emit("video-play-now", _lastSong); 
       });
 
       $("#song li").click(function(){
         var which = this.innerHTML;
         $(this).addClass('selected').siblings().removeClass('selected');
-        _ev("song-tab:" + which);
+        _ev.set("song-tab", which);
 
       });
+
+      _ev("song-tab", panelFlash);
+      _ev("song-tab", "History");
 
       $("#song-skip").click(function(){
         Song.countdown();
@@ -749,6 +796,7 @@ var Song = (function(){
       });
 
       onEnter("#input-song-search", Song.search);
+
       _ev.on("panel:song", function(which) {
         if(which == "show") {
           Player.letterbox();
@@ -756,7 +804,7 @@ var Song = (function(){
             $("#song").css({width: "100%"});
           }, 1000);
           $("#input-song-search").focus();
-          _socket.emit("get-history");
+          panelFlash();
         } else {
           $("#embedder").empty();
           $("#song-preview .bigbtn").hide();
@@ -807,6 +855,7 @@ var Song = (function(){
       node = $("<a class=title />").append("<img src=http://i3.ytimg.com/vi/" + id + "/1.jpg>")
 
       node.click(function(){ 
+        console.log("Clicked");
         preview(data);
         blink(node, function(){
           mute();
@@ -827,9 +876,31 @@ var Song = (function(){
     },
 
     search: function(q){
-      var qstr = q || $("#input-song-search").val();
+      var 
+        qstr = q || $("#input-song-search").val(),
+        query = {};
 
-      if(qstr && qstr.length) {
+      if(_ev("song-tab") == "Everything") {
+        $("#song-results").empty();
+        if(qstr && qstr.length) {
+          $("#song-search-label").html("Search results for " + qstr);
+          query = { artist: DB.like(qstr) };
+        } else {
+          $("#song-search-label").html("Everything on " + _channel);
+        }
+        _db[_channel].find(query)
+          .select(
+            'artist',
+            'title',
+            'id'
+          ).sort('artist').each(function(res){
+            Song.format({
+              artist:res[0],
+              title:res[1],
+              vid:res[2]
+            }).appendTo("#song-results");
+          });
+      } else if(qstr && qstr.length) {
         $("#song-results").empty();
         $("#song-search-label").html("Searching...");
         _socket.emit("search", qstr);
@@ -1176,7 +1247,7 @@ var Panel = {
       _.each(["user", "channel"], function(which){
         Panel.hide(which, 100);
       });
-      width = 700;
+      width = 600;
     }
 
     var interval = _interval || 500;
@@ -1222,7 +1293,7 @@ var Panel = {
 
     var width = 220;
     if(which == 'song') {
-      width = 700;
+      width = 600;
     }
     Panel.currentWidth -= width;
     width = Math.max(20, Panel.currentWidth);

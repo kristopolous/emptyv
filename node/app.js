@@ -260,6 +260,14 @@ IO.sockets.on('connection', function (socket) {
   socket.on("video-play", function(p) {
     p.channel = _user.channel;
     p.name = _user.name;
+    p.now = false;
+    _db.lpush("request", JSON.stringify(p));
+  });
+
+  socket.on("video-play-now", function(p) {
+    p.channel = _user.channel;
+    p.name = _user.name;
+    p.now = true;
     _db.lpush("request", JSON.stringify(p));
   });
 
@@ -287,7 +295,7 @@ IO.sockets.on('connection', function (socket) {
       for(var ix = 0; ix < last.length; ix++) {
         last[ix] = JSON.parse(last[ix]);
       }
-      socket.emit("song-results", {
+      socket.emit("history", {
         channel: chan,
         results: {
           total: last.length,
@@ -312,6 +320,21 @@ IO.sockets.on('connection', function (socket) {
       _db.hdel("user", _user.uid);
       _user.name = "anonymous";
     }
+  });
+
+  socket.on("get-all-videos", function() {
+    _db.lrange("pl:" + _user.channel, 0, -1, function(err, list) {
+      _db.hmget("vid", list, function(err, allvideos) {
+        for(var ix = 0; ix < allvideos.length; ix++) {
+          allvideos[ix] = JSON.parse(allvideos[ix]);
+          allvideos[ix].unshift(list[ix]);
+        }
+        socket.emit("all-videos", {
+          channel: _user.channel,
+          data: allvideos
+        });
+      });
+    });
   });
 
   socket.on("chat", function(data) {

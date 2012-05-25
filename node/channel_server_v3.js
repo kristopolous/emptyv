@@ -74,7 +74,7 @@ function loadVideo(channel, index, offset, quiet) {
           title: data.title,
           artist: data.artist
         };
-        Chat.append("lastplayed:" + channel,  obj);
+        Chat.append("lastplayed:" + channel, obj);
         Channel.update(channel, obj);
       }
     });
@@ -204,13 +204,16 @@ _db.hgetall("tick", function(err, state) {
               } 
 
               Chat.add(data.channel, {
-                action: 'request',
+                type: 'request',
                 artist: data.artist,
                 title: data.title,
                 id: data.vid,
                 who: data.name
               });
 
+              if(data.now) {
+                getNext(_state[data.channel]);
+              }
             });
         }
       });
