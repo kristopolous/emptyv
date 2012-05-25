@@ -20,14 +20,14 @@ for(var i = 0; i < scripts.length; i++) {
 if(!self.console) {
   self.console = {log:function(){}};
 }
+if(!self.localStorage) {
+  self.localStorage = {};
+}
 
 var
   MYCOLOR = Math.floor(Math.random() * 10),
 
-  // This is the duration of the video minus the offsets in
-  // the start and stop, as determined through visual inspection.
-  // These are the transitions put on by different uploaders, things
-  // like "THIS IS A JJ COOLGUY RIP" etc.
+  DUMMY = new Function(),
   ID = 0,
 
   RUNTIME = 1,
@@ -78,15 +78,6 @@ var
 
 // }} // Constants
 
-self.indexOf = function(array, item) {
-  for(var ix = 0; ix < array.length; ix++) {
-    if(array[ix] == item) {
-      return ix;
-    }
-  }
-  return -1;
-}
-
 // Utils {{
 function getNow(offset) {
   return +(new Date() / 1000) + (offset || 0);
@@ -97,7 +88,9 @@ function blink(node, cb) {
     iter = 5,
     ival = setInterval(function(){
       if(iter == 0) {
-        cb();
+        if (cb) {
+          cb();
+        }
         clearInterval(ival);
       }
       if(iter % 2) {
@@ -161,17 +154,6 @@ function secondsToTime(count) {
   return stack.reverse().join(' ').replace(/^0/,'');
 }
 
-function hide(player, transition) {
-  if(player && player.style) {
-    player.style.left = "-2000%";
-  }
-}
-
-function show(player, transition) {
-  if(player && player.style) {
-    player.style.left = 0;
-  }
-}
 
 function log() {
   console.log([
@@ -193,14 +175,9 @@ var
   //
   // We start at medium quality and then the skies the limit, I guess.
   _currentLevel = 1,
-  
 
-  // The lag counter is a token system that gets set by an interval.  If
-  // we accumulate a certain negative or positive balance, then we can exchange
-  // the negative or positive units for a quality shift. This makes sure that 
-  // we can prove the stability of any setting through successive incremental
-  // sampling
-  _lagCounter = 0,
+  _unit = 15 * 60,
+  _goal = _unit,
 
   _volume = Store("volume") || 1,
 
@@ -208,7 +185,7 @@ var
 
   _index = -1,
 
-  _channel,
+  _channel = document.location.hash.slice(1),
   _socket = false,
 
   _seekTimeout = 0,
@@ -218,16 +195,9 @@ var
   _drift,
   _counter = parseInt(Store("ttl") || 0),
  
-  // The epoch time is based off the system time AND the users
-  // local clock.  This makes sure that separate clock drifts
-  // are *about* the same ... minus the TTL latency incurred by
-  // the emit from the server of course (which we assume to be fairly
-  // constant).
   _start = getNow(),
-  _referenceTime = _start,
-  _epoch = 1325778000 + ( _start - _referenceTime ),
 
-  _offsetIval,
+  _letterBoxed = false,
 
   // How many of the YT players are loaded
   _loaded = 0,
@@ -245,10 +215,6 @@ var
 // }} // Globals
 
 
-
-if(!self.localStorage) {
-  self.localStorage = {};
-}
 function Store(key, value) {
   if(arguments.length == 2) {
     localStorage[key] = value;
@@ -256,10 +222,12 @@ function Store(key, value) {
   return localStorage[key];
 }
 
-function setVolume(amount, animate) {
+function setVolume(amount, animate, nostore) {
   _volume = Math.max(0, amount);
 
-  Store("volume", _volume);
+  if(!nostore) { 
+    Store("volume", _volume);
+  }
 
   var volume = 100;
 
@@ -272,162 +240,269 @@ function setVolume(amount, animate) {
   _playerPrev[_active].setVolume(volume * _volume);
 }
 
-function secondarySwap(){
-  var swapInterval = setInterval(function(){
-    if (_playerById[_index].getCurrentTime() < _player[EXTRA].getCurrentTime()) {
+var Player = (function(){
+  self.onYouTubePlayerReady = function(id) { onReady("yt", id); }
+  self.onDailymotionPlayerReady = function(id) { onReady("dm", id); }
 
-      // Nows our time to shine
-      _playerById[_index].playVideo();
-      _playerById[_index].setVolume(_song[VOLUME] * _volume);
-     
-      // Bring the volume up of the higher quality player and mute the current
-      _player[EXTRA].setVolume(0);
-      _player[EXTRA].stopVideo();
+  function check(player) {
+    return (player && player.style);
+  }
 
-      // Show the higher quality and hide the current one
-      hide(_player[EXTRA]);
-      show(_player[_active]);
-
-      // And then clear the polling interval
-      clearInterval(swapInterval);
+  function hide(player, transition) {
+    if(check(player)) {
+      player.style.left = "-2000%";
     }
-  }, 10);
-}
-
-function onYouTubePlayerReady(id) { onReady("yt", id); }
-function onDailymotionPlayerReady (id) { onReady("dm", id); }
-
-// This sets the quality of the video along with
-// supporting going down or up a notch based on
-// what is detected, probably in findOffset
-function setQuality(direction) {
-  console.log(_playerById);
-  var 
-    supported = true,
-
-    newQualityIndex = _currentLevel,
-    newQualityWord,
-                    
-    activeAvailable = _playerById[_index].getAvailableQualityLevels().reverse(),
-    activeQualityWord = _playerById[_index].getPlaybackQuality();
-
-  // If no video is loaded, then go no further.
-  if(activeAvailable.length === 0) {
-    return;
   }
 
-  // For certain EMI and Polydor muted tracks, 240p (small) works
-  // ok for youtube ... we put 240p in the notes section if this is
-  // the case.
-  if(_song[NOTES].search("240p") > 0) {
-    // If this is the case, then we limit ourselves to just the 
-    // lowest quality video
-    activeAvailable = ["small"];
+  function show(player, transition) {
+    if(check(player)) {
+      player.style.left = 0;
+    }
   }
 
-  if(direction === -1) {
-    _qualityTimeout = 2 * LOADTIME_sec + getNow();
-  } else if (direction > 0 && getNow() < _qualityTimeout) {
-    return;
-  }
+  function secondarySwap(){
+    var swapInterval = setInterval(function(){
+      if (_playerById[_index].getCurrentTime() < _player[EXTRA].getCurrentTime()) {
 
-  // If the lapse has dropped and the direction is specific
-  if(direction) {
-    newQualityIndex = Math.min(
-      Math.max(_currentLevel + direction, 0),
-      LEVELS.length
-    );
-  }
+        // Nows our time to shine
+        _playerById[_index].playVideo();
+        _playerById[_index].setVolume(_song[VOLUME] * _volume);
+       
+        // Bring the volume up of the higher quality player and mute the current
+        _player[EXTRA].setVolume(0);
+        _player[EXTRA].stopVideo();
 
-  // Now that we have the destination quality level, we need to see
-  // if the current video playing has this quality level.
-  newQualityWord = LEVELS[newQualityIndex];
+        // Show the higher quality and hide the current one
+        hide(_player[EXTRA]);
+        show(_player[_active]);
 
-  // If this video doesn't support the destination quality level
-  if ( indexOf(activeAvailable, newQualityWord) === -1) {
-    log("NOT SUPPORTED", newQualityWord, activeAvailable);
-
-    // Use the highest one available (the lower ones are always available)
-    // Get the word version of the highest quality available
-    newQualityWord = activeAvailable[activeAvailable.length - 1];
-
-    // state that we are downsampling because of an incompatibility
-    supported = false;
-  }
-
-  // If this new, supported quality isn't the current one set
-  if (newQualityWord !== activeQualityWord) {
-
-    log("Quality: " + activeQualityWord + " => " + newQualityWord);
-
-    // If we are downsampling then just do it
-    if(direction < 0) {
-      // we also shuffle the placement forward to accomodate for the change over
-      _playerById[_index].seekTo(_playerById[_index].getCurrentTime() + LOADTIME_sec);
-      _playerById[_index].setPlaybackQuality(newQualityWord);
-
-      // If we are upsampling, then do it seemlessly.
-    } else if( 
-      _playerById[_index].getDuration() - 
-      _song[STOP] - 
-      _playerById[_index].getCurrentTime() > LOADTIME_sec * 2.5
-    ) {
-
-      // First, load the active video in the extra player,
-      // setting the volume to 0
-      _player[EXTRA].loadVideoById(
-        _song[ID].split(":")[1], 
-        _playerById[_index].getCurrentTime() + LOADTIME_sec
-      );
-
-      _player[EXTRA].setVolume(0);
-      _player[EXTRA].pauseVideo();
-
-      // Set the playback quality of the extra video to the higher
-      // quality
-      _player[EXTRA].setPlaybackQuality(newQualityWord);
-
-      // Now poll the two time offsets and swap videos when they cross
-      var swapInterval = setInterval(function(){
-
-        if (
-          (_player[EXTRA].getCurrentTime() > 0) &&
-          (_playerById[_index].getCurrentTime() > _player[EXTRA].getCurrentTime())
-        ) {
-          // Nows our time to shine
-          // Start the higher quality player and stop the current one
-          _player[EXTRA].playVideo();
-          var myplayer = _playerById[_index];
-          setTimeout(function(){
-            // Show the higher quality and hide the current one
-            hide(_player[_active]);
-            show(_player[EXTRA]);
-
-            // Bring the volume up of the higher quality player and mute the current
-            _player[EXTRA].setVolume(_song[VOLUME] * _volume);
-            myplayer.setVolume(0);
-            myplayer.seekTo(_player[EXTRA].getCurrentTime() + 3.5);
-            myplayer.setPlaybackQuality(newQualityWord);
-            secondarySwap();
-          }, 500);
-
-          // And then clear the polling interval
-          clearInterval(swapInterval);
-        }
-      }, 10);
-
-      // And set it as the default, but only if this isn't
-      // a forced down-sampling because of available quality
-      // limitations.
-      if(supported) {
-        _currentLevel = indexOf(LEVELS, newQualityWord);
+        // And then clear the polling interval
+        clearInterval(swapInterval);
       }
+    }, 10);
+  }
+
+  function onReady(domain, id) {
+    var 
+      id = parseInt(id.split('-')[1]),
+      key = domain + _playerByDom[domain].length;
+
+    _playerByDom[domain].push( document.getElementById("player-" + id) );
+    log(key + " ready");
+
+    _ev.set(key);
+
+    if(++_loaded === 1) {
+      show(_next);
+
+      setTimeout(function(){ 
+        Player.load("yt", 1);
+        Player.load("yt", 2); 
+      }, 1000);
+
+      when("_song", function(){
+        setInterval(doTitle, 1000);
+      });
     } 
   }
-}
 
-var _unit = 15 * 60,
-    _goal = _unit;
+  // This sets the quality of the video along with
+  // supporting going down or up a notch based on
+  // what is detected, probably in findOffset
+  function setQuality(direction) {
+    var 
+      supported = true,
+
+      newQualityIndex = _currentLevel,
+      newQualityWord,
+                      
+      activeAvailable = _playerById[_index].getAvailableQualityLevels().reverse(),
+      activeQualityWord = _playerById[_index].getPlaybackQuality();
+
+    if(!direction) {
+      direction = 0;
+    }
+    log("Quality Direction", direction);
+
+    // If no video is loaded, then go no further.
+    if(activeAvailable.length === 0) {
+      log("No video loaded");
+      return;
+    }
+
+    // For certain EMI and Polydor muted tracks, 240p (small) works
+    // ok for youtube ... we put 240p in the notes section if this is
+    // the case.
+    if(_song[NOTES].search("240p") > 0) {
+      // If this is the case, then we limit ourselves to just the 
+      // lowest quality video
+      activeAvailable = ["small"];
+    }
+
+    if(direction === -1) {
+      _qualityTimeout = 2 * LOADTIME_sec + getNow();
+    } 
+
+    // If the lapse has dropped and the direction is specific
+    if(direction) {
+      newQualityIndex = Math.min(
+        Math.max(_currentLevel + direction, 0),
+        LEVELS.length
+      );
+    }
+
+    // Now that we have the destination quality level, we need to see
+    // if the current video playing has this quality level.
+    newQualityWord = LEVELS[newQualityIndex];
+    
+    if(!newQualityWord)  {
+      log("No Quality hit");
+    }
+
+    log("Current Quality:", activeQualityWord);
+    log("Quality to hit:", newQualityWord);
+
+    // If this video doesn't support the destination quality level
+    if ( _.indexOf(activeAvailable, newQualityWord) === -1) {
+      log("NOT SUPPORTED", newQualityWord, activeAvailable);
+
+      // Use the highest one available (the lower ones are always available)
+      // Get the word version of the highest quality available
+      newQualityWord = activeAvailable[activeAvailable.length - 1];
+
+      // state that we are downsampling because of an incompatibility
+      supported = false;
+    }
+
+    // If this new, supported quality isn't the current one set
+    if (newQualityWord !== activeQualityWord) {
+
+      log("Quality: " + activeQualityWord + " => " + newQualityWord);
+
+      // If we are downsampling then just do it
+      if(direction < 0) {
+        // we also shuffle the placement forward to accomodate for the change over
+        _playerById[_index].seekTo(_playerById[_index].getCurrentTime() + LOADTIME_sec);
+        _playerById[_index].setPlaybackQuality(newQualityWord);
+
+        // If we are upsampling, then do it seemlessly.
+      } else if( 
+        _playerById[_index].getDuration() - 
+        _song[STOP] - 
+        _playerById[_index].getCurrentTime() > LOADTIME_sec * 2.5
+      ) {
+
+        // First, load the active video in the extra player,
+        // setting the volume to 0
+        _player[EXTRA].loadVideoById(
+          _song[ID].split(":")[1], 
+          _playerById[_index].getCurrentTime() + LOADTIME_sec
+        );
+
+        _player[EXTRA].setVolume(0);
+        _player[EXTRA].pauseVideo();
+
+        // Set the playback quality of the extra video to the higher
+        // quality
+        _player[EXTRA].setPlaybackQuality(newQualityWord);
+
+        // Now poll the two time offsets and swap videos when they cross
+        var swapInterval = setInterval(function(){
+
+          if (
+            (_player[EXTRA].getCurrentTime() > 0) &&
+            (_playerById[_index].getCurrentTime() > _player[EXTRA].getCurrentTime())
+          ) {
+            // Nows our time to shine
+            // Start the higher quality player and stop the current one
+            _player[EXTRA].playVideo();
+            var myplayer = _playerById[_index];
+            setTimeout(function(){
+              // Show the higher quality and hide the current one
+              hide(_player[_active]);
+              show(_player[EXTRA]);
+
+              // Bring the volume up of the higher quality player and mute the current
+              _player[EXTRA].setVolume(_song[VOLUME] * _volume);
+              myplayer.setVolume(0);
+              myplayer.seekTo(_player[EXTRA].getCurrentTime() + 3.5);
+              myplayer.setPlaybackQuality(newQualityWord);
+              secondarySwap();
+            }, 500);
+
+            // And then clear the polling interval
+            clearInterval(swapInterval);
+          }
+        }, 10);
+
+        // And set it as the default, but only if this isn't
+        // a forced down-sampling because of available quality
+        // limitations.
+        if(supported) {
+          _currentLevel = _.indexOf(LEVELS, newQualityWord);
+        }
+      } 
+    }
+  }
+  return {
+    load: function(domain, ix) {
+      swfobject.embedSWF({
+          "yt": "http://www.youtube.com/apiplayer?" + [
+            "version=3",
+            "enablejsapi=1",
+            "playerapiid=player-" + ix
+          ].join('&'),
+
+          "dm": "http://www.dailymotion.com/swf?" + [
+            "chromeless=1",
+            "enableApi=1",
+            "playerapiid=player-" + ix
+          ].join('&'),
+        }[domain],
+
+        "p" + ix,   // id
+        "400",      // width
+        "300",      // height
+        "9",        // version
+        null,       // express install swf url (we assume you have the flash player)
+        null,       // flash vars 
+
+        { allowScriptAccess: "always" }, // params
+
+        { id: 'player-' + ix } // attributes
+      );
+    },
+
+    letterbox: function() {
+      _letterBoxed = true;
+      $("#players").css({
+        height: "162px",
+        width: "216px",
+        marginTop: "6px",
+        marginLeft: "6px" 
+      });
+      $("#top").animate({
+        marginTop: "160px"
+      });
+    },
+    hide: hide,
+    setQuality: setQuality,
+    show: show,
+    fullscreen: function(){
+      if(_letterBoxed) {
+        _letterBoxed = false;
+        $("#players").css({
+          height: "100%",
+          width: "auto",
+          marginTop: 0
+        });
+        $("#top").animate({
+          marginTop: "12px"
+        });
+      }
+    }
+  }
+})();
 
 function doTitle(){
   var newtitle = _song[ARTIST] + " - " + _song[TITLE];
@@ -444,29 +519,6 @@ function doTitle(){
   document.title = newtitle + " | " + secondsToTime(ttl);
 }
 
-function onReady(domain, id) {
-  var 
-    id = parseInt(id.split('-')[1]),
-    key = domain + _playerByDom[domain].length;
-
-  _playerByDom[domain].push( document.getElementById("player-" + id) );
-  log(key + " ready");
-
-  _ev.set(key);
-
-  if(++_loaded === 1) {
-    show(_next);
-
-    setTimeout(function(){ 
-      loadPlayer("yt", 1);
-      loadPlayer("yt", 2); 
-    }, 2000);
-
-    when("_song", function(){
-      setInterval(doTitle, 1000);
-    });
-  } 
-}
 
 function transition(song) {
 
@@ -493,6 +545,7 @@ function transition(song) {
   _ev.isset(dom + _next, function() {
     if(dom === "yt") {
       _player[_next].loadVideoById(uuid, offset);
+      _player[_next].setPlaybackQuality("medium");
       _player[_next].setVolume(0);
       _player[_next].playVideo();
     } else {
@@ -521,7 +574,7 @@ function transition(song) {
     log("video loaded");
 
     var 
-      step1Timeout = Math.min(8000, (remainingTime(_playerPrev[_active]) - NEXTVIDEO_PRELOAD) * 1000),
+      step1Timeout = Math.min(NEXTVIDEO_PRELOAD, (remainingTime(_playerPrev[_active]) - NEXTVIDEO_PRELOAD) * 1000),
       step2Timeout = step1Timeout + 2000;
 
     // This is when the audio for the video starts; some small
@@ -575,61 +628,18 @@ function transition(song) {
       // When you toggle the visibility, there is still an annoying spinner.
       // So to avoid this we just "move" the players off screen that aren't
       // being used.
-      show(_player[_active], 'slide');
-      hide(_playerPrev[_next], 'slide');
-      hide(_playerPrev[EXTRA]);
+      Player.show(_player[_active], 'slide');
+      Player.hide(_playerPrev[_next], 'slide');
+      Player.hide(_playerPrev[EXTRA]);
 
       _player[_active].index = index;
       _playerById[index] = _player[_active];
-      _playerById[index].setPlaybackQuality("medium");
 
       _index = index;
-      setQuality(0);
       _playerPrev = _player;
+      _ev.isset("yt2", Player.setQuality);
     }, step2Timeout);
   });
-}
-
-function loadPlayer(domain, ix) {
-
-  swfobject.embedSWF({
-      "yt": "http://www.youtube.com/apiplayer?" + [
-        "version=3",
-        "enablejsapi=1",
-        "playerapiid=player-" + ix
-      ].join('&'),
-
-      "dm": "http://www.dailymotion.com/swf?" + [
-        "chromeless=1",
-        "enableApi=1",
-        "playerapiid=player-" + ix
-      ].join('&'),
-    }[domain],
-
-    "p" + ix,   // id
-    "400",      // width
-    "300",      // height
-    "9",        // version
-    null,       // express install swf url (we assume you have the flash player)
-    null,       // flash vars 
-
-    { allowScriptAccess: "always" }, // params
-
-    { id: 'player-' + ix } // attributes
-  );
-}
-
-
-function verb(command, id) {
-  send("channel", {
-    action: command,
-    params: {
-      channel: 1,
-      ytid: id
-    }
-  });
-  $("#talk").val("");
-  $("#autocomplete").css('display','none');
 }
 
 var User = {
@@ -687,159 +697,180 @@ var User = {
     send("set-user", {user: false});
   }
 };
-var Song = {
-  Init: function(){
-    $("#video-current-wrapper").click(function(){
-      Panel.toggle("song");
-    });
+var Song = (function(){
+  var _lastSong = false;
 
-    $("#song-show-history").click(function(){
-      _socket.emit("get-history");
-    });
-
-    $("#song-delist").click(function(){
-      Song.countdown();
-      Panel.hide("song");
-      _socket.emit("delist", {
-        vid: _song[ID],
-        title: _song[TITLE],
-        artist: _song[ARTIST]
-      });
-    });
-
-    onEnter("#input-song-search", Song.search);
-    _ev.on("panel:song", function(which) {
-      if(which == "show") {
-        $("#input-song-search").focus();
-        _socket.emit("get-history");
-      } else {
-        $("#input-song-search").val("");
-        $("#song-search-results").empty();
-        $("#song-search-label").html("");
-      }
-    });
-
-    var panel = 1;
-    setInterval(function(){
-      $("#song-search-results img").each(function() {
-        var pieces = this.src.split('/');
-        pieces.pop();
-        pieces.push(panel + '.jpg');
-        this.src = pieces.join('/');
-      });
-      panel ++;
-      if(panel == 4) {
-        panel = 1;
-      }
-    }, 2000);
-  },
-
-  countdown: function(){
-    $("#countdown").css('display','inline-block').html("9");
-    var 
-      count = 9,
-      ival = setInterval(function(){
-        count--;
-        $("#countdown").html(count);
-        if(count == 0) {
-          $("#countdown")
-            .html("")
-            .css('display','none');
-          clearInterval(ival);
-        }
-      }, 1000); 
-  },
-
-  format: function(data, type) {
-    var 
-      id = data.vid.split(':').pop(),
-      node;
-    
-    node = $("<a class=title />").append("<img src=http://i3.ytimg.com/vi/" + id + "/1.jpg>")
-
-    switch (type) {
-      case 'history':
-        node.attr({
-          target: "_blank",
-          href: "http://youtube.com/watch?v=" + id
-        }).click(function(){
-          var oldvolume = _volume;
-          setVolume(0, true);
-          $(document.body).bind('mousemove', function(){
-            $(document.body).unbind('mousemove');
-            setVolume(oldvolume, true);
-          });
-        });
-        break;
-
-      case 'search':
-        node.click(function(){ 
-          blink(node, function(){
-            Panel.hide("song");
-          });
-          _socket.emit("video-play", data); 
-        });
-        break;
-    }
-
-    if(data.artist) {
-      node.append("<span><b>" + data.artist + "</b>" + data.title + "</span>");
-    } else {
-      node.append("<span>" + data.title + "</span>")
-    }
-    return node;
-  },
-
-  reallyDelist: function(q,el) {
-    _socket.emit("really-delist", { vid: q });
-    Chat.addmessage("Delisted");
-    $(el.parentNode).slideUp();
-  },
-
-  search: function(q){
-    var qstr = q || $("#input-song-search").val();
-
-    if(qstr && qstr.length) {
-      $("#song-search-results").empty();
-      $("#song-search-label").html("Searching...");
-      _socket.emit("search", qstr);
-    }
-  },
-
-  gen: function(data) {
-    var 
-      type,
-      titles = {
-        local: "Existing",
-        remote: "New",
-        history: ""
-      };
-
-    $("#song-search-results").empty();
-    if(data.query) {
-      type = 'search';
-      if(data.results.total) {
-        $("#song-search-label").html("Showing results for <b>" + data.query + "</b>");
-      } else {
-        $("#song-search-label").html("Nothing found for <b>" + data.query + "</b> :-(");
-      }
-    } else {
-      type = 'history';
-      $("#song-search-label").html("Last played videos on " + data.channel + "</b>");
-    }
-
-    _.each(_.keys(titles), function(which) {
-      if(data.results[which] && data.results[which].length) {
-        if(titles[which]) {
-          $("<h3>" + titles[which] + "</h3>").appendTo("#song-search-results");
-        }
-        _.each(data.results[which], function(row) {
-          Song.format(row, type).appendTo("#song-search-results");
-        });
-      }
-    });
+  function preview(obj) {
+    _lastSong = obj;
+    var id = obj.vid.split(':').pop();
+    $("#embedder").html('<object width="600" height="400"><param name="movie" value="http://www.youtube.com/v/' + id + '?version=3&amp;hl=en_GB&amp;autoplay=1"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/' + id + '?version=3&amp;hl=en_GB&amp;autoplay=1" type="application/x-shockwave-flash" width="600" height="400" allowscriptaccess="always" allowfullscreen="true"></embed></object>');
+    $("#song-preview .bigbtn").show();
   }
-};
+
+  return {
+    Init: function(){
+      $("#video-current-wrapper").click(function(){
+        Panel.toggle("song");
+      });
+
+      $("#song-results").css({height: $(window).height() - 128});
+      $(window).resize(function(){
+        $("#song-results").css({height: $(window).height() - 128});
+      });
+
+      $("#song-show-history").click(function(){
+        _socket.emit("get-history");
+      });
+
+      $("#song-select-cancel").click(function(){
+        Panel.hide("song");
+      });
+
+      $("#song-select").click(function(){
+        Panel.hide("song");
+        _socket.emit("video-play", _lastSong); 
+      });
+
+      $("#song li").click(function(){
+        var which = this.innerHTML;
+        $(this).addClass('selected').siblings().removeClass('selected');
+        _ev("song-tab:" + which);
+
+      });
+
+      $("#song-skip").click(function(){
+        Song.countdown();
+        Panel.hide("song");
+        _socket.emit("skip", {
+          vid: _song[ID],
+          title: _song[TITLE],
+          artist: _song[ARTIST]
+        });
+      });
+
+      onEnter("#input-song-search", Song.search);
+      _ev.on("panel:song", function(which) {
+        if(which == "show") {
+          Player.letterbox();
+          setTimeout(function(){
+            $("#song").css({width: "100%"});
+          }, 1000);
+          $("#input-song-search").focus();
+          _socket.emit("get-history");
+        } else {
+          $("#embedder").empty();
+          $("#song-preview .bigbtn").hide();
+          unmute();
+          Player.fullscreen();
+          $("#input-song-search").val("");
+          $("#song-results").empty();
+          $("#song-search-label").html("");
+        }
+      });
+
+      var panel = 1;
+      setInterval(function(){
+        $("#song-results img").each(function() {
+          var pieces = this.src.split('/');
+          pieces.pop();
+          pieces.push(panel + '.jpg');
+          this.src = pieces.join('/');
+        });
+        panel ++;
+        if(panel == 4) {
+          panel = 1;
+        }
+      }, 2000);
+    },
+
+    countdown: function(){
+      $("#countdown").css('display','inline-block').html(NEXTVIDEO_PRELOAD + 1);
+      var 
+        count = NEXTVIDEO_PRELOAD + 1,
+        ival = setInterval(function(){
+          count--;
+          $("#countdown").html(count);
+          if(count == 0) {
+            $("#countdown")
+              .html("")
+              .css('display','none');
+            clearInterval(ival);
+          }
+        }, 1000); 
+    },
+
+    format: function(data, type) {
+      var 
+        id = data.vid.split(':').pop(),
+        node;
+      
+      node = $("<a class=title />").append("<img src=http://i3.ytimg.com/vi/" + id + "/1.jpg>")
+
+      node.click(function(){ 
+        preview(data);
+        blink(node, function(){
+          mute();
+        });
+      });
+
+      if(data.artist) {
+        node.append("<span><b>" + data.artist + "</b>" + data.title + "</span>");
+      } else {
+        node.append("<span>" + data.title + "</span>")
+      }
+      return node;
+    },
+
+    reallyDelist: function(q,el) {
+      _socket.emit("delist", { vid: q });
+      $(el.parentNode).slideUp();
+    },
+
+    search: function(q){
+      var qstr = q || $("#input-song-search").val();
+
+      if(qstr && qstr.length) {
+        $("#song-results").empty();
+        $("#song-search-label").html("Searching...");
+        _socket.emit("search", qstr);
+      }
+    },
+
+    gen: function(data) {
+      var 
+        type,
+        titles = {
+          local: "Existing",
+          remote: "New",
+          history: ""
+        };
+
+      $("#song-results").empty();
+      if(data.query) {
+        type = 'search';
+        if(data.results.total) {
+          $("#song-search-label").html("Showing results for <b>" + data.query + "</b>");
+        } else {
+          $("#song-search-label").html("Nothing found for <b>" + data.query + "</b> :-(");
+        }
+      } else {
+        type = 'history';
+        $("#song-search-label").html("Last played videos on " + data.channel + "</b>");
+      }
+
+      _.each(_.keys(titles), function(which) {
+        if(data.results[which] && data.results[which].length) {
+          if(titles[which]) {
+            $("<h3>" + titles[which] + "</h3>").appendTo("#song-results");
+          }
+          _.each(data.results[which], function(row) {
+            Song.format(row, type).appendTo("#song-results");
+          });
+        }
+      });
+    }
+  }
+})();
 
 var Channel = {
   Init: function(){
@@ -876,7 +907,7 @@ var Channel = {
     return $("<div class=channel />").append(
       "<em>" + obj.name + "</em>" +
       "<small>" + (obj.count ? ( obj.count + " partying" ) : "Be the first") + "</small>"
-    ).append(Song.format(obj.lastplayed)).click(cb);
+    ).append(Song.format(obj)).click(cb);
   },
 
   gen: function(res) {
@@ -938,6 +969,12 @@ var Chat = (function(){
   }
 
   function Init(){
+    _ev.on("panel:chat", function(which) {
+      if(which == "hide") {
+        Player.fullscreen();
+      }
+    });
+
     when("$", function(){
       log("Loading chat");
       reset();
@@ -945,7 +982,7 @@ var Chat = (function(){
 
       _socket.on("chat", function(d) {
         _chat.data = _chat.data.concat(d);
-        _chat.lastid = _chat.data[_chat.data.length - 1][0];
+        _chat.lastid = _chat.data[_chat.data.length - 1]._id;
         showmessage();
       });
 
@@ -961,7 +998,11 @@ var Chat = (function(){
   }
 
   function addmessage(data) {
-    _chat.data.push([_chat.lastid, "<p class=announce>" + data + "</p>"]);
+    _chat.data.push({
+      _id: _chat.lastid,
+      type: 'announce',
+      text: data
+    });
     showmessage();
   }
 
@@ -994,27 +1035,76 @@ var Chat = (function(){
     return false;
   }
 
+  var format = {
+    announce: function(data) {
+      return "<p class=announce>" + data.text + "</p>";
+    },
+
+    skip: function(data) {
+      var id = data.id.split(':').pop();
+      return "<div class=action>" +
+        "<em>Skipped:</em>" +
+          "<a title='DELIST THIS SONG. Please Use With Caution' class=delist onclick=Song.reallyDelist('" + data.id + "',this)>x</a><br>" +
+           "<a class=title target=_blank href=http://youtube.com/watch?v=" + id + ">" + 
+           "<img src=http://i3.ytimg.com/vi/" + id + "/default.jpg>" +
+           "<span>" +
+             "<b>" + data.artist + "</b>" +  
+              data.title +
+              "</span>" +
+             "</a>" +
+           "</div>";
+    },
+    request: function(data) {
+      var id = data.id.split(':').pop();
+      return "<div class=action>" +
+          "<em>Requested:</em>" +
+          "<a class=title target=_blank href=http://youtube.com/watch?v=" + id + ">" + 
+           "<img src=http://i3.ytimg.com/vi/" + id + "/default.jpg>" +
+           "<span>" +
+             "<b>" + data.artist + "</b>" +  
+             data.title +
+           "</span>" +
+         "</a>" +
+       "</div>";
+    },
+    chat: function(data) {
+      return data.text
+    }
+  };
+    
   function showmessage() {
     var 
       entry, 
+      row,
       color;
 
     while(_chat.data.length > lastindex) {
 
-      lastEntry = _chat.data[lastindex][1];
-      if(entryList.length > 20) {
-        entryList.shift().remove();
-      }
+      row = _chat.data[lastindex];
+      if(format[row.type]) {
 
+        if(entryList.length > 20) {
+          entryList.shift().remove();
+        }
+
+        entry = $("<div>").html(format[row.type](row));
+
+        if(row.who) {
+          entry.append("<div class=author>" + row.who + ".</div>");
+        }
+
+        entryList.push(entry);
+        $("#message").prepend(entry);
+      }
+      /*
       if(_chat.data[lastindex].length > 2) {
         color = _chat.data[lastindex][2];
       }
+      
 
       if(
           (_chat.data[lastindex][3] != _chat.lastauthor) || 
           (_chat.lastauthor == false) ||
-          (_chat.lastcolor == -1 ) ||
-          (_chat.lastcolor !== color)
         ) {
         entry = $("<div>").html(lastEntry);
 
@@ -1037,6 +1127,7 @@ var Chat = (function(){
       } else {
         $(lastEntry).insertAfter(_chat.lastentry.get(0).lastChild.previousSibling);
       }
+      */
       $("a", entry).attr("target", "_blank");
        
       entryCount++;
@@ -1051,7 +1142,11 @@ var Chat = (function(){
     send: function(){
       var message = $("#talk").val();
       if(message.length && !processCommand(message)) {
-        send("chat", { d: message });
+        send("chat", { 
+          d: message,
+          vid: _song[ID],
+          offset: _playerById[_song[ID]].getCurrentTime()
+        });
       }
       $("#talk").val("");
     },
@@ -1059,8 +1154,10 @@ var Chat = (function(){
   };
 })();
 
+
 var Panel = {
   visible: {count:0},
+  currentWidth: 0,
   toggle: function(which) {
     if(Panel.visible[which]) {
       Panel.hide(which);
@@ -1068,44 +1165,69 @@ var Panel = {
       Panel.show(which);
     }
   },
-  show: function(which) {
+  show: function(which, _interval) {
     if(Panel.visible[which]) {
       return;
     }
+    var width = 220;
+    if(which != "song") {
+      Panel.hide("song", 100);
+    } else {
+      _.each(["user", "channel"], function(which){
+        Panel.hide(which, 100);
+      });
+      width = 700;
+    }
+
+    var interval = _interval || 500;
+
     _ev.set("panel:" + which, "show");
     Panel.visible[which] = true;
     Panel.visible.count++;
     if(Panel.visible.count == 1) {
       $("#lhs-expand").hide();
     }
+
+    Panel.currentWidth += width;
+
+    $("#panels").animate({width: Panel.currentWidth + "px"}, interval);
     $("#" + which).show().animate({
       opacity: 1,
-      width: "220px"
-    });
-
-    $("#panels").animate({width: (Panel.visible.count * 224) + "px"});
-    $("#players").animate({marginRight: (Panel.visible.count * 224) + "px"});
+      width: width + "px"
+    }, interval);
+    if(!_letterBoxed) {
+      $("#players").animate({marginLeft: Panel.currentWidth + "px"}, interval);
+    } else {
+      $("#players").animate({marginLeft: "6px"}, interval);
+    }
   },
-  hide: function(which) {
+  hide: function(which, _interval) {
     if(!Panel.visible[which]) {
       return;
     }
+
+    var interval = _interval || 500;
     _ev.set("panel:" + which, "hide");
     Panel.visible[which] = false;
     Panel.visible.count--;
     $("#" + which).animate({
       opacity: 0,
       width: 0
-    }, function(){
+    }, interval, function(){
       $(this).hide();
       if(Panel.visible.count == 0) {
         $("#lhs-expand").show();
       } 
     });
 
-    var width = Math.max(20, Panel.visible.count * 224);
-    $("#panels").animate({width: width + "px"});
-    $("#players").animate({marginRight: width + "px"});
+    var width = 220;
+    if(which == 'song') {
+      width = 700;
+    }
+    Panel.currentWidth -= width;
+    width = Math.max(20, Panel.currentWidth);
+    $("#panels").animate({width: width + "px"}, interval);
+    $("#players").animate({marginLeft: width + "px"}, interval);
   }
 };
 
@@ -1124,6 +1246,17 @@ function send(func, data) {
     _socket.emit(func, data);
   });
 }
+
+(function(){
+  var oldvolume; 
+  self.mute = function(){ 
+    oldvolume = _volume;
+    setVolume(0, true, true);
+  }
+  self.unmute = function(){
+    setVolume(oldvolume, true);
+  }
+})();
 
 function volumeSlider() {
   $("#mute").css({top: (1 - _volume) * 100});
@@ -1153,11 +1286,6 @@ function volumeSlider() {
     }
   }, 100);
 }
-
-_channel = document.location.hash.slice(1);
-
-// Load the first player
-loadPlayer("yt", 0);
 
 when("io", function(){
   _socket = io.connect('http://' + window.location.hostname + ':1985/');
@@ -1204,7 +1332,6 @@ when("$", function (){
     }
   });
 
-
   $(".btn.collapse").click(function(){ Panel.hide(this.parentNode.id); });
   $("#lhs-expand").click(function(){ Panel.show("chat"); });
   $("#channel-expand").click(function(){ Panel.toggle("channel"); });
@@ -1240,3 +1367,7 @@ when("$", function (){
     }
   }, 1000);
 });
+
+
+// Load the first player
+Player.load("yt", 0);

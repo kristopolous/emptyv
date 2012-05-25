@@ -1,61 +1,127 @@
 var redis = require('redis')
   , _db = redis.createClient()
+  , Channel = require('./channel')
+  , Chat = require('./chat')
   , _last = +(new Date())
   , _state = {};
 
 _db.select(1);
-
-function add(key, data) {
-  _db.multi([
-   [ "rpush", key, JSON.stringify(data) ],
-   [ "ltrim", key, -20, -1]
-  ]).exec();
-}
+Channel.setDB(_db);
+Chat.setDB(_db);
 
 function build(channel) {
   _state[channel] = {
     name: channel,
     index: 0,
+    video: {},
+    requestStack: [],
+    add: false
   };
+}
+
+function setVideo(channel, vid, offset, cb) {
+  _db.hget("vid", vid, function(err, raw) {
+    var full = JSON.parse(raw);
+    if(!full) {
+      console.log("error reading from " + channel);
+      return;
+    }
+    _state[channel].video = {
+      vid: vid,
+      len: full[0],
+      start: full[1],
+      volume: full[2],
+      artist: full[3],
+      title: full[4],
+      notes: full[5],
+      offset: offset || full[1]
+    };
+    if(cb) {
+      cb(_state[channel].video);
+    }
+  });
+}
+
+function addVideo(data) {
+  _db.hget("vid", data.vid, function(err, vid) {
+    if(!vid) {
+      _db.hset("vid", data.vid, JSON.stringify([
+        data.len,   // Length of video
+        0,          // Start at 0 for now 
+        100,        // Full volume
+        data.artist,// Put everything in the artist
+        data.title, // Empty title
+        "",         // Empty notes.
+        data.name   // Adder.
+      ]));
+    }
+  });
+}
+
+function setIndex(channel, index, offset) {
+  // this is to survive a server crash
+ _db.hset("tick", channel, [index, offset].join(','));
 }
 
 function loadVideo(channel, index, offset, quiet) {
   _db.lindex("pl:" + channel, index, function(err, vid) {
-    _db.hget("vid", vid, function(err, raw) {
-      var full = JSON.parse(raw);
-      if(!full) {
-        console.log("error reading from " + channel);
-        return;
-      }
-      console.log(vid, raw);
-      _state[channel] = {
-        name: channel,
-        index: index,
-        video: {
-          vid: vid,
-          len: full[0],
-          start: full[1],
-          volume: full[2],
-          artist: full[3],
-          title: full[4],
-          notes: full[5],
-          offset: offset || full[1]
-        },
-      };
+    setVideo(channel, vid, offset, function(data) {
+      setIndex(channel, index, data.start);
+      _state[channel].index = index;
       if(!quiet) {
-        add("lastplayed:" + channel, {
+        var obj = {
           vid: vid,
-          title: full[4],
-          artist: full[3]
-        });
+          title: data.title,
+          artist: data.artist
+        };
+        Chat.append("lastplayed:" + channel,  obj);
+        Channel.update(channel, obj);
       }
     });
   });
 }
 
+function getNext(row) {
+  var video = row.requestStack.shift();
+
+  // This means that the new video should
+  // be appended to our playlist after the previous
+  // video
+  if(row.add) {
+    _db.linsert(
+      "pl:" + row.name,
+      "AFTER",
+      row.video.vid,
+      video.vid
+    );
+
+    // And then we move the index forward
+    // so that when we've exhausted our 
+    // request stack we don't revisit the
+    // stuff we are inserting
+    setIndex(row.name, row.index + 1, 0);
+  }
+  if(video) {
+    setVideo(row.name, video.vid, 0, function(){});
+    row.add = video.add;
+  } else {
+    row.add = false;
+    _db.llen("pl:" + row.name, function(err, len) {
+      loadVideo(row.name, (row.index + 1) % len);
+    });
+  }
+}
+
 _db.hgetall("tick", function(err, state) {
   for(var channel in state) {
+    if (channel == '' || channel == '[object Object]') {
+      Channel.remove(channel);
+      continue;
+    }
+    Channel.update(channel, {name: channel});
     var position = state[channel].split(',');
+
+    build(channel);
 
     loadVideo(
       channel, 
@@ -64,142 +130,108 @@ _db.hgetall("tick", function(err, state) {
       true
     );
   }
-});
 
+  setInterval(function(){
+    var 
+      now = +(new Date()),
+      channel,
+      row,
+      delta = (now - _last) / 1000;
 
-function go2(row, index) {
-  loadVideo(row.name, index);
-}
+    _db.lrange("request", 0, -1, function(err, request) {
+      _db.del("request");
+      request.forEach(function(row) {
+        var data = JSON.parse(row);
 
-function getNext(row) {
-  _db.llen("pl:" + row.name, function(err, len) {
-    go2(row, (row.index + 1) % len);
-  });
-}
-
-setInterval(function(){
-  var 
-    now = +(new Date()),
-    channel,
-    row,
-    delta = (now - _last) / 1000;
-
-  _db.lrange("request", 0, -1, function(err, request) {
-    _db.del("request");
-    request.forEach(function(row) {
-      var data = JSON.parse(row);
-
-      if(data.action) {
-        if(data.action == 'delist') {
-          _db.incr("ix", function(err, chat_id) {
-            var id = data.track.vid.split(':').pop();
-
-            add("log:" + data.channel, [
-              chat_id,
-                "<div class=action>" +
-                  "<em>Skipped:</em>" +
-                  "<a title='DELIST THIS SONG. Please Use With Caution' class=delist onclick=Song.reallyDelist('" + data.track.vid + "',this)>x</a><br>" +
-                  "<a class=title target=_blank href=http://youtube.com/watch?v=" + id + ">" + 
-                   "<img src=http://i3.ytimg.com/vi/" + id + "/default.jpg>" +
-                   "<span>" +
-                     "<b>" + data.track.artist + "</b>" +  
-                     data.track.title +
-                   "</span>" +
-                 "</a>" +
-               "</div>",
-              0,
-              data.name
-            ]);
+        switch(data.action) {
+          case 'skip':
+            Chat.add(data.channel, {
+              type: 'skip',
+              artist: data.track.artist,
+              title: data.track.title,
+              id: data.track.vid,
+              who: data.name
+            });
 
             getNext(_state[data.channel]);
-          });
-        } else if (data.action == "really-delist") {
-          _db.lrem("pl:" + data.channel, 0, data.track.vid);
+            break;
+
+          case 'delist': 
+            _db.lrem("pl:" + data.channel, 0, data.track.vid);
+            Chat.add(data.channel, {
+              type: 'delist',
+              artist: data.track.artist,
+              title: data.track.title,
+              id: id,
+              who: data.name
+            });
+            break;
+
+          default:
+            _db.lrange("pl:" + data.channel, 0, -1, function(res, list) {
+              var offset = list.indexOf(data.vid);
+
+              // See if its in thie channels playlist
+              if(offset > -1) {
+
+                // request
+                _state[data.channel].requestStack.push({
+                  vid: data.vid,
+                  name: data.name,
+                  add: false
+                });
+
+              } else {
+                addVideo(data);
+
+                if(!_state[data.channel]) {
+                  // This is a channel bootstrap
+                  build(data.channel);
+                  _db.lpush(
+                    "pl:" + data.channel,
+                    data.vid
+                  );
+                  loadVideo(data.channel, 0, 0);
+                } else {
+                  // Putting it in the on-disk playlist is done
+                  // through the stack shifting logic
+                  _state[data.channel].requestStack.push({
+                    vid: data.vid,
+                    name: data.name,
+                    add: true
+                  });
+                }
+              } 
+
+              Chat.add(data.channel, {
+                action: 'request',
+                artist: data.artist,
+                title: data.title,
+                id: data.vid,
+                who: data.name
+              });
+
+            });
         }
-      } else {
-        _db.lrange("pl:" + data.channel, 0, -1, function(res, list) {
-          var offset = list.indexOf(data.vid);
-
-          // See if its in thie channels playlist
-          if(offset > -1) {
-
-            go2(_state[data.channel], offset);
-
-          } else {
-            // otherwise use the len property
-            // to test whether it was a local
-            // or a remote result
-
-            if (data.len) {
-              _db.hset("vid", data.vid, JSON.stringify([
-                data.len,   // Length of video
-                0,          // Start at 0 for now 
-                100,        // Full volume
-                data.artist,// Put everything in the artist
-                data.title, // Empty title
-                ""          // Empty notes.
-              ]));
-            }
-
-            if(!_state[data.channel]) {
-              // This is a channel boot-strap
-              build(data.channel);
-              _db.lpush(
-                "pl:" + data.channel,
-                data.vid
-              );
-              loadVideo(data.channel, 0, 0);
-            } else {
-              // Now put it in our playlist
-              // AFTER the current video.
-              _db.linsert(
-                "pl:" + data.channel,
-                "AFTER",
-                _state[data.channel].video.vid,
-                data.vid
-              );
-            }
-          } 
-
-          _db.incr("ix", function(err, chat_id) {
-            var id = data.vid.split(':').pop();
-
-            add("log:" + data.channel, [
-              chat_id,
-                "<div class=action>" +
-                  "<em>Requested:</em>" +
-                  "<a class=title target=_blank href=http://youtube.com/watch?v=" + id + ">" + 
-                   "<img src=http://i3.ytimg.com/vi/" + id + "/default.jpg>" +
-                   "<span>" +
-                     "<b>" + data.artist + "</b>" +  
-                     data.title +
-                   "</span>" +
-                 "</a>" +
-               "</div>",
-             0,
-             data.name
-            ]);
-          });
-        });
-      }
+      });
     });
-  });
 
-  for(channel in _state) {
-    row = _state[channel]; 
-    row.video.offset = (row.video.offset + delta);
+    for(channel in _state) {
+      row = _state[channel]; 
+      row.video.offset = (row.video.offset + delta);
 
-    if((row.video.offset + 8) > row.video.len) {
-      getNext(row);
+      if((row.video.offset + 3) > row.video.len) {
+        getNext(row);
+      }
+
+      // this is to survive a server crash
+      setIndex(row.name, row.index, row.video.offset);
+
+      console.log(row);
+      // this is for the consumer.
+      _db.hset("play", row.name, JSON.stringify(row.video));
     }
 
-    // this is to survive a server crash
-    _db.hset("tick", row.name, [row.index, row.video.offset].join(','));
-
-    // this is for the consumer.
-    _db.hset("play", row.name, JSON.stringify(row.video));
-  }
-    console.log(now);
-
-  _last = now;
-}, 1000);
+    _last = now;
+  }, 1000);
+});

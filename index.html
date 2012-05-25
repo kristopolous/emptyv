@@ -1,7 +1,7 @@
 <!doctype html><html><head><meta name=description content="Non-stop back-to-back videos with Chat"><title>Chat With Videos</title>
 <style>
-body{overflow-x:hidden;position:absolute;top:0;left:0;height:100%;width:100%;background:#000;font-family:Verdana,sans-serif;margin:0;color:#aaa}
-a{color:#aaa}
+body{display:block;overflow:hidden;position:absolute;top:0;left:0;height:100%;width:100%;background:#000;font-family:Verdana,sans-serif;margin:0;color:#aaa}
+a{color:#aaa;text-decoration:underline;cursor:pointer}
 p,h1,h2,h3,h4,h5,h6{margin:0}
 button{background:#333;border-color:#222;color:#ccc;border-width:1px}
 img{border:0}
@@ -22,14 +22,14 @@ h2 b{display:block;font-size:1.5em;color:#90a0af}
 #bottom{position:fixed;bottom:0;right:0}
 
 #bottom{float:right}
-#players{margin-right:220px;height:100%;position:relative}
+#players{margin-left:220px;position:absolute;bottom:0;height:100%;position:relative;z-index:20}
 #players object,#players embed{position:absolute;top:0;left:-2000%;width:100%;height:100%}
 #mute-control{height:132px;position:absolute;right:36px;top:10.5em;z-index:8}
 #mute-bg{position:absolute;background:url("images/chat-bg.png");top:10px;height:122px;left:20px;width:6px}
 #mute{cursor:pointer;position:absolute;left:10px}
 
-#panels{float:right;width:20px;position:relative;height:100%;white-space:nowrap}
-#panels > span{width:0px;display:none;position:relative;height:100%;vertical-align:top;overflow:hidden;background:url('css/chat-bg.png')}
+#panels{float:left;width:20px;position:relative;height:100%;white-space:nowrap}
+#panels > span{width:0px;display:none;position:relative;height:100%;vertical-align:top;background:url('css/chat-bg.png')}
 .panel-title{color:#ccc;font-size:1.2em;padding:0.5em;line-height:0.8em;white-space:nowrap}
 .panel-content{margin:0 1em;display:block;font-size:0.7em}
 .collapse{position:absolute;top:0.25em;right:0em;z-index:12}
@@ -40,7 +40,7 @@ h2 b{display:block;font-size:1.5em;color:#90a0af}
 #message div.author{color:#555;font-size:0.7em;margin:-0.1em 0 0;text-align:right;border-bottom:1px solid #222}
 #message p {margin-left:0.25em;font-size:0.9em}
 #message p.announce{font-size:0.7em;color:#555;margin:0;padding:0.15 0}
-#message .delist{float:right;color:#222;cursor:pointer}
+#message .delist{float:right;color:#222}
 #message .delist:hover{color:#333}
 #message .title {margin:0.15em 0 0.5em 0;display:block;}
 #message .title img{width:40px;height:30px;padding:0.1em}
@@ -82,12 +82,15 @@ h2 b{display:block;font-size:1.5em;color:#90a0af}
 #video-current-wrapper:hover{box-shadow:0 0 10px 3px #35393a}
 #video-current-wrapper #countdown{font-size:2em;overflow:visible;width:1em;display:none}
 
-#input-song-search{font-size:1.25em}
-#song-show-history{display:block;text-decoration:underline;margin-bottom:0.5em;cursor:pointer}
+#input-song-search{font-size:1.25em;margin-left:3px;width:225px}
 #song-search-label{margin-top:-.5em;margin-bottom:.5em;white-space:normal}
-#song-search-results a{display:block;font-size:1.25em;cursor:pointer;margin:0.25em 0;padding:0.15em}
-#song-search-results a:hover{background:#333;color:#ccc}
-#song-search-results a.title span{white-space:normal}
+#song-results {overflow:auto}
+#song-results a{display:block;font-size:1.25em;margin:0.25em 0;padding:0.15em}
+#song-results a:hover{background:#333;color:#ccc}
+#song-results a.title span{white-space:normal}
+#song-preview .bigbtn{display:none;margin:1em 0.5em;font-size:1em}
+#song-skip{display:block;margin-top:6px}
+
 #chatbar{z-index:0;width:220px;margin-top:1em}
 #channel-wrap{display:inline-block;padding-top:0.5em;font-size:1.2em}
   #channel-wrap span{display:inline-block;width:150px}
@@ -100,9 +103,9 @@ h2 b{display:block;font-size:1.5em;color:#90a0af}
 
 #user-control{margin:0 0.5em 0.4em 0;text-align:right;visibility:hidden}
   #display-username{margin-left:0.75em;display:inline-block;color:#555}
-  #login-button{text-decoration:underline;cursor:pointer}
   #email-wrap{display:none}
-#song-delist{padding:0.5em;background:#222;position:absolute;bottom:0;right:0;text-decoration:underline;cursor:pointer}
+  #register-button{display:block}
+
 #app{display:none;height:100%}
 
 #videoList{width:550px;display:inline-block;text-align:center;margin-top:1em;}
@@ -111,8 +114,10 @@ h2 b{display:block;font-size:1.5em;color:#90a0af}
   height:85px;
   display:inline-block;padding:0.5em;margin:1em
 }
-.channel:hover{box-shadow: 0 0 5px 3px #555}
-.channel { text-align:left; 
+#song-skip{
+position:absolute;font-size:1.4em;top:2px;left:238px;display:block}
+#song-skip,.bigbtn,.channel:hover{box-shadow: 0 0 5px 3px #555}
+#song-skip,.bigbtn,.channel { text-align:left; 
   cursor:pointer;
   padding:3px 6px;
   margin:15px 0;
@@ -125,6 +130,42 @@ h2 b{display:block;font-size:1.5em;color:#90a0af}
 .channel .title{display:block;margin-top:6px;font-size:14px}
 .channel em { margin-top:-0.15em;display:inline-block;margin-right:9px;font-style:normal;font-size:1.25em}
 .channel small { color:#ccc;display:block;margin-top:-0.25em}
+
+.tabs {
+  height:24px;
+  border-bottom:1px solid #444;
+  margin:0;padding:0 0 0 6px}
+.tabs li {
+  list-style:none;
+  display:inline-block;
+  color:#fff;
+  width:85px;
+  height:24px;
+  padding-left:6px;
+  margin-right:9px;
+  border:2px solid #333;
+  z-index:9;
+  position:relative;
+  font-size:14px;
+  cursor:pointer;
+  border-bottom:0;
+}
+.tabs li.selected{
+  height:25px;
+  box-shadow: 0 0 2px 2px #999;
+  background:#222;
+}
+.tab-content{
+  padding:6px;
+  background:#222;
+  z-index:10;
+  position:relative;
+}
+#song-preview{display:inline-block;text-align:center;margin-left:6px;font-size:1.4em}
+#song-preview b{display:block;text-align:center;color:#ccc}
+
+#embedder{width:600px;height:400px}
+#song-lhs{display:inline-block;overflow:hidden;width:240px;vertical-align:top}
 </style>
 <!--[if IE]><link rel=stylesheet href=css/ie.css><![endif]-->
 </head>
@@ -173,20 +214,33 @@ h2 b{display:block;font-size:1.5em;color:#90a0af}
           <label>Email</label>
           <input id=input-email>
         </div>
+        <button id=user-cancel>Cancel</button>
         <button id=user-login>That's me</button>
-        <button id=user-cancel>I'll stay anonymous</button>
         <a id=register-button>I'm new.</a>
       </span>
     </span><span id=song>
       <span class="btn collapse">X</span>
       <div class=panel-title>Video Selection</div>
       <span class=panel-content>
-        <a id=song-delist>Skip This Video.</a>
-        <!--<a id=song-show-history>Show Playlist History</a>-->
-        <label>Search To Choose Next Video</label>
-        <input id=input-song-search autocomplete=off>
-        <div id=song-search-label></div>
-        <div id=song-search-results></div>
+        <button id=song-skip>Skip Over The Current Video.</button>
+        <ul class=tabs>
+          <li>Everything</li>
+          <li class=selected>History</li>
+        </ul>
+        <div class=tab-content>
+          <div id=song-lhs>
+            <label>Search To Choose Next Video</label>
+            <input id=input-song-search autocomplete=off>
+            <div id=song-search-label></div>
+            <div id=song-results></div>
+          </div>
+          <div id=song-preview>
+            <b>Video Preview</b>
+            <div id=embedder></div>
+            <button class=bigbtn id=song-select-cancel>Cancel</button>
+            <button class=bigbtn id=song-select>Select Video</button>
+          </div>
+        </div>
       </span>
     </span></div><div id=players><div id=p2></div><div id=p1></div><div id=p0></div></div></div></body>
 <script>

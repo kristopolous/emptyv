@@ -1,26 +1,22 @@
 var app = require('http').createServer(function(){})
   , redis = require('redis')
-  , DB = redis.createClient()
+  , _db = redis.createClient()
+  , _md = require("node-markdown").Markdown
   , IO = require('socket.io').listen(app)
   , QS = require('querystring')
-  , HTTP = require('http')
-  , MD = require("node-markdown").Markdown
-  , VERSION = 2;
+  , Chat = require('./chat')
+  , Channel = require('./channel')
+  , HTTP = require('http');
 
-DB.select(1);
+_db.select(1);
 app.listen(1985);
+Chat.setDB(_db);
+Channel.setDB(_db);
 
 function uidgen() {
   return (Math.random() * Math.pow(2,63)).toString(36);
 }
 
-function add(key, data, width) {
-  width = width || 100;
-  DB.multi([
-    [ "rpush", key, JSON.stringify(data) ],
-    [ "ltrim", key, -width, -1]
-  ]).exec();
-}
 
 var search = (function(){
 
@@ -74,7 +70,7 @@ var search = (function(){
     var local = [];
     remote(query, function(err, res) {
       var idList = res.map(function(row) { return row.vid });
-      DB.hmget("vid", idList, function(err, data) {
+      _db.hmget("vid", idList, function(err, data) {
         for(var ix = data.length - 1; ix >= 0; ix--) {
           if(data[ix]) {
             local.push(res[ix]);
@@ -100,112 +96,32 @@ IO.sockets.on('connection', function (socket) {
     _ival = {};
 
   var _channel = {
-    get: function(name, cb) {
-      DB.hget("channel", name, function(err, chan) {
-        if(!chan) {
-          console.log("Creating " + name);
-          DB.hset("tick", name, [0,0].join());
-          DB.hset("channel", name, JSON.stringify({}));
-        }
-        cb();
-      })
-    },
-
-    create: function(name){
-      console.log("Creating ", name);
-      DB.hset("channel", name, JSON.stringify({}));
-    },
-
-    list: function(params) {
-    },
 
     join: function(which) {
-      _channel.get(which, function(){
-        if(_user.channel) {
-          _channel.leave();
-        }
+      Channel.get(which, function(){
+        _channel.leave();
         _user.channel = which;
         socket.emit("channel-name", which);
         if(_user.uid) {
-          DB.sadd("user:" + which, _user.uid);
+          Channel.join(which, _user.uid);
         }
       });
     },
 
     leave: function() {
-      if(_user.uid) {
-        DB.srem("user:" + _user.channel, _user.uid);
-      }
+      Channel.leave(_user.channel, _user.uid);
     },
 
     play: function(params) {
-      DB.set("request", JSON.stringify(params));
-    },
-    update: function(params) {
+      _db.set("request", JSON.stringify(params));
     }
   };
 
-  socket.on("disconnect", function(){
-    if(_user.name && _user.name != "anonymous") {
-      announce(_user.name + " logged out");
-    }
-    for(var which in _ival) {
-      clearInterval(_ival[which]);
-    };
-    _channel.leave();
-  });
-
-  socket.on("channel-join", function(obj){
-    console.log(obj);
-    _channel.join(obj.channel);
-  });
-
-  socket.on("channel-create", function(obj) {
-    _channel.create(obj.channel);
-  });
-
-  socket.on("get-channels", function(obj) {
-    DB.hgetall("channel", function(err, channelMap) {
-      var 
-        channelNameList = Object.keys(channelMap),
-        channelObjList = [],
-        playCount = channelNameList.length,
-        userCount = channelNameList.length;
-
-      function check() {
-        if(playCount === 0 && userCount === 0) {
-          socket.emit("channel-results", 
-            channelObjList.sort(function(a, b) {
-              return b.count - a.count;
-            })
-          );
-        }
-      }
-      channelNameList.forEach(function(channel) {
-        if(channel.length == 0) {
-          playCount --;
-          userCount --;
-          return;
-        }
-        channelMap[channel] = JSON.parse(channelMap[channel]);
-        channelMap[channel].name = channel;
-        channelObjList.push(channelMap[channel]);
-        DB.lrange("lastplayed:" + channel, -1, -1, function(er, lastplayed) {
-          if(lastplayed && lastplayed.length && lastplayed[0].length) {
-            channelMap[channel].lastplayed = JSON.parse(lastplayed[0]); 
-          }
-          check(--playCount);
-        });
-        DB.scard("user:" + channel, function(er, count) {
-          channelMap[channel].count = count;
-          check(--userCount);
-        }); // scard user
-      }); // foreach
-    }); // hget channel
-  }); // socket-on
-
   function song() {
-    DB.hget("play", _user.channel, function(err, last) {
+    if(!_user.channel) {
+      return;
+    }
+    _db.hget("play", _user.channel, function(err, last) {
       if(!last) {
         return;
       }
@@ -229,9 +145,12 @@ IO.sockets.on('connection', function (socket) {
   }
 
   function poll() {
-    DB.get("ix", function(err, last) {
+    if(!_user.channel) {
+      return;
+    }
+    _db.get("ix", function(err, last) {
 
-      DB.lrange(
+      _db.lrange(
         "log:" + _user.channel, 
         0, -1, 
         function(err, data) {
@@ -241,8 +160,8 @@ IO.sockets.on('connection', function (socket) {
 
           data.forEach(function(rowRaw) {
             row = JSON.parse(rowRaw);
-            if(row[0] > _user.lastid) {
-              _user.lastid = row[0];
+            if(row._id > _user.lastid) {
+              _user.lastid = row._id;
               chat.push(row);
             }
           })
@@ -252,7 +171,7 @@ IO.sockets.on('connection', function (socket) {
         });
     });
 
-    DB.scard("user:" + _user.channel, function(err, online) {
+    _db.scard("user:" + _user.channel, function(err, online) {
       if(online != _online) {
         _online = online;
         socket.emit("stats", {online: online});
@@ -260,13 +179,48 @@ IO.sockets.on('connection', function (socket) {
     });
   }
 
-  setTimeout(function(){
-    if(!_user.color) {
-      socket.emit("greet-request", VERSION);
-    } else {
-      socket.emit("version", VERSION);
+  function announce(message) {
+    Chat.add(
+      _user.channel, 
+      'announce',
+      message
+    );
+  }
+
+  socket.on("disconnect", function(){
+    if(_user.name && _user.name != "anonymous") {
+      announce(_user.name + " logged out");
     }
-  }, 1000);
+    for(var which in _ival) {
+      clearInterval(_ival[which]);
+    };
+    _channel.leave();
+  });
+
+  socket.on("channel-join", function(obj){
+    console.log(obj);
+    _channel.join(obj.channel);
+  });
+
+  socket.on("channel-create", function(obj) {
+    Channel.create(obj.channel);
+  });
+
+  socket.on("get-channels", function(obj) {
+    _db.hvals("channel", function(err, channelList) {
+
+      for(var ix = 0; ix < channelList.length; ix++) {
+        channelList[ix] = JSON.parse(channelList[ix]);
+      }
+
+      socket.emit("channel-results", 
+        channelList.sort(function(a, b) {
+          return b.count - a.count;
+        })
+      );
+    }); 
+  }); 
+
 
   socket.on("greet-response", function(p) {
     _user = p;
@@ -276,7 +230,7 @@ IO.sockets.on('connection', function (socket) {
       _user.uid = uidgen();
       socket.emit("uid", _user.uid);
     } else {
-      DB.hget("user", _user.uid, function(err, last) {
+      _db.hget("user", _user.uid, function(err, last) {
         if(last) {
           _user.name = last;
           socket.emit("username", _user.name);
@@ -286,8 +240,6 @@ IO.sockets.on('connection', function (socket) {
         }
       });
     }
-
-    _channel.join(_user.channel);
 
     if(!_ival.poll) {
       _ival.poll = setInterval(poll, 50);
@@ -308,20 +260,11 @@ IO.sockets.on('connection', function (socket) {
   socket.on("video-play", function(p) {
     p.channel = _user.channel;
     p.name = _user.name;
-    DB.lpush("request", JSON.stringify(p));
-  });
-
-  socket.on("really-delist", function(p) {
-    DB.lpush("request", JSON.stringify({
-      track: p,
-      action: "really-delist",
-      name: _user.name,
-      channel: _user.channel
-    }));
+    _db.lpush("request", JSON.stringify(p));
   });
 
   socket.on("delist", function(p) {
-    DB.lpush("request", JSON.stringify({
+    _db.lpush("request", JSON.stringify({
       track: p,
       action: "delist",
       name: _user.name,
@@ -329,9 +272,18 @@ IO.sockets.on('connection', function (socket) {
     }));
   });
 
+  socket.on("skip", function(p) {
+    _db.lpush("request", JSON.stringify({
+      track: p,
+      action: "skip",
+      name: _user.name,
+      channel: _user.channel
+    }));
+  });
+
   socket.on("get-history", function(p) {
     var chan = _user.channel;
-    DB.lrange("lastplayed:" + chan, 0, -1, function(err, last){
+    _db.lrange("lastplayed:" + chan, 0, -1, function(err, last){
       for(var ix = 0; ix < last.length; ix++) {
         last[ix] = JSON.parse(last[ix]);
       }
@@ -353,44 +305,30 @@ IO.sockets.on('connection', function (socket) {
         announce(p.user + " logged in");
       }
       _user.name = p.user;
-      DB.hset("user", _user.uid, p.user);
+      _db.hset("user", _user.uid, p.user);
       socket.emit("username", _user.name);
     } else {
       announce(_user.name + " logged out");
-      DB.hdel("user", _user.uid);
+      _db.hdel("user", _user.uid);
       _user.name = "anonymous";
     }
   });
 
-  function announce(message) {
-    DB.incr("ix", function(err, id) {
-      var payload = [ 
-        id, 
-        "<p class=announce>" + message + "</p>"
-      ];
-      add("log:" + _user.channel, payload);
-      add("logall", payload, 400);
+  socket.on("chat", function(data) {
+    Chat.add(_user.channel, {
+      type: "chat", 
+      text: _md(data.d
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')),
+      vid: data.vid, 
+      who: _user.name,
+      offset: data.offset
     });
-  }
+  });
 
-  function chat(p) {
-    if(!p.d) {
-      return;
+  setTimeout(function(){
+    if(!_user.color) {
+      socket.emit("greet-request");
     }
-
-    DB.incr("ix", function(err, id) {
-      var payload = [ 
-        id, 
-        MD(p.d
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')),
-        _user.color,
-        _user.name
-      ];
-      add("log:" + _user.channel, payload);
-      add("logall", payload, 400);
-    });
-  }
-
-  socket.on("chat", chat);
+  }, 1000);
 });
