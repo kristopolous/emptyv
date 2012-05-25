@@ -162,7 +162,7 @@ _db.hgetall("tick", function(err, state) {
               type: 'delist',
               artist: data.track.artist,
               title: data.track.title,
-              id: id,
+              id: data.track.vid,
               who: data.name
             });
             break;
