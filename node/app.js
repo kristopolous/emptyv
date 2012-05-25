@@ -215,7 +215,7 @@ IO.sockets.on('connection', function (socket) {
 
       socket.emit("channel-results", 
         channelList.sort(function(a, b) {
-          return b.count - a.count;
+          return (b.count || 0) - (a.count || 0);
         })
       );
     }); 

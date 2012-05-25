@@ -765,6 +765,10 @@ var Song = (function(){
         Panel.hide("song");
       });
 
+      $("#song-delist").click(function() {
+        _socket.emit("delist", _lastSong);
+      });
+
       $("#song-select-next").click(function(){
         Panel.hide("song");
         _socket.emit("video-play", _lastSong); 
@@ -868,11 +872,6 @@ var Song = (function(){
         node.append("<span>" + data.title + "</span>")
       }
       return node;
-    },
-
-    reallyDelist: function(q,el) {
-      _socket.emit("delist", { vid: q });
-      $(el.parentNode).slideUp();
     },
 
     search: function(q){
@@ -1115,7 +1114,6 @@ var Chat = (function(){
       var id = data.id.split(':').pop();
       return "<div class=action>" +
         "<em>Skipped:</em>" +
-          "<a title='DELIST THIS SONG. Please Use With Caution' class=delist onclick=Song.reallyDelist('" + data.id + "',this)>x</a><br>" +
            "<a class=title target=_blank href=http://youtube.com/watch?v=" + id + ">" + 
            "<img src=http://i3.ytimg.com/vi/" + id + "/default.jpg>" +
            "<span>" +
