@@ -1319,13 +1319,19 @@ function send(func, data) {
 }
 
 (function(){
-  var oldvolume; 
+  var 
+    oldvolume,
+    muted = false; 
   self.mute = function(){ 
     oldvolume = _volume;
     setVolume(0, true, true);
+    muted = true;
   }
   self.unmute = function(){
-    setVolume(oldvolume, true);
+    if(muted) {
+      setVolume(oldvolume, true);
+      muted = false
+    }
   }
 })();
 
