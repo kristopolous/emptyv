@@ -11,6 +11,8 @@ label{margin-bottom:0.4em;color:#555;font-size:11px;display:block}
 input{width:190px;margin:0.25em 0 0.75em}
 .btn{text-align:center;font-size:0.60em;padding:0.25em;margin:0.25em;cursor:pointer;border:0.25em solid #222}
 .btn:hover{border-color:#555;color:#eee}
+ 
+/*#message-wrap {width: 215px;overflow-y:auto}*/
 
 #splash{text-align:center;background:#000;height:100%}
 #splash a{color:#90a0af}
@@ -24,15 +26,19 @@ h2 b{display:block;font-size:1.5em;color:#90a0af}
 #bottom{float:right}
 #players{margin-left:220px;position:absolute;bottom:0;height:100%;position:relative;z-index:20}
 #players object,#players embed{position:absolute;top:0;left:-2000%;width:100%;height:100%}
-#mute-control{height:132px;position:absolute;right:36px;top:10.5em;z-index:8}
-#mute-bg{position:absolute;background:url("images/chat-bg.png");top:10px;height:122px;left:20px;width:6px}
-#mute{cursor:pointer;position:absolute;left:10px}
+#mute-control{position:absolute;top:25px;right:10px;background:#222}
+#mute-control .expanded{display:none;border:1px solid #555;background:#222;width:26px;margin-left:1px;
+}
+#mute-bg{background:#555;height:100px;margin:10px;width:6px}
+#mute-fg{background:#aaa;height:0;position:absolute;bottom:10px;left:11px;width:8px}
+#mute{padding:0px;margin:0;width:31px;height:33px}
+#mute img{margin:-1px 0 0 -1px}
 
 #panels{float:left;width:20px;position:relative;height:100%;white-space:nowrap}
 #panels > span{width:0px;display:none;position:relative;height:100%;vertical-align:top;background:url('css/chat-bg.png')}
 .panel-title{color:#ccc;font-size:1.2em;padding:0.5em;line-height:0.8em;white-space:nowrap}
 .panel-content{margin:0 1em;display:block;font-size:0.7em}
-.collapse{position:absolute;top:0.25em;right:0em;z-index:12}
+.collapse{color:#ccc;position:absolute;top:0.25em;right:0;z-index:12;width:20px;height:8px;background:url('css/button-bg.jpg');line-height:8px;margin-top:0}
 
 #message img{max-width:195px}
 #message{border-top:1px solid #222;font-size:0.9em;color:#ccc; padding:0 0.5em;overflow-y:auto}
@@ -66,7 +72,6 @@ h2 b{display:block;font-size:1.5em;color:#90a0af}
 #lhs-expand,#lhs-collapse{padding:0.5em 0.25em;font-size:0.6em;width:1em}
 #channel{background:#222}
 #input-channel-search{font-size:1.25em}
-
 
 #video-current-wrapper div{display:inline-block}
 #video-current-wrapper{
@@ -178,7 +183,8 @@ a#song-delist.bigbtn{float:right;font-size:0.7em;color:#555}
 <div id=bottom><a href=about.html target=_blank>about</a></div>
 </div>
 <div id=app>
-  <div id=panels><div class=btn id=lhs-expand>&gt;</div><div id=mute-control><div id=mute-bg></div><img id=mute src=images/mute_off_32.png></div><span id=channel>
+  <div id=panels><div class=btn id=lhs-expand>&gt;</div>
+    <span id=channel>
       <span class="btn collapse">X</span>
       <div class=panel-title>Party Hopper</div>
       <span class=panel-content>
@@ -194,7 +200,17 @@ a#song-delist.bigbtn{float:right;font-size:0.7em;color:#555}
             <div id=channel-stats></div>
           </span>
         </span>
-        <div id=video-current-wrapper><div id=countdown></div><div id=video-current></div><div id=video-expand></div></div>
+        <div id=mute-control>
+          <button class=bigbtn id=mute>
+            <img src=images/mute_off_32.png>
+          </button>
+          <div class=expanded>
+            <div id=mute-bg></div><div id=mute-fg></div>
+          </div>
+        </div>
+        <div id=countdown></div>
+        <div id=video-current-wrapper>
+        <div id=video-current></div><div id=video-expand></div></div>
       </div>
       <div id=chatbar>
         <label id=user-control>
@@ -202,7 +218,10 @@ a#song-delist.bigbtn{float:right;font-size:0.7em;color:#555}
           <a id=login-button>Log in</a>
         </label>
         <input id=talk autocomplete=off>
-        <div id=message></div>
+        <div id=message-wrap>
+          <div id=message>
+          </div>
+        </div>
       </div>
     </span><span id=user>
       <span class="btn collapse">X</span>

@@ -17,6 +17,7 @@ Thanks to (alphabetically listed):
  * [socket-io](http://socket.io/)
  * [sox](http://sox.sourceforge.net/)
  * [swfobject](http://code.google.com/p/swfobject/)
+ * [tinyscroll](http://baijs.nl/tinyscrollbar/)
  * [underscore](https://github.com/documentcloud/underscore)
  * [xml2js](https://github.com/Leonidas-from-XIV/node-xml2js)
  * [youtube-dl](https://github.com/rg3/youtube-dl)

@@ -1,8 +1,7 @@
 var scripts = [
-  [0, 'js/underscore-min.js'],
-  [10, 'js/jquery-1.7.1.min.js'],
-  [2000, 'js/db.min.js'],
-  [5000, 'js/jquery-ui-1.8.20.custom.min.js']
+  [0, 'http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.3.3/underscore-min.js'],
+  [10, 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js'],
+  [2000, 'js/db.min.js']
 ];
 
 for(var i = 0; i < scripts.length; i++) {
@@ -225,6 +224,7 @@ function Store(key, value) {
 
 function setVolume(amount, animate, nostore) {
   _volume = Math.max(0, amount);
+  _volume = Math.min(1, _volume);
 
   if(!nostore) { 
     Store("volume", _volume);
@@ -237,9 +237,7 @@ function setVolume(amount, animate, nostore) {
       volume = _song[VOLUME] * _volume;
     }
   }
-  if(animate) {
-    $("#mute").animate({top: (1 - _volume) * 100});
-  }
+  $("#mute-fg").css('height', (_volume * 100) + "px");
   _playerPrev[_active].setVolume(volume * _volume);
 }
 
@@ -640,7 +638,7 @@ function transition(song) {
 
       _index = index;
       _playerPrev = _player;
-      _ev.isset("yt2", Player.setQuality);
+      //_ev.isset("yt2", Player.setQuality);
     }, step2Timeout);
   });
 }
@@ -1048,6 +1046,10 @@ var Chat = (function(){
     });
 
     when("$", function(){
+      $("#message-wrap").css({height: $(window).height() - 128});
+      $(window).resize(function(){
+        $("#message-wrap").css({height: $(window).height() - 128});
+      });
       log("Loading chat");
       reset();
       $("#talk").focus();
@@ -1336,32 +1338,48 @@ function send(func, data) {
 })();
 
 function volumeSlider() {
-  $("#mute").css({top: (1 - _volume) * 100});
-
-  var ival = setInterval(function(){
-    if($("#mute").draggable) {
-      $("#mute").draggable({
-        axis: "y",
-        containment: $("#mute-control"),
-        drag: function(e, ui) {
-          setVolume(1 - ui.position.top / 100);
-        } 
-      });
-      $("#mute").click(function(){
-        if(_volume < 0.3) {
-          setVolume(1, true);
-        } else if (_volume > 0.7) {
-          setVolume(0, true);
-        }
-      });
-
-      $("#mute-bg").click(function(e) {
-        var place = e.pageY - $("#mute-bg").offset().top;
-        setVolume(1 - (place / 110), true);
-      });
-      clearInterval(ival);
+  var _mousedown = false,
+      _expanded = false;
+  
+  function toggle(){
+    if(_expanded) {
+      $("#mute-control .expanded").hide();
+    } else {
+      setVolume(_volume);
+      $("#mute-control .expanded").show();
     }
-  }, 100);
+    _expanded = !_expanded;
+    return false;
+  }
+  $("#mute").click(toggle).mousedown(function(){
+    return false;
+  });
+
+  $(document.body).mouseup(function(){
+    _mousedown = false;
+  });
+  $(document.body).mousedown(function(){
+    _expanded = true;
+    toggle();
+  });
+  $("#mute-control .expanded").mousedown(function(e){
+    _mousedown = true;
+    var offset = 70;
+    if(_letterBoxed) {
+      offset += 168;
+    }
+    setVolume(1 - (e.pageY - offset) / 100);
+    return false;
+  }).mousemove(function(e){
+    var offset = 70;
+    if(_letterBoxed) {
+      offset += 168;
+    }
+    if(_mousedown) {
+      setVolume(1 - (e.pageY - offset) / 100);
+    }
+    return false;
+  });
 }
 
 when("io", function(){
@@ -1420,11 +1438,6 @@ when("$", function (){
   User.Init();
   Song.Init();
   volumeSlider();
-
-  $("#mute-control").hover(
-    function(){ $("#mute-bg").css('background', '#333'); },
-    function(){ $("#mute-bg").css('background', 'url("images/chat-bg.png")'); }
-  );
 
   if(_channel) {
     Channel.set(_channel);
