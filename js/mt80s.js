@@ -803,13 +803,15 @@ var Song = (function(){
 
       _ev.on("panel:song", function(which) {
         if(which == "show") {
+          $("#embedder").empty();
           Player.letterbox();
-          setTimeout(function(){
-            $("#song").css({width: "100%"});
-          }, 1000);
+          $("#song").css({
+            display: 'inline-block',
+            opacity: 1,
+            width: "100%"});
           $("#input-song-search").focus();
           panelFlash();
-        } else {
+        } else if(which == 'hide-after') {
           $("#embedder").empty();
           $("#song-preview .bigbtn").hide();
           unmute();
@@ -836,6 +838,7 @@ var Song = (function(){
     },
 
     countdown: function(){
+      /*
       $("#countdown").css('display','inline-block').html(NEXTVIDEO_PRELOAD + 1);
       var 
         count = NEXTVIDEO_PRELOAD + 1,
@@ -849,6 +852,7 @@ var Song = (function(){
             clearInterval(ival);
           }
         }, 1000); 
+        */
     },
 
     format: function(data, type) {
@@ -859,7 +863,6 @@ var Song = (function(){
       node = $("<a class=title />").append("<img src=http://i3.ytimg.com/vi/" + id + "/1.jpg>")
 
       node.click(function(){ 
-        console.log("Clicked");
         preview(data);
         blink(node, function(){
           mute();
@@ -1238,21 +1241,19 @@ var Panel = {
       Panel.show(which);
     }
   },
-  show: function(which, _interval) {
+  show: function(which) {
     if(Panel.visible[which]) {
       return;
     }
     var width = 220;
     if(which != "song") {
-      Panel.hide("song", 100);
+      Panel.hide("song");
     } else {
       _.each(["user", "channel"], function(which){
-        Panel.hide(which, 100);
+        Panel.hide(which);
       });
       width = 600;
     }
-
-    var interval = _interval || 500;
 
     _ev.set("panel:" + which, "show");
     Panel.visible[which] = true;
@@ -1263,30 +1264,31 @@ var Panel = {
 
     Panel.currentWidth += width;
 
-    $("#panels").animate({width: Panel.currentWidth + "px"}, interval);
-    $("#" + which).show().animate({
-      opacity: 1,
-      width: width + "px"
-    }, interval);
-    if(!_letterBoxed) {
-      $("#players").animate({marginLeft: Panel.currentWidth + "px"}, interval);
-    } else {
+    if(_letterBoxed) {
+      $("#panels").css({width: Panel.currentWidth + "px"});
       $("#players").css({marginLeft: "6px"});
+    } else {
+      $("#panels").animate({width: Panel.currentWidth + "px"});
+      $("#players").animate({marginLeft: Panel.currentWidth + "px"});
+      $("#" + which).show().animate({
+        opacity: 1,
+        width: width + "px"
+      });
     }
   },
-  hide: function(which, _interval) {
+  hide: function(which) {
+   
     if(!Panel.visible[which]) {
       return;
     }
 
-    var interval = _interval || 500;
     _ev.set("panel:" + which, "hide");
     Panel.visible[which] = false;
     Panel.visible.count--;
     $("#" + which).animate({
       opacity: 0,
       width: 0
-    }, interval, function(){
+    }, function(){
       $(this).hide();
       if(Panel.visible.count == 0) {
         $("#lhs-expand").show();
@@ -1296,11 +1298,17 @@ var Panel = {
     var width = 220;
     if(which == 'song') {
       width = 600;
+      Panel.currentWidth -= width;
+      width = Math.max(20, Panel.currentWidth);
+      $("#panels").css({width: width + "px"});
+      $("#players").css({marginLeft: width + "px"});
+    } else {
+      Panel.currentWidth -= width;
+      width = Math.max(20, Panel.currentWidth);
+      $("#panels").animate({width: width + "px"});
+      $("#players").animate({marginLeft: width + "px"});
     }
-    Panel.currentWidth -= width;
-    width = Math.max(20, Panel.currentWidth);
-    $("#panels").animate({width: width + "px"}, interval);
-    $("#players").animate({marginLeft: width + "px"}, interval);
+    _ev.set("panel:" + which, "hide-after");
   }
 };
 
