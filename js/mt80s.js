@@ -1322,7 +1322,7 @@ var Panel = {
       Panel.hide("song");
     } else {
       _.each(["user", "channel"], function(which){
-        Panel.hide(which);
+        Panel.hide(which, true);
       });
       width = 600;
     }
@@ -1348,11 +1348,15 @@ var Panel = {
       });
     }
   },
-  hide: function(which) {
+  hide: function(which, now) {
    
     if(!Panel.visible[which]) {
       return;
     }
+
+    var 
+      func = now ? "css" : "animate",
+      width = 220;
 
     _ev.set("panel:" + which, "hide");
     Panel.visible[which] = false;
@@ -1367,19 +1371,15 @@ var Panel = {
       } 
     });
 
-    var width = 220;
     if(which == 'song') {
       width = 600;
-      Panel.currentWidth -= width;
-      width = Math.max(20, Panel.currentWidth);
-      $("#panels").css({width: width + "px"});
-      $("#players").css({marginLeft: width + "px"});
-    } else {
-      Panel.currentWidth -= width;
-      width = Math.max(20, Panel.currentWidth);
-      $("#panels").animate({width: width + "px"});
-      $("#players").animate({marginLeft: width + "px"});
+      func = "css";
     }
+    Panel.currentWidth -= width;
+    width = Math.max(20, Panel.currentWidth);
+    $("#panels")[func]({width: width + "px"});
+    $("#players")[func]({marginLeft: width + "px"});
+    
     _ev.set("panel:" + which, "hide-after");
   }
 };
