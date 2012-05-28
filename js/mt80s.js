@@ -1,5 +1,5 @@
 var scripts = [
-  [0, 'http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.3.3/underscore-min.js'],
+  [0, 'js/underscore-min.js'],
   [10, 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js'],
   [2000, 'js/db.min.js']
 ];
