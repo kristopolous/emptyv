@@ -55,6 +55,9 @@ function addVideo(data, cb) {
         "",         // Empty notes.
         data.name   // Adder.
       ]), cb);
+    } else {
+      // If it exists, still call the callback
+      cb();
     }
   });
 }
@@ -90,12 +93,20 @@ function getNext(row) {
   // be appended to our playlist after the previous
   // video
   if(row.add) {
-    _db.linsert(
-      "pl:" + row.name,
-      "AFTER",
-      row.previous,
-      row.video.vid
-    );
+    if(row.previous) {
+      _db.linsert(
+        "pl:" + row.name,
+        "AFTER",
+        row.previous,
+        row.video.vid
+      );
+    } else {
+      _db.lpush(
+        "pl:" + row.channel,
+        row.video.vid
+      );
+    }
+    row.previous = false;
 
     // And then we move the index forward
     // so that when we've exhausted our 
@@ -183,6 +194,7 @@ _db.hgetall("tick", function(err, state) {
 
           getNext(_state[data.channel]);
         } else if(data.action == 'delist') {
+          console.log("Delist", data);
           _db.lrem("pl:" + data.channel, 0, data.track.vid);
           Chat.add(data.channel, {
             type: 'delist',
@@ -202,7 +214,8 @@ _db.hgetall("tick", function(err, state) {
             } else {
               addVideo(data, function(){
 
-                if(!_state[data.channel]) {
+                if(!_state[data.channel] || !_state[data.channel].video.vid) {
+                  console.log("Building channel: " + data.channel);
                   // This is a channel bootstrap
                   build(data.channel);
                   _db.lpush(
@@ -231,9 +244,7 @@ _db.hgetall("tick", function(err, state) {
       // this is to survive a server crash
       setIndex(row.name, row.index, row.video.offset);
 
-      if(row.name == '80smtv') {
-        //console.log(row);
-      }
+      //console.log(row);
       // this is for the consumer.
       _db.hset("play", row.name, JSON.stringify(row.video));
     }

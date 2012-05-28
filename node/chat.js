@@ -31,6 +31,7 @@ function add(channel, obj) {
   }
   _db.incr("ix", function(err, id) {
     obj._id = id;
+    obj._ts = +(new Date());
     append("log:" + channel, obj);
   });
 }

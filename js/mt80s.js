@@ -154,6 +154,44 @@ function secondsToTime(count) {
   return stack.reverse().join(' ').replace(/^0/,'');
 }
 
+function time(fmt, utime) {
+	// return time in a format
+	// fmt is of type
+	// 	%[Y|M|N|D|W|H|h|m|s]
+	// 		Y = year, such as 2010
+	// 		N = Named month, such as Feb
+	// 		M = month, such 2
+	// 		W = Week day, such as Tue
+	// 		D = Day, such as 24
+	// 		H = hour base 12
+	// 		h = hour
+	// 		m = minute
+	// 		s = second
+  var d = new Date(utime),
+      t = {
+    Y: d.getFullYear(),
+    N: C.months[d.getMonth()],
+    M: (d.getMonth() + 1).padLeft(2),
+    W: C.days[d.getDay()],
+    D: d.getDate().padLeft(2),
+    H: ( ((d.getHours() + 1) % 12) - 1),
+    h: d.getHours().padLeft(2),
+    m: d.getMinutes().padLeft(2),
+    s: d.getSeconds().padLeft(2)
+  }, post = '';
+
+  if(!fmt) {
+    fmt = "%Y-%M-%D %h:%m:%s";
+  }
+
+  return fmt.replace(/%(.)/g, function (f, m) {
+    if(m == 'H') {
+      post = [' AM', ' PM'][Math.floor(t.h / 12)];
+    }
+
+    return t[m];
+  }) + post;
+}
 
 function log() {
   console.log([
@@ -761,6 +799,7 @@ var Song = (function(){
 
       $("#song-delist").click(function() {
         _socket.emit("delist", _lastSong);
+        Panel.hide("song");
       });
 
       $("#song-select-next").click(function(){
@@ -1140,6 +1179,19 @@ var Chat = (function(){
              "</a>" +
            "</div>";
     },
+    delist: function(data) {
+      var id = data.id.split(':').pop();
+      return "<div class=action>" +
+          "<em>Delisted:</em>" +
+          "<a class=title target=_blank href=http://youtube.com/watch?v=" + id + ">" + 
+           "<img src=http://i3.ytimg.com/vi/" + id + "/default.jpg>" +
+           "<span>" +
+             "<b>" + data.artist + "</b>" +  
+             data.title +
+           "</span>" +
+         "</a>" +
+       "</div>";
+    },
     request: function(data) {
       var id = data.id.split(':').pop();
       return "<div class=action>" +
@@ -1158,6 +1210,9 @@ var Chat = (function(){
     }
   };
     
+  function showContext(){
+  }
+
   function showmessage() {
     var 
       entry, 
@@ -1176,7 +1231,14 @@ var Chat = (function(){
         entry = $("<div>").html(format[row.type](row));
 
         if(row.who) {
-          entry.append("<div class=author>" + row.who + ".</div>");
+          $("<div class=author>" + row.who + ".</div>").click(function(){
+            if(entry.expanded) {
+              return;
+            } else {
+              entry.expanded = true;
+              showContext(row);
+            }
+          }).appendTo(entry);
         }
 
         entryList.push(entry);

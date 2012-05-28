@@ -17,7 +17,6 @@ function uidgen() {
   return (Math.random() * Math.pow(2,63)).toString(36);
 }
 
-
 var search = (function(){
 
   function process(data, cb) {
@@ -277,8 +276,8 @@ IO.sockets.on('connection', function (socket) {
 
   socket.on("delist", function(p) {
     _db.lpush("request", JSON.stringify({
-      track: p,
       action: "delist",
+      track: p,
       name: _user.name,
       channel: _user.channel
     }));
@@ -328,6 +327,16 @@ IO.sockets.on('connection', function (socket) {
 
   socket.on("get-all-videos", function() {
     _db.lrange("pl:" + _user.channel, 0, -1, function(err, list) {
+      // This means an empty channel, it's probably an error
+      // and we should probably handle it better than this.
+      // But at least we aren't crashing.
+      if(list.length == 0) {
+        socket.emit("all-videos", {
+          channel: _user.channel,
+          data: [[]]
+        });
+        return;
+      }
       _db.hmget("vid", list, function(err, allvideos) {
         for(var ix = 0; ix < allvideos.length; ix++) {
           allvideos[ix] = JSON.parse(allvideos[ix]);
