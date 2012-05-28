@@ -167,10 +167,12 @@ button.bigbtn,.channel { text-align:left;
   z-index:10;
   position:relative;
 }
+#preview-artist{display:block}
 #song-preview{display:inline-block;text-align:center;margin-left:6px;font-size:1.4em}
-#song-preview b{display:block;text-align:center;color:#ccc;margin-bottom:1em}
+#song-preview-info{display:block;text-align:center;color:#ccc;margin-bottom:1em}
 
 #embedder{width:500px;height:400px}
+#title-edit{display:none;position:absolute;right:6px}
 #song-lhs{display:inline-block;overflow:hidden;width:240px;vertical-align:top}
 a#song-delist.bigbtn{float:right;font-size:0.7em;color:#555}
 </style>
@@ -259,7 +261,11 @@ a#song-delist.bigbtn{float:right;font-size:0.7em;color:#555}
             <div id=song-results></div>
           </div>
           <div id=song-preview>
-            <b>Video Preview</b>
+            <div id=song-preview-info>
+              <button id=title-edit><img src=css/edit_24.png></button>
+              <b id=preview-artist>Video Preview</b>
+              <span id=preview-title></span>
+            </div>
             <div id=embedder></div>
             <a class=bigbtn id=song-delist>delist</a>
             <button class=bigbtn id=song-select-cancel>Cancel</button>

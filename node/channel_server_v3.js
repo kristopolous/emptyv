@@ -42,7 +42,8 @@ function setVideo(channel, vid, offset, cb) {
   });
 }
 
-function addVideo(data) {
+function addVideo(data, cb) {
+  console.log("Adding " + data.vid);
   _db.hget("vid", data.vid, function(err, vid) {
     if(!vid) {
       _db.hset("vid", data.vid, JSON.stringify([
@@ -53,7 +54,7 @@ function addVideo(data) {
         data.title, // Empty title
         "",         // Empty notes.
         data.name   // Adder.
-      ]));
+      ]), cb);
     }
   });
 }
@@ -64,6 +65,7 @@ function setIndex(channel, index, offset) {
 }
 
 function loadVideo(channel, index, offset, quiet) {
+  console.log("Loading " + channel + " " + index);
   _db.lindex("pl:" + channel, index, function(err, vid) {
     setVideo(channel, vid, offset, function(data) {
       setIndex(channel, index, data.start);
@@ -91,17 +93,20 @@ function getNext(row) {
     _db.linsert(
       "pl:" + row.name,
       "AFTER",
-      row.video.vid,
-      video.vid
+      row.previous,
+      row.video.vid
     );
 
     // And then we move the index forward
     // so that when we've exhausted our 
     // request stack we don't revisit the
     // stuff we are inserting
-    setIndex(row.name, row.index + 1, 0);
+    row.index++;
+    setIndex(row.name, row.index, 0);
   }
   if(video) {
+    console.log(video);
+    row.previous = row.video.vid;
     setVideo(row.name, video.vid, 0, function(){});
     row.add = video.add;
   } else {
@@ -109,6 +114,29 @@ function getNext(row) {
     _db.llen("pl:" + row.name, function(err, len) {
       loadVideo(row.name, (row.index + 1) % len);
     });
+  }
+}
+
+function doRequest(data, doadd) {
+  // Putting it in the on-disk playlist is done
+  // through the stack shifting logic
+  console.log("Adding to the request stack");
+  _state[data.channel].requestStack.push({
+    vid: data.vid,
+    name: data.name,
+    add: doadd
+  });
+  Chat.add(data.channel, {
+    type: 'request',
+    artist: data.artist,
+    title: data.title,
+    id: data.vid,
+    who: data.name
+  });
+
+  if(data.now) {
+    console.log("Playing now");
+    getNext(_state[data.channel]);
   }
 }
 
@@ -131,6 +159,7 @@ _db.hgetall("tick", function(err, state) {
     );
   }
 
+  console.log("Up");
   setInterval(function(){
     var 
       now = +(new Date()),
@@ -143,46 +172,35 @@ _db.hgetall("tick", function(err, state) {
       request.forEach(function(row) {
         var data = JSON.parse(row);
 
-        switch(data.action) {
-          case 'skip':
-            Chat.add(data.channel, {
-              type: 'skip',
-              artist: data.track.artist,
-              title: data.track.title,
-              id: data.track.vid,
-              who: data.name
-            });
+        if(data.action == 'skip') {
+          Chat.add(data.channel, {
+            type: 'skip',
+            artist: data.track.artist,
+            title: data.track.title,
+            id: data.track.vid,
+            who: data.name
+          });
 
-            getNext(_state[data.channel]);
-            break;
+          getNext(_state[data.channel]);
+        } else if(data.action == 'delist') {
+          _db.lrem("pl:" + data.channel, 0, data.track.vid);
+          Chat.add(data.channel, {
+            type: 'delist',
+            artist: data.track.artist,
+            title: data.track.title,
+            id: data.track.vid,
+            who: data.name
+          });
+        } else {
+          _db.lrange("pl:" + data.channel, 0, -1, function(res, list) {
+            var offset = list.indexOf(data.vid);
 
-          case 'delist': 
-            _db.lrem("pl:" + data.channel, 0, data.track.vid);
-            Chat.add(data.channel, {
-              type: 'delist',
-              artist: data.track.artist,
-              title: data.track.title,
-              id: data.track.vid,
-              who: data.name
-            });
-            break;
+            // See if its in thie channels playlist
+            if(offset > -1) {
 
-          default:
-            _db.lrange("pl:" + data.channel, 0, -1, function(res, list) {
-              var offset = list.indexOf(data.vid);
-
-              // See if its in thie channels playlist
-              if(offset > -1) {
-
-                // request
-                _state[data.channel].requestStack.push({
-                  vid: data.vid,
-                  name: data.name,
-                  add: false
-                });
-
-              } else {
-                addVideo(data);
+              doRequest(data, false);
+            } else {
+              addVideo(data, function(){
 
                 if(!_state[data.channel]) {
                   // This is a channel bootstrap
@@ -193,28 +211,11 @@ _db.hgetall("tick", function(err, state) {
                   );
                   loadVideo(data.channel, 0, 0);
                 } else {
-                  // Putting it in the on-disk playlist is done
-                  // through the stack shifting logic
-                  _state[data.channel].requestStack.push({
-                    vid: data.vid,
-                    name: data.name,
-                    add: true
-                  });
+                  doRequest(data, true);
                 }
-              } 
-
-              Chat.add(data.channel, {
-                type: 'request',
-                artist: data.artist,
-                title: data.title,
-                id: data.vid,
-                who: data.name
               });
-
-              if(data.now) {
-                getNext(_state[data.channel]);
-              }
-            });
+            } 
+          });
         }
       });
     });
@@ -230,7 +231,9 @@ _db.hgetall("tick", function(err, state) {
       // this is to survive a server crash
       setIndex(row.name, row.index, row.video.offset);
 
-      console.log(row);
+      if(row.name == '80smtv') {
+        //console.log(row);
+      }
       // this is for the consumer.
       _db.hset("play", row.name, JSON.stringify(row.video));
     }
