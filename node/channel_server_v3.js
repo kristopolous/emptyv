@@ -128,6 +128,67 @@ function getNext(row) {
   }
 }
 
+function delist(data) {
+  // Redis' api is stupid here.
+  // really crappy.
+
+  // First we need a reference point, for later verification
+  // when it comes to the possibility of resetting an index
+  // or not.
+  var 
+    refPoint = _state[data.channel].previous || _state[data.channel].video.vid,
+    currentIndex = _state[data.channel].index,
+    channel = data.channel;
+
+  console.log("Removing " + data.track.vid + " from " + channel);
+  // Now we need to remove the entry from the playlist by
+  // its content, not its index.
+  _db.lrem("pl:" + channel, 0, data.track.vid, function(err, last) {
+    //
+    // After the content has been removed we need to now know whether our
+    // reference pointer needs to go behind, be reset, or stay put.
+    //
+    // If our refPoint is the same as our data.track.vid, that is to say
+    // that we are delisting the video that is being currently watched, 
+    // then all we need to do is keep the index as is, and reset the
+    // offset counter, re-emitting the index, which is at the new content.
+    // 
+    if(refPoint == data.track.vid) {
+      console.log("That was our current video, resetting to the new index");
+      setIndex(channel, currentIndex, 0);
+      loadVideo(channel, currentIndex);
+      return;
+    }
+
+    // Otherwise, we need to query the database, at the index 
+    // that we previously knew.
+    _db.lindex("pl:" + channel, currentIndex, function(err, last) {
+      //
+      // If the content at the previous index is the same as the refpoint
+      // content, that means that the delisting happened after the current
+      // position. We don't have to do anything.
+      //
+      // However, if the content at the previous index is different, then
+      // that means that the deletion happened prior to the refpoint content
+      // and so therefore we need to back up one. Of course we are assuming
+      // that we aren't backing up to -1. I think this is not possible here.
+      //
+      // Absofuckinglutely insane.
+      //
+      if(last != refPoint) {
+        console.log("That was an earlier index, tracking back");
+        _state[channel].index -= 1;
+        setIndex(channel, _state[channel].index, _state[channel].offset);
+      } else {
+        console.log("That was a later index, everything is gravy");
+      }
+    });
+  });
+}
+
+function updateNext(channel) {
+}
+
 function doRequest(data, doadd) {
   // Putting it in the on-disk playlist is done
   // through the stack shifting logic
@@ -137,6 +198,9 @@ function doRequest(data, doadd) {
     name: data.name,
     add: doadd
   });
+
+  updateNext(channel);
+
   Chat.add(data.channel, {
     type: 'request',
     artist: data.artist,
@@ -195,7 +259,9 @@ _db.hgetall("tick", function(err, state) {
           getNext(_state[data.channel]);
         } else if(data.action == 'delist') {
           console.log("Delist", data);
-          _db.lrem("pl:" + data.channel, 0, data.track.vid);
+
+          delist(data);
+
           Chat.add(data.channel, {
             type: 'delist',
             artist: data.track.artist,
