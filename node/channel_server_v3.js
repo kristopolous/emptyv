@@ -199,7 +199,7 @@ function doRequest(data, doadd) {
     add: doadd
   });
 
-  updateNext(channel);
+  updateNext(data.channel);
 
   Chat.add(data.channel, {
     type: 'request',
