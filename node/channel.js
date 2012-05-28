@@ -43,6 +43,7 @@ function update(name, newData) {
     }
     _db.hset('channel', name, JSON.stringify(oldData));
   });
+  return newData;
 }
 
 function remove(channel) {

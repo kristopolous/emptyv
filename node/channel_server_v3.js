@@ -19,7 +19,8 @@ function build(channel) {
   };
 }
 
-function setVideo(channel, vid, offset, cb) {
+function setVideo(channel, vid, offset, cb, opts) {
+  opts = opts || {};
   _db.hget("vid", vid, function(err, raw) {
     var full = JSON.parse(raw);
     if(!full) {
@@ -38,6 +39,16 @@ function setVideo(channel, vid, offset, cb) {
     };
     if(cb) {
       cb(_state[channel].video);
+    }
+    if(!opts.quiet) {
+      Chat.append(
+        "lastplayed:" + channel, 
+        Channel.update(channel, {
+          vid: vid,
+          title: full[4],
+          artist: full[3]
+        })
+      );
     }
   });
 }
@@ -67,22 +78,13 @@ function setIndex(channel, index, offset) {
  _db.hset("tick", channel, [index, offset].join(','));
 }
 
-function loadVideo(channel, index, offset, quiet) {
+function loadVideo(channel, index, offset, opts) {
   console.log("Loading " + channel + " " + index);
   _db.lindex("pl:" + channel, index, function(err, vid) {
     setVideo(channel, vid, offset, function(data) {
       setIndex(channel, index, data.start);
       _state[channel].index = index;
-      if(!quiet) {
-        var obj = {
-          vid: vid,
-          title: data.title,
-          artist: data.artist
-        };
-        Chat.append("lastplayed:" + channel, obj);
-        Channel.update(channel, obj);
-      }
-    });
+    }, opts);
   });
 }
 
@@ -118,12 +120,12 @@ function getNext(row) {
   if(video) {
     console.log(video);
     row.previous = row.video.vid;
-    setVideo(row.name, video.vid, 0, function(){});
+    setVideo(row.name, video.vid, 0);
     row.add = video.add;
   } else {
     row.add = false;
     _db.llen("pl:" + row.name, function(err, len) {
-      loadVideo(row.name, (row.index + 1) % len);
+      loadVideo(row.name, (row.index + 1) % len, 0);
     });
   }
 }
@@ -155,8 +157,7 @@ function delist(data) {
     // 
     if(refPoint == data.track.vid) {
       console.log("That was our current video, resetting to the new index");
-      setIndex(channel, currentIndex, 0);
-      loadVideo(channel, currentIndex);
+      loadVideo(channel, currentIndex, 0);
       return;
     }
 
@@ -215,26 +216,7 @@ function doRequest(data, doadd) {
   }
 }
 
-_db.hgetall("tick", function(err, state) {
-  for(var channel in state) {
-    if (channel == '' || channel == '[object Object]') {
-      Channel.remove(channel);
-      continue;
-    }
-    Channel.update(channel, {name: channel});
-    var position = state[channel].split(',');
-
-    build(channel);
-
-    loadVideo(
-      channel, 
-      parseInt(position[0]),
-      parseInt(position[1]),
-      true
-    );
-  }
-
-  console.log("Up");
+function poll() {
   setInterval(function(){
     var 
       now = +(new Date()),
@@ -317,4 +299,26 @@ _db.hgetall("tick", function(err, state) {
 
     _last = now;
   }, 1000);
+}
+
+_db.hgetall("tick", function(err, state) {
+  for(var channel in state) {
+    if (channel == '' || channel == '[object Object]') {
+      Channel.remove(channel);
+      continue;
+    }
+    Channel.update(channel, {name: channel});
+    var position = state[channel].split(',');
+
+    build(channel);
+
+    loadVideo(
+      channel, 
+      parseInt(position[0]),
+      parseInt(position[1]),
+      {quiet: true}
+    );
+  }
+  console.log("Up");
+  poll();
 });
