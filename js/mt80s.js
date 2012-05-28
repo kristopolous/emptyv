@@ -1468,7 +1468,10 @@ var Volume = (function(){
         }
       }
       $("#mute-fg").css('height', (_volume * 100) + "px");
-      _playerPrev[_active].setVolume(volume * _volume);
+
+      if(_playerPrev[_active]) {
+        _playerPrev[_active].setVolume(volume * _volume);
+      }
     },
 
     mute: function(){
@@ -1543,7 +1546,9 @@ when("$", function (){
 
   Channel.Init();
   User.Init();
-  Song.Init();
+
+  when("_", Song.Init);
+
   Volume.Init();
 
   if(_channel) {
