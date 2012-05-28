@@ -1491,7 +1491,6 @@ var Volume = (function(){
   };
 })();
 
-
 when("io", function(){
   _socket = io.connect('http://' + window.location.hostname + ':1985/');
   _socket.on("stats", function(d) { $("#channel-stats").html(d.online + " partying"); });

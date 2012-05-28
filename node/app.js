@@ -70,10 +70,12 @@ var search = (function(){
     remote(query, function(err, res) {
       var idList = res.map(function(row) { return row.vid });
       _db.hmget("vid", idList, function(err, data) {
-        for(var ix = data.length - 1; ix >= 0; ix--) {
-          if(data[ix]) {
-            local.push(res[ix]);
-            res.splice(ix, 1);
+        if(data) {
+          for(var ix = data.length - 1; ix >= 0; ix--) {
+            if(data[ix]) {
+              local.push(res[ix]);
+              res.splice(ix, 1);
+            }
           }
         }
         cb(false, {
