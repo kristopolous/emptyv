@@ -23,13 +23,13 @@ var search = (function(){
     var results = [], title, artist, split;
     if(data.feed.entry) {
       data.feed.entry.forEach(function(result) {
-        split = result.title.$t.split('-');
+        split = result.title.$t.split(' - ');
         if(split.length == 1) {
           artist = "";
           title = split[0];
         } else {
           artist = split.shift();
-          title = split.join('-');
+          title = split.join(' - ');
         }
         results.push({
           vid: 'yt:' + result.media$group.yt$videoid.$t,
