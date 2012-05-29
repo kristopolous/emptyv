@@ -360,6 +360,7 @@ IO.sockets.on('connection', function (socket) {
         .replace(/>/g, '&gt;')),
       vid: data.vid, 
       who: _user.name,
+      color: _user.color,
       offset: data.offset
     });
   });
@@ -368,5 +369,5 @@ IO.sockets.on('connection', function (socket) {
     if(!_user.color) {
       socket.emit("greet-request");
     }
-  }, 1000);
+  }, 3000);
 });

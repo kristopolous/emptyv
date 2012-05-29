@@ -499,11 +499,11 @@ var Player = (function(){
       $("#players").css({
         height: "162px",
         width: "216px",
-        marginTop: "6px",
+        paddingTop: "6px",
         marginLeft: "6px" 
       });
       $("#top").css({
-        marginTop: "160px"
+        paddingTop: "160px"
       });
     },
     hide: hide,
@@ -515,10 +515,10 @@ var Player = (function(){
         $("#players").css({
           height: "100%",
           width: "auto",
-          marginTop: 0
+          paddingTop: 0
         });
         $("#top").css({
-          marginTop: "12px"
+          paddingTop: "0"
         });
       }
     }
@@ -1098,9 +1098,11 @@ var Chat = (function(){
     });
 
     when("$", function(){
-      $("#message-wrap").css({height: $(window).height() - 128});
+      var inputHeight = $("#user-control").height() + $("#talk").height();
+
+      $("#message-wrap").css({height: $(window).height() - 140 - inputHeight});
       $(window).resize(function(){
-        $("#message-wrap").css({height: $(window).height() - 128});
+        $("#message-wrap").css({height: $(window).height() - 140 - inputHeight});
       });
       log("Loading chat");
       reset();
@@ -1242,7 +1244,7 @@ var Chat = (function(){
         }
 
         entryList.push(entry);
-        $("#message").prepend(entry);
+        $("#message").append(entry);
       }
       /*
       if(_chat.data[lastindex].length > 2) {
@@ -1292,8 +1294,8 @@ var Chat = (function(){
       if(message.length && !processCommand(message)) {
         send("chat", { 
           d: message,
-          vid: _song[ID],
-          offset: _playerById[_song[ID]].getCurrentTime()
+          vid: _song ? _song[ID] : 0,
+          offset: _song ? _playerById[_song[ID]].getCurrentTime() : 0
         });
       }
       $("#talk").val("");
@@ -1338,7 +1340,9 @@ var Panel = {
 
     if(_letterBoxed) {
       $("#panels").css({width: Panel.currentWidth + "px"});
-      $("#players").css({marginLeft: "6px"});
+      $("#players").css({
+        marginLeft: "6px"
+      });
     } else {
       $("#panels").animate({width: Panel.currentWidth + "px"});
       $("#players").animate({marginLeft: Panel.currentWidth + "px"});

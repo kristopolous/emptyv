@@ -12,7 +12,7 @@ input{width:190px;margin:0.25em 0 0.75em}
 .btn{text-align:center;font-size:0.60em;padding:0.25em;margin:0.25em;cursor:pointer;border:0.25em solid #222}
 .btn:hover{border-color:#555;color:#eee}
  
-/*#message-wrap {width: 215px;overflow-y:auto}*/
+#message-wrap {overflow:hidden;}
 
 #splash{text-align:center;background:#000;height:100%}
 #splash a{color:#90a0af}
@@ -24,7 +24,7 @@ h2 b{display:block;font-size:1.5em;font-weight:normal;line-height:1em}
 #bottom{position:fixed;bottom:0;right:0}
 
 #bottom{float:right}
-#players{margin-left:220px;position:absolute;bottom:0;height:100%;position:relative;z-index:20}
+#players{margin-left:220px;position:absolute;bottom:0;height:100%;position:relative;z-index:20;background:#000}
 #players object,#players embed{position:absolute;top:0;left:-2000%;width:100%;height:100%}
 #mute-control{position:absolute;top:25px;right:10px;background:#222}
 #mute-control .expanded{display:none;border:1px solid #555;background:#222;width:26px;margin-left:1px;
@@ -35,13 +35,13 @@ h2 b{display:block;font-size:1.5em;font-weight:normal;line-height:1em}
 #mute img{margin:-1px 0 0 -1px}
 
 #panels{float:left;width:20px;position:relative;height:100%;white-space:nowrap}
-#panels > span{width:0px;display:none;position:relative;height:100%;vertical-align:top;background:url('css/chat-bg.png')}
+#panels > span{width:0px;display:none;position:relative;height:100%;vertical-align:top;background:#18191b}
 .panel-title{color:#ccc;font-size:1.2em;padding:0.5em;line-height:0.8em;white-space:nowrap}
 .panel-content{margin:0 1em;display:block;font-size:0.7em}
 .collapse{color:#ccc;position:absolute;top:0.25em;right:0;z-index:12;width:20px;height:8px;background:url('css/button-bg.jpg');line-height:8px;margin-top:0}
 
 #message img{max-width:195px}
-#message{border-top:1px solid #222;font-size:0.9em;color:#ccc; padding:0 0.5em;overflow-y:auto}
+#message{border-top:1px solid #222;font-size:0.9em;color:#ccc; padding:0 0.5em;overflow-y:auto;position:absolute;bottom:40px}
 #message > div{padding:0.35em 0;overflow:hidden;white-space:normal}
 #message div.author{color:#555;font-size:0.7em;margin:-0.1em 0 0;text-align:right;border-bottom:1px solid #222;cursor:pointer}
 #message p {margin-left:0.25em;font-size:0.9em}
@@ -67,7 +67,7 @@ h2 b{display:block;font-size:1.5em;font-weight:normal;line-height:1em}
 .title span{display:inline-block;margin-left:6px;font-size:0.75em;color:#888;width:148px;white-space:normal}
 .title img{width:50px;vertical-align:top;height:38px}
 .title b{display:block;font-size:1.2em;color:#ccc;font-weight:normal;height:1.25em;overflow:hidden}
-#top{position:relative;margin-left:6px}
+#top{position:relative;margin-left:6px;z-index:5;background:#18191b}
 #lhs-expand{display:none}
 #lhs-expand,#lhs-collapse{padding:0.5em 0.25em;font-size:0.6em;width:1em}
 #channel{background:#222}
@@ -99,7 +99,7 @@ display:block;margin-top:6px;
 position:absolute;font-size:1.4em;top:2px;left:238px
 }
 
-#chatbar{z-index:0;width:220px;margin-top:1em}
+#chatbar{z-index:0;width:220px;position:absolute;bottom:0}
 #channel-wrap{display:inline-block;padding-top:0.5em;font-size:1.2em}
   #channel-wrap span{display:inline-block;width:150px}
   #channel-expand{display:inline-block;background:url("images/door_open.png") 0.3em 0.2em no-repeat #222;width:38px;height:40px;
@@ -114,7 +114,7 @@ position:absolute;font-size:1.4em;top:2px;left:238px
   #email-wrap{display:none}
   #register-button{display:block}
 
-#app{display:none;height:100%}
+  #app{display:none;height:100%}
 
 #videoList{width:550px;display:inline-block;text-align:left;margin-top:1em}
 #videoList .channel{
@@ -178,13 +178,11 @@ a#song-delist.bigbtn{float:right;font-size:0.7em;color:#555}
 </style>
 <!--[if IE]><link rel=stylesheet href=css/ie.css><![endif]-->
 </head>
-<body>
-<div id=splash>
+<body><div id=splash>
   <h2><b>Join a Party</b>You Be The VJ</h2>
 <div id=videoList></div>
 <div id=bottom><a href=about.html target=_blank>about</a></div>
-</div>
-<div id=app>
+</div><div id=app>
   <div id=panels><div class=btn id=lhs-expand>&gt;</div>
     <span id=channel>
       <span class="btn collapse">X</span>
@@ -215,15 +213,15 @@ a#song-delist.bigbtn{float:right;font-size:0.7em;color:#555}
         <div id=video-current></div><div id=video-expand></div></div>
       </div>
       <div id=chatbar>
+        <div id=message-wrap>
+          <div id=message>
+          </div>
+        </div>
         <label id=user-control>
           <div id=display-username>You are anonymous.</div>
           <a id=login-button>Log in</a>
         </label>
         <input id=talk autocomplete=off>
-        <div id=message-wrap>
-          <div id=message>
-          </div>
-        </div>
       </div>
     </span><span id=user>
       <span class="btn collapse">X</span>
