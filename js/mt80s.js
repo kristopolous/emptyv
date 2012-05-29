@@ -847,6 +847,7 @@ var Song = (function(){
         } else if(which == 'hide-after') {
           Song.reset();
           $("#song-preview .bigbtn").hide();
+          console.log("UNMUTED");
           Volume.unmute();
           Player.fullscreen();
           $("#input-song-search").val("");
@@ -1113,6 +1114,10 @@ var Chat = (function(){
         _chat.lastid = _chat.data[_chat.data.length - 1]._id;
         showmessage();
       });
+
+      if(!_channel) {
+        reset();
+      }
 
       _socket.on("greet-request", function(version) {
         send("greet-response", {
@@ -1465,7 +1470,7 @@ var Volume = (function(){
       }
       $("#mute-fg").css('height', (_volume * 100) + "px");
 
-      if(_playerPrev[_active]) {
+      if(_playerPrev && _playerPrev[_active]) {
         _playerPrev[_active].setVolume(volume * _volume);
       }
     },

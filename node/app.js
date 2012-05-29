@@ -137,7 +137,7 @@ IO.sockets.on('connection', function (socket) {
         socket.emit("song", [
           song.vid,
           song.len,
-          song.offset.toFixed(3),
+          song.offset !== null ? song.offset.toFixed(3) : 0,
           song.start,
           song.volume,
           song.artist,
