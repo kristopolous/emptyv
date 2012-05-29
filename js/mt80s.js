@@ -1445,14 +1445,14 @@ var Volume = (function(){
         _mousedown = true;
         var offset = 70;
         if(_letterBoxed) {
-          offset += 168;
+          offset += 160;
         }
         Volume.set(1 - (e.pageY - offset) / 100);
         return false;
       }).mousemove(function(e){
         var offset = 70;
         if(_letterBoxed) {
-          offset += 168;
+          offset += 160;
         }
         if(_mousedown) {
           Volume.set(1 - (e.pageY - offset) / 100);
