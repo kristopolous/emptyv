@@ -16,11 +16,11 @@ input{width:190px;margin:0.25em 0 0.75em}
 
 #splash{text-align:center;background:#000;height:100%}
 #splash a{color:#90a0af}
-h2 b{display:block;font-size:1.5em;color:#90a0af}
+h2 b{display:block;font-size:1.5em;font-weight:normal;line-height:1em}
 #splash h2{
-  font-weight:normal;color:#608088;
+  font-weight:normal;color:#90a0af;
   width:100%;text-align:center;font-size:2em;padding:0.5em 0;text-shadow:0px 0px 4px #959;
-  background:#000;position:relative}
+  background:#202228;position:relative}
 #bottom{position:fixed;bottom:0;right:0}
 
 #bottom{float:right}
@@ -66,7 +66,7 @@ h2 b{display:block;font-size:1.5em;color:#90a0af}
 .title {text-decoration:none}
 .title span{display:inline-block;margin-left:6px;font-size:0.75em;color:#888;width:148px;white-space:normal}
 .title img{width:50px;vertical-align:top;height:38px}
-.title b{display:block;font-size:1.2em;color:#ccc;font-weight:normal}
+.title b{display:block;font-size:1.2em;color:#ccc;font-weight:normal;height:1.25em;overflow:hidden}
 #top{position:relative;margin-left:6px}
 #lhs-expand{display:none}
 #lhs-expand,#lhs-collapse{padding:0.5em 0.25em;font-size:0.6em;width:1em}
@@ -119,23 +119,23 @@ position:absolute;font-size:1.4em;top:2px;left:238px
 #videoList{width:550px;display:inline-block;text-align:center;margin-top:1em;}
 #videoList .channel{
   width:220px;
-  height:85px;
+  height:68px;
   display:inline-block;padding:0.5em;margin:1em
 }
-button.bigbtn:hover,.channel:hover{box-shadow: 0 0 5px 3px #555;color:#fff}
+button.bigbtn:hover,.channel:hover{box-shadow: 0 0 5px 3px #505257;color:#fff}
 button.bigbtn,.channel { text-align:left; 
   cursor:pointer;
   padding:3px 6px;
   margin:15px 0;
   color:#ddd;
   vertical-align:top;
-  box-shadow:0 0 5px 3px #35393a;
-  border-radius:3px;
-  background:url("css/button-bg.jpg");
+  box-shadow:0 0 5px 3px #35393f;
+  background:#202228;/*url("css/button-bg.jpg");*/
 }
-.channel .title{display:block;margin-top:6px;font-size:14px}
-.channel em { margin-top:-0.15em;display:inline-block;margin-right:9px;font-style:normal;font-size:1.25em}
-.channel small { color:#ccc;display:block;margin-top:-0.25em}
+.channel{overflow:hidden;position:relative}
+.channel .title{display:block;margin-top:5px;font-size:14px}
+.channel em { color:#e8ecf3;margin-top:-0.15em;display:inline-block;color:#ddd;font-style:normal;font-size:1.2em}
+.channel small { color:#aaa;display:block;position:absolute;top:0.75em;right:0.75em;font-size:0.75em}
 
 .tabs {
   height:24px;
