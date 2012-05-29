@@ -1105,7 +1105,7 @@ var Chat = (function(){
         $("#message-wrap").css({height: $(window).height() - 140 - inputHeight});
       });
       // There's a race condition here ... so we run this twice.
-      setTimetout(function(){
+      setTimeout(function(){
         $("#message-wrap").css({height: $(window).height() - 140 - inputHeight});
       }, 3000);
 
