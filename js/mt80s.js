@@ -503,7 +503,7 @@ var Player = (function(){
         marginLeft: "6px" 
       });
       $("#top").css({
-        paddingTop: "160px"
+        marginTop: "160px"
       });
     },
     hide: hide,
@@ -518,7 +518,7 @@ var Player = (function(){
           paddingTop: 0
         });
         $("#top").css({
-          paddingTop: "0"
+          marginTop: "0"
         });
       }
     }
