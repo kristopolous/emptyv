@@ -1061,22 +1061,18 @@ var Chat = (function(){
   var 
     row,
     lastEntry, 
-    entryCount,
     entryList,
     lastindex = 0;
 
   function reset() {
 
     self._chat = {
-      lastentry: false,
-      lastauthor: false,
-      lastcolor: -1,
+      lastuid: undefined,
       data: [],
       lastid: 0
     };
 
     lastEntry = "";
-    entryCount = 0;
     entryList = [],
     lastindex = 0;
     $("#message").empty();
@@ -1110,7 +1106,6 @@ var Chat = (function(){
       }, 3000);
 
       log("Loading chat");
-      reset();
       $("#talk").focus();
 
       _socket.on("chat", function(d) {
@@ -1229,63 +1224,55 @@ var Chat = (function(){
     while(_chat.data.length > lastindex) {
 
       row = _chat.data[lastindex];
+      // Only display rows that we know how to
+      // display.
       if(format[row.type]) {
 
+        // Truncate the log after 20 containers
+        // of messages.
         if(entryList.length > 20) {
           entryList.shift().remove();
         }
 
-        entry = $("<div>").html(format[row.type](row));
+        entry = format[row.type](row);
 
-        if(row.who) {
-          $("<div class=author>" + row.who + ".</div>").click(function(){
-            if(entry.expanded) {
-              return;
-            } else {
-              entry.expanded = true;
-              showContext(row);
-            }
-          }).appendTo(entry);
+        // If this is a new author or the first entry 
+        // then we create a new entry
+        if(!_chat.lastentry || ( _chat.lastuid != row.uid )) {
+          entry = $("<div>").html(entry);
+
+          // If it's a human, it will have a color
+          if(row.color) {
+            entry.addClass("c" + row.color);
+          }
+
+          if(row.who) {
+            $("<div class=author>" + row.who + ".</div>").click(function(){
+              if(entry.expanded) {
+                return;
+              } else {
+                entry.expanded = true;
+                showContext(row);
+              }
+            }).appendTo(entry);
+          }
+
+          entryList.push(entry);
+          $("#message").append(entry);
+
+          // This is needed if the author says further things
+          // before someone else.
+          _chat.lastentry = entry;
+        } else {
+          $(entry).insertAfter(_chat.lastentry.get(0).lastChild.previousSibling);
         }
 
-        entryList.push(entry);
-        $("#message").append(entry);
-      }
-      /*
-      if(_chat.data[lastindex].length > 2) {
-        color = _chat.data[lastindex][2];
+        // A value of undefined here is a-ok.
+        _chat.lastuid = row.uid;
       }
       
-
-      if(
-          (_chat.data[lastindex][3] != _chat.lastauthor) || 
-          (_chat.lastauthor == false) ||
-        ) {
-        entry = $("<div>").html(lastEntry);
-
-        _chat.lastauthor = _chat.data[lastindex][3];
-
-        entryList.push(entry);
-
-        if(_chat.data[lastindex].length > 2) {
-          entry.addClass("c" + _chat.data[lastindex][2]);
-        } else {
-          entry.addClass("c");
-        }
-        _chat.lastcolor = color;
-
-        $("#message").prepend(entry);
-        if(_chat.lastauthor) {
-          entry.append("<div class=author>~ " + _chat.lastauthor + ".</div>");
-        } 
-        _chat.lastentry = entry;
-      } else {
-        $(lastEntry).insertAfter(_chat.lastentry.get(0).lastChild.previousSibling);
-      }
-      */
       $("a", entry).attr("target", "_blank");
        
-      entryCount++;
       lastindex++;
     }
   }

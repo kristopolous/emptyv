@@ -41,6 +41,12 @@ function setVideo(channel, vid, offset, cb, opts) {
       cb(_state[channel].video);
     }
     if(!opts.quiet) {
+      Chat.add(data.channel, {
+        type: 'play',
+        artist: full[4],
+        title: full[3],
+        id: data.vid
+      });
       Chat.append(
         "lastplayed:" + channel, 
         Channel.update(channel, {

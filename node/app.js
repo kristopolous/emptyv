@@ -360,6 +360,7 @@ IO.sockets.on('connection', function (socket) {
         .replace(/>/g, '&gt;')),
       vid: data.vid, 
       who: _user.name,
+      uid: _user.uid,
       color: _user.color,
       offset: data.offset
     });
