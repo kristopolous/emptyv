@@ -1104,6 +1104,11 @@ var Chat = (function(){
       $(window).resize(function(){
         $("#message-wrap").css({height: $(window).height() - 140 - inputHeight});
       });
+      // There's a race condition here ... so we run this twice.
+      setTimetout(function(){
+        $("#message-wrap").css({height: $(window).height() - 140 - inputHeight});
+      }, 3000);
+
       log("Loading chat");
       reset();
       $("#talk").focus();
