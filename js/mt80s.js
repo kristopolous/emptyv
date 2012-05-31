@@ -112,51 +112,48 @@ function remainingTime(player) {
   return 0;
 }
 
+function plural(num, mod, base) {
+  if(num % mod != 1) { return base + "s"; }
+  return base;
+}
+
 function secondsToTime(count) {
   var stack = [];
 
-  stack.push((Math.floor(count) % 60) + " sec");
+  stack.push((Math.floor(count) % 60) + plural(count, 60, " second"));
 
-  // seconds
   count = Math.floor(count / 60);
 
-  // minutes
-  if (count > 1) {
-    stack.push((count % 60) + " min");
-    count = Math.floor(count / 60);
+  if (count > 0) {
+    stack[0] = (count % 60) + plural(count, 60, " minute") + " and " + stack[0];
+    count = Math.floor(count / 60);;
   }
 
-  // hours
-  if (count > 1) {
-    stack.push((count % 24) + " hours");
+  if (count > 0) {
+    stack.push((count % 24) + plural(count, 24, " hour"));
     count = Math.floor(count / 24);
   }
 
-  // days
-  if (count > 1) {
-    stack.push((count % 7) + " days");
+  if (count > 0) {
+    stack.push((count % 7) + plural(count, 7, " day"));
     count = Math.floor(count / 7);
   }
 
-  // weeks
-  if (count > 1) {
-    stack.push((count % 2) + " weeks");
+  if (count > 0) {
+    stack.push((count % 2) + plural(count, 2, " week"));
     count = Math.floor(count / 2);
   }
 
-  // fortnights
-  if (count > 1) {
-    stack.push((count % 2) + " fortnights");
+  if (count > 0) {
+    stack.push((count % 2) + plural(count, 2, " fortnight"));
     count = Math.floor(count / 2);
   }
 
-  // Consider the classical 28 day month
-  if (count > 1) {
-    stack.push((count % 3) + " months");
-    count = Math.floor(count / 3);
+  if (count > 0) {
+    stack.push(count + plural(count, count + 1, " month"));
   }
 
-  return stack.reverse().join(' ').replace(/^0/,'');
+  return stack.reverse().join(', ').replace(/^0/,'');
 }
 
 function time(_fmt, utime) {
