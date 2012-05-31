@@ -1,3 +1,4 @@
+  self.onDailymotionPlayerReady = function(id) { onReady("dm", id); }
 countdown:
       /*
       $("#countdown").css('display','inline-block').html(PRELOAD + 1);

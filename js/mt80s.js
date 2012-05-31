@@ -1,21 +1,16 @@
-var scripts = [
-  [0, 'js/underscore-min.js'],
-  [10, 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js'],
-  [2000, 'js/db.min.js']
-];
-
-for(var i = 0; i < scripts.length; i++) {
-  (function(row){
-    setTimeout(function(){
-      log("Loading " + row[1]);
-      var ga = document.createElement('script');
-      ga.type = 'text/javascript';
-      ga.src = row[1];
-      var s = document.getElementsByTagName('script')[0];
-      s.parentNode.insertBefore(ga, s);
-    }, row[0]);
-  })(scripts[i]);
+function loadsrc(row) {
+  setTimeout(function(){
+    log("Loading " + row[1]);
+    var ga = document.createElement('script');
+    ga.type = 'text/javascript';
+    ga.src = row[1];
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(ga, s);
+  }, row[0]);
 }
+
+loadsrc([10, 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js']);
+loadsrc([2000, 'js/db.min.js']);
 
 if(!self.console) {
   self.console = {log:function(){}};
@@ -27,29 +22,14 @@ if(!self.localStorage) {
 var
   MYCOLOR = Math.floor(Math.random() * 10),
 
-  DUMMY = new Function(),
   ID = 0,
-
   RUNTIME = 1,
   START = 2,
   STOP = 3,
-
-  // This is for volume normalization on a per video
-  // basis
   VOLUME = 4,
-
   ARTIST = 5,
-
   TITLE = 6,
-
   NOTES = 7,
-
-  COMMERCIAL_sec = 30, 
-
-  // If there is a hash value (there should not be regularly)
-  // Then debugging output is turned on, whatever the hell that
-  // entails
-  DEBUG = location.hash.search("DEBUG") > -1,
 
   // The offset addition was after some toying around and 
   // seeint how long the player took to load. This seemed
@@ -71,7 +51,7 @@ var
   LASTTITLE = "",
 
   // @ref: http://code.google.com/apis/youtube/flash_api_reference.html
-  LEVELS = ["small", "medium"];//, "large"]; //, "hd720", "hd1080", "highres"];
+  LEVELS = ["small", "medium"];//, "large", "hd720", "hd1080", "highres"];
 
 // }} // Constants
 
@@ -118,10 +98,6 @@ function remainingTime(player) {
   } else {
     return 0;
   }
-}
-
-function image(id) {
-  return "http://i3.ytimg.com/vi/" + id.split(":").pop() + "/default.jpg>";
 }
 
 function secondsToTime(count) {
@@ -197,6 +173,15 @@ function log() {
   ].join(' '));
 } 
 
+function when(prop, cb) {
+  var ival = setInterval(function(){
+    if(self[prop]) {
+      cb();
+      clearInterval(ival);
+    }
+  }, 25);
+}
+
 // }} // Utils
 
 
@@ -262,7 +247,6 @@ var Player = (function(){
   var activePlayer;
 
   self.onYouTubePlayerReady = function(id) { onReady("yt", id); }
-  self.onDailymotionPlayerReady = function(id) { onReady("dm", id); }
 
   function check(player) {
     return (player && player.style);
@@ -344,13 +328,10 @@ var Player = (function(){
     if(++_loaded === 1) {
       show(_next);
 
-      setTimeout(function(){ 
-        Player.load("yt", 1);
-        Player.load("yt", 2); 
-      }, 1000);
-
       when("_song", function(){
         setInterval(doTitle, 1000);
+        Player.load("yt", 1);
+        Player.load("yt", 2); 
       });
     } 
   }
@@ -571,6 +552,7 @@ function doTitle(){
 
 function transition(song) {
 
+  _song = song;
   // Load the next video prior to actually switching over
   var 
     id = song[ID],
@@ -597,11 +579,6 @@ function transition(song) {
   // Optimistically, this would mean that there is PRELOAD seconds left in
   // the current video, but oftentimes more.
   _ev.isset(dom + _next, function() {
-    _player[_next].loadVideoById(uuid, Math.max(offset, 0));
-    _player[_next].setPlaybackQuality("medium");
-    _player[_next].setVolume(0);
-    _player[_next].playVideo();
-    log("video loaded");
 
     // The amount of time we have to transition is 
     // The minimum of the remaining time in the video and the lead time
@@ -629,6 +606,13 @@ function transition(song) {
       // mess so we store it locally.
       active = _player[_active],
       next = _player[_next];
+
+    next.loadVideoById(uuid, Math.max(offset, 0));
+    next.setPlaybackQuality("medium");
+    next.setVolume(0);
+    next.playVideo();
+
+    log("video loaded");
 
     setTimeout(function(){ 
       log("drop playing volume");
@@ -666,11 +650,11 @@ function transition(song) {
       // When you toggle the visibility, there is still an annoying spinner.
       // So to avoid this we just "move" the players off screen that aren't
       // being used.
-      Player.show(_player[_active], 'slide');
-      Player.hide(_playerPrev[_next], 'slide');
+      Player.show(next, 'slide');
+      Player.hide(active, 'slide');
       Player.hide(_playerPrev[EXTRA]);
 
-      _player[_active].index = index;
+      next.index = index;
       _playerById[index] = _player[_active];
 
       _index = index;
@@ -758,6 +742,7 @@ var User = {
     send("set-user", {user: false});
   }
 };
+
 var Song = (function(){
   var 
     _editing = false,
@@ -838,12 +823,11 @@ var Song = (function(){
       });
 
       $("#song-delist").click(function() {
-        _socket.emit("delist", _lastSong);
         Panel.hide("song");
+        _socket.emit("delist", _lastSong);
       });
 
       $("#song-select-next").click(function(){
-        Panel.hide("song");
         _socket.emit("video-play", _lastSong); 
       });
 
@@ -863,13 +847,8 @@ var Song = (function(){
       _ev("song-tab", "History");
 
       $("#song-skip").click(function(){
-        Song.countdown();
         Panel.hide("song");
-        _socket.emit("skip", {
-          vid: _song[ID],
-          title: _song[TITLE],
-          artist: _song[ARTIST]
-        });
+        _socket.emit("skip", _song[ID]);
       });
 
       onEnter("#input-song-search", Song.search);
@@ -1037,10 +1016,6 @@ var Channel = {
     $("#channel-query").keyup(function(){
       Channel.search(this.value);
     });
-  },
-
-  stats: function(d) {
-    return "users " + d;
   },
 
   set: function(which) {
@@ -1213,7 +1188,7 @@ var Chat = (function(){
     },
 
     skip: function(data) {
-      return format._baseVideo(data, 'Skipped');
+      return format.announce({text: 'Skipped <a onclick=preview("' + data.id + '")>' + data.artist + ' - ' + data.title + '</a>'});
     },
     delist: function(data) {
       return format._baseVideo(data, 'Delisted');
@@ -1313,7 +1288,6 @@ var Chat = (function(){
   };
 })();
 
-
 var Panel = {
   visible: {count:0},
   currentWidth: 0,
@@ -1397,14 +1371,6 @@ var Panel = {
   }
 };
 
-function when(prop, cb) {
-  var ival = setInterval(function(){
-    if(self[prop]) {
-      cb();
-      clearInterval(ival);
-    }
-  }, 25);
-}
 
 function send(func, data) {
   when("_socket", function(){
@@ -1488,7 +1454,7 @@ var Volume = (function(){
     },
 
     mute: function(){
-      if(muted == false) {
+      if(!muted) {
         oldvolume = _volume;
         Volume.set(0, true);
         muted = true;
@@ -1509,12 +1475,7 @@ when("io", function(){
   _socket.on("stats", function(d) { $("#channel-stats").html(d.online + " partying"); });
   _socket.on("channel-results", Channel.gen);
   _socket.on("song-results", Song.gen);
-
-  _socket.on("song", function(d) {
-    _song = d;
-    transition(d);
-  });
-
+  _socket.on("song", transition);
   _socket.on("uid", function(d) { Store("uid", d); });
   _socket.on("channel-name", function(d){ _ev("channel", d); });
   _socket.on("username", User.login);
@@ -1581,7 +1542,6 @@ when("$", function (){
     }
   }, 1000);
 });
-
 
 // Load the first player
 Player.load("yt", 0);

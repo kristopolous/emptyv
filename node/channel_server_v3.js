@@ -243,16 +243,19 @@ function requestProcessor() {
       var data = JSON.parse(row);
 
       if(data.action == 'skip') {
-        Chat.add(data.channel, {
-          type: 'skip',
-          artist: data.track.artist,
-          title: data.track.title,
-          id: data.track.vid,
-          uid: data.uid,
-          who: data.name
-        });
+        // Only skip the video if its currently still playing.
+        if(data.vid == _state[data.channel].video.vid) {
+          Chat.add(data.channel, {
+            type: 'skip',
+            artist: _state[data.channel].video.artist,
+            title: _state[data.channel].video.title,
+            id: data.vid,
+            uid: data.uid,
+            who: data.name
+          });
 
-        getNext(_state[data.channel]);
+          getNext(_state[data.channel]);
+        }
       } else if(data.action == 'delist') {
         console.log("Delist", data);
 

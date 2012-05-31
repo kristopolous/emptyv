@@ -288,10 +288,10 @@ IO.sockets.on('connection', function (socket) {
     }));
   });
 
-  socket.on("skip", function(p) {
+  socket.on("skip", function(vid) {
     _db.lpush("request", JSON.stringify({
-      track: p,
       action: "skip",
+      vid: vid,
       name: _user.name,
       uid: _user.uid,
       channel: _user.channel
