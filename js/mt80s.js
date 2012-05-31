@@ -48,8 +48,6 @@ var
   // by some increment, we take that to be the LOADTIME,
   PRELOAD = 3,
 
-  LASTTITLE = "",
-
   // @ref: http://code.google.com/apis/youtube/flash_api_reference.html
   LEVELS = ["small", "medium"];//, "large", "hd720", "hd1080", "highres"];
 
@@ -65,18 +63,33 @@ function blink(node, cb) {
     iter = 5,
     ival = setInterval(function(){
       if(iter == 0) {
-        node.css('background','none');
+        node.css('background', 'none');
         if (cb) {
           cb(node);
         }
         clearInterval(ival);
-      } else if(iter % 2) {
-        node.css("background", "#888");
       } else {
-        node.css("background", "#000");
+        node.css("background", ["#888", "#000"][iter % 2]);
       }
       iter--;
     }, 150);
+}
+
+function send(func, data) {
+  when("_socket", function(){
+    console.log("emitting " + func);
+    _socket.emit(func, data);
+  });
+}
+
+function stack() {
+  try { throw new Error(); }
+  catch (e) { console.log(
+    e.stack
+      .replace(/^[^@]*/mg, '')
+      .replace(/\n[^@]*/mg, '\n   ')
+    || e.stack);
+  }
 }
 
 function onEnter(node, cb) {
@@ -95,9 +108,8 @@ function remainingTime(player) {
       _song[STOP] - 
       player.getCurrentTime()
     );
-  } else {
-    return 0;
-  }
+  } 
+  return 0;
 }
 
 function secondsToTime(count) {
@@ -127,7 +139,7 @@ function secondsToTime(count) {
   return stack.reverse().join(' ').replace(/^0/,'');
 }
 
-function time(fmt, utime) {
+function time(_fmt, utime) {
 	// return time in a format
 	// fmt is of type
 	// 	%[Y|M|N|D|W|H|h|m|s]
@@ -140,22 +152,21 @@ function time(fmt, utime) {
 	// 		h = hour
 	// 		m = minute
 	// 		s = second
-  var d = new Date(utime),
-      t = {
-    Y: d.getFullYear(),
-    N: C.months[d.getMonth()],
-    M: (d.getMonth() + 1).padLeft(2),
-    W: C.days[d.getDay()],
-    D: d.getDate().padLeft(2),
-    H: ( ((d.getHours() + 1) % 12) - 1),
-    h: d.getHours().padLeft(2),
-    m: d.getMinutes().padLeft(2),
-    s: d.getSeconds().padLeft(2)
-  }, post = '';
-
-  if(!fmt) {
-    fmt = "%Y-%M-%D %h:%m:%s";
-  }
+  var 
+    d = new Date(utime || 0),
+    fmt = _fmt || "%Y-%M-%D %h:%m:%s",
+    post = '',
+    t = {
+      Y: d.getFullYear(),
+      N: C.months[d.getMonth()],
+      M: (d.getMonth() + 1).padLeft(2),
+      W: C.days[d.getDay()],
+      D: d.getDate().padLeft(2),
+      H: ( ((d.getHours() + 1) % 12) - 1),
+      h: d.getHours().padLeft(2),
+      m: d.getMinutes().padLeft(2),
+      s: d.getSeconds().padLeft(2)
+    };
 
   return fmt.replace(/%(.)/g, function (f, m) {
     if(m == 'H') {
@@ -174,6 +185,10 @@ function log() {
 } 
 
 function when(prop, cb) {
+  if(self[prop]) {
+    return cb();
+  }
+
   var ival = setInterval(function(){
     if(self[prop]) {
       cb();
@@ -211,8 +226,6 @@ var
   _seekTimeout = 0,
   _qualityTimeout = 0,
 
-  _driftcounter = 0,
-  _drift,
   _counter = parseInt(Store("ttl") || 0),
  
   _start = getNow(),
@@ -229,8 +242,7 @@ var
   _playerById = {},
 
   _song,
-  _next = 0,
-  _runtime = 0;
+  _next = 0;
 
 // }} // Globals
 
@@ -242,9 +254,7 @@ function Store(key, value) {
   return localStorage[key];
 }
 
-
 var Player = (function(){
-  var activePlayer;
 
   self.onYouTubePlayerReady = function(id) { onReady("yt", id); }
 
@@ -329,7 +339,17 @@ var Player = (function(){
       show(_next);
 
       when("_song", function(){
-        setInterval(doTitle, 1000);
+        setInterval(function (){
+          var ttl = _counter + (getNow() - _start);
+
+          Store("ttl", ttl);
+          if(ttl > _goal) {
+            Chat.addmessage("Total Time On Site " + secondsToTime(ttl));
+            _goal = (1 + Math.floor(ttl / _unit)) * _unit;
+          }
+          document.title = _song[ARTIST] + " - " + _song[TITLE] + " | " + secondsToTime(ttl);
+        }, 1000);
+
         Player.load("yt", 1);
         Player.load("yt", 2); 
       });
@@ -534,21 +554,6 @@ var Player = (function(){
   }
 })();
 
-function doTitle(){
-  var newtitle = _song[ARTIST] + " - " + _song[TITLE];
-  if(LASTTITLE != newtitle) {
-    LASTTITLE = newtitle;
-    $("#video-current").html("<b>" + _song[ARTIST] + "</b>" +  _song[TITLE]);
-  }
-  var ttl = _counter + (getNow() - _start);
-  Store("ttl", ttl);
-  if(ttl > _goal) {
-    Chat.addmessage("Total Time On Site " + secondsToTime(ttl));
-    _goal = (1 + Math.floor(ttl / _unit)) * _unit;
-  }
-  document.title = newtitle + " | " + secondsToTime(ttl);
-}
-
 
 function transition(song) {
 
@@ -622,6 +627,8 @@ function transition(song) {
     }, dropPlayingVolume);
 
     setTimeout(function(){
+      $("#video-current").html("<b>Loading next song ...</b>" + [_song[ARTIST], _song[TITLE]].join(' - '));
+
       log("raise next volume");
       next.seekTo(Math.max(offset, 0));
       // Crank up the volume to the computed normalization
@@ -641,6 +648,7 @@ function transition(song) {
     }, raiseNextVolume);
 
     setTimeout(function(){
+      $("#video-current").html("<b>" + _song[ARTIST] + "</b>" +  _song[TITLE]);
       log("pivot");
 
       // Toggle the player pointers
@@ -720,7 +728,6 @@ var User = {
     if(username.length > 0) {
       send("set-user", {user: username});
       Panel.hide("user");
-      $("#talk").focus();
     }
   },
   login: function(who){
@@ -748,8 +755,6 @@ var Song = (function(){
     _editing = false,
     _lastSong = false,
     _db = {};
-
-  self._DB = _db;
 
   function preview(obj) {
     _lastSong = obj;
@@ -828,6 +833,7 @@ var Song = (function(){
       });
 
       $("#song-select-next").click(function(){
+        Panel.hide("song");
         _socket.emit("video-play", _lastSong); 
       });
 
@@ -894,9 +900,6 @@ var Song = (function(){
       });
     },
 
-    countdown: function(){
-    },
-
     reset: function() {
       $("#embedder").empty();
       $("#preview-artist").html("Video Preview");
@@ -905,15 +908,15 @@ var Song = (function(){
 
     format: function(data, type) {
       var 
-        id = data.vid.split(':').pop(),
-        node;
-      
-      node = $("<a class=title />").append("<img src=http://i3.ytimg.com/vi/" + id + "/1.jpg>")
+        node = $("<a class=title />")
+          .append("<img src=http://i3.ytimg.com/vi/" + data.vid.split(':').pop() + "/1.jpg>");
 
-      node.click(function(){ 
-        preview(data);
-        blink(node, Volume.mute);
-      });
+      if(type != 'dummy') {
+        node.click(function(){ 
+          preview(data);
+          blink(node, Volume.mute);
+        });
+      }
 
       if(data.artist) {
         node.append("<span><b>" + data.artist + "</b>" + data.title + "</span>");
@@ -1030,7 +1033,7 @@ var Channel = {
     return $("<div class=channel />").append(
       "<em>" + obj.name + "</em>" +
       "<small>" + (obj.count ? ( obj.count + " partying" ) : "Be the first") + "</small>"
-    ).append(Song.format(obj)).click(cb);
+    ).append(Song.format(obj, 'dummy')).click(cb);
   },
 
   gen: function(res) {
@@ -1042,10 +1045,10 @@ var Channel = {
     _.each(res, function(which) {
       Channel.display(which, function(){
         blink($(this), function(){
+          console.log(arguments);
           Panel.hide("channel");
         });
         Channel.set(which.name); 
-        Song.countdown();
       }).appendTo("#channel-results")
     });
   },
@@ -1372,13 +1375,6 @@ var Panel = {
 };
 
 
-function send(func, data) {
-  when("_socket", function(){
-    console.log("emitting " + func);
-    _socket.emit(func, data);
-  });
-}
-
 var Volume = (function(){
   var 
     oldvolume,
@@ -1519,10 +1515,9 @@ when("$", function (){
 
   Channel.Init();
   User.Init();
+  Volume.Init();
 
   when("_", Song.Init);
-
-  Volume.Init();
 
   if(_channel) {
     Channel.set(_channel);
