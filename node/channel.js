@@ -9,6 +9,13 @@ module.exports = {
     _db.expire("user:" + name + ":" + user, 10);
     count(name);
   },
+  fix: function(name) {
+    _db.exists("pl:" + name, function (err, last) {
+      if(!last) {
+        remove(name);
+      }
+    });
+  },
   leave: function(name, user) {
     if(name) {
       _db.del("user:" + name + ":" + user);
@@ -17,6 +24,11 @@ module.exports = {
   },
   setDB: function(which) {
     _db = which;
+  },
+  getAll: function(cb) {
+    _db.hkeys("channel", function(err, last) {
+      cb(last);
+    });
   },
   get: function(name, cb) {
     _db.hget("channel", name, function(err, chan) {
@@ -47,6 +59,7 @@ function update(name, newData) {
 }
 
 function remove(channel) {
+  console.log("Removing " + channel);
   _db.hdel('tick', channel);
   _db.hdel('channel', channel);
 }

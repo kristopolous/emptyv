@@ -25,7 +25,7 @@ h2 b{display:block;font-size:1.5em;font-weight:normal;line-height:1em}
 
 #bottom{float:right}
 #players{margin-left:220px;position:absolute;bottom:0;height:100%;position:relative;z-index:20;background:#000}
-#players object,#players embed{position:absolute;top:0;left:-2000%;width:100%;height:100%}
+#players object,#players embed{position:absolute;top:-100%;left:0;width:100%;height:100%}
 #mute-control{position:absolute;top:25px;right:10px;background:#222}
 #mute-control .expanded{display:none;border:1px solid #555;background:#222;width:26px;margin-left:1px;
 }
@@ -48,7 +48,7 @@ h2 b{display:block;font-size:1.5em;font-weight:normal;line-height:1em}
 #message p.announce{font-size:0.7em;color:#555;margin:0;padding:0.15 0}
 #message .delist{float:right;color:#222}
 #message .delist:hover{color:#333}
-#message .title {margin:0.15em 0 0.5em 0;display:block;}
+#message .title {margin:0.15em 0;display:block}
 #message .title img{width:40px;height:30px;padding:0.1em}
 
 .action em{font-size:0.6em;font-style:normal;color:#555;font-size:11px;margin-left:0.2em}
@@ -184,7 +184,20 @@ a#song-delist.bigbtn{float:right;font-size:0.7em;color:#555}
 <div id=bottom><a href=about.html target=_blank>about</a></div>
 </div><div id=app>
   <div id=panels><div class=btn id=lhs-expand>&gt;</div>
-    <span id=channel>
+    <span id=channel-detail>
+      <span class="btn collapse">X</span>
+      <div class=panel-title>Channel Details</div>
+      <span class=panel-content>
+        <label>Channel Name</label>
+        <input id=input-channel-name autocomplete=off>
+        <label>Description</label>
+        <textarea id=input-channel-description></textarea>
+        <input type=radio><label>Publically List The Channel</label>
+        <input type=radio><label>This Channel is Private. Do Not List it</label>
+        <button id=channel-create-cancell>Cancel</button>
+        <button id=channel-create-button>Create Channel</button>
+      </span>
+    </span><span id=channel>
       <span class="btn collapse">X</span>
       <div class=panel-title>Party Hopper</div>
       <span class=panel-content>
@@ -228,7 +241,7 @@ a#song-delist.bigbtn{float:right;font-size:0.7em;color:#555}
       <span class="btn collapse">X</span>
       <div class=panel-title>Who u be?</div>
       <span class=panel-content>
-        <label>Partyname</label>
+        <label>VJ Name</label>
         <input id=input-username autocomplete=off>
         <label>Secret Pasword</label>
         <input id=input-password type=password autocomplete=off>

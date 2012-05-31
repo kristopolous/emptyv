@@ -57,19 +57,16 @@ var
   // to 0 as possible.
   LOADTIME_sec = 5,
 
-  // According to the docs: "The player does not request 
-  // the FLV until playVideo() or seekTo() is called.". In
-  // order to combat this, we have to pre-load the video
-  // by some increment, we take that to be the LOADTIME,
-  // multiplied by 1000 because it's expressed in MS
-  PRELOAD_ms = LOADTIME_sec * 1000,
-
   LAG_THRESHHOLD = 12,
 
   // An extra player
   EXTRA = 2,
 
-  NEXTVIDEO_PRELOAD = 3,
+  // According to the docs: "The player does not request 
+  // the FLV until playVideo() or seekTo() is called.". In
+  // order to combat this, we have to pre-load the video
+  // by some increment, we take that to be the LOADTIME,
+  PRELOAD = 2,
 
   LASTTITLE = "",
 
@@ -262,6 +259,8 @@ function Store(key, value) {
 
 
 var Player = (function(){
+  var activePlayer;
+
   self.onYouTubePlayerReady = function(id) { onReady("yt", id); }
   self.onDailymotionPlayerReady = function(id) { onReady("dm", id); }
 
@@ -269,15 +268,44 @@ var Player = (function(){
     return (player && player.style);
   }
 
+  function move(el, start, end, cb) {
+    var 
+      top = start,
+      interval = (start > end) ? -18 : 18,
+      ival = setInterval(function(){
+        el.style.top = top + "%";
+        top += interval;
+        if( (interval > 0 && top >= end) ||
+            (interval < 0 && top <= end)
+          ) {
+            el.style.top = end + "%";
+            clearInterval(ival);
+            if(cb) {
+              cb(el);
+            }
+        }
+      }, 50);
+  }
+
   function hide(player, transition) {
     if(check(player)) {
-      player.style.left = "-2000%";
+      if(transition && !_letterBoxed) {
+        move(player, 0, 100, function(el) {
+          el.style.top = "-100%";
+        });
+      } else {
+        player.style.top = "-100%";
+      }
     }
   }
 
   function show(player, transition) {
     if(check(player)) {
-      player.style.left = 0;
+      if(transition && !_letterBoxed) {
+        move(player, -100, 0);
+      } else {
+        player.style.top = 0;
+      }
     }
   }
 
@@ -548,7 +576,7 @@ function transition(song) {
     id = song[ID],
     offset = song[START],
     index = id,
-    dom = id.split(':')[0],
+    dom = 'yt',
     uuid = id.split(':')[1];
 
   // Offset mechanics are throughout, but placing it here
@@ -563,55 +591,55 @@ function transition(song) {
     _playerPrev = _player;
   }
 
+  // This function is called at the time that we want to start our process.
+  // Currently it's -PRELOAD seconds before we should be showing the video.
+  //
+  // Optimistically, this would mean that there is PRELOAD seconds left in
+  // the current video, but oftentimes more.
   _ev.isset(dom + _next, function() {
-    if(dom === "yt") {
-      _player[_next].loadVideoById(uuid, offset);
-      _player[_next].setPlaybackQuality("medium");
-      _player[_next].setVolume(0);
-      _player[_next].playVideo();
-    } else {
-      // In the DM api, you can mute prior to loading
-      // the video (and the ad), and this works.
-      _player[_next].mute();
-      setTimeout(function(){
-        _player[_next].loadVideoById(uuid);
-        _player[_next].mute();
-        _player[_next].playVideo();
-        _player[_next].mute();
-      }, 500);
-
-      // This is an advertising work around for
-      // daily motion to suppress the video ads.
-      var 
-        myplayer = _player[_next], 
-        ival = setInterval(function(){
-          if(myplayer.getCurrentTime() > 0) {
-            myplayer.unMute();
-            myplayer.setVolume(0);
-            clearInterval(ival);
-          }
-        }, 100); 
-    }
+    _player[_next].loadVideoById(uuid, Math.max(offset, 0));
+    _player[_next].setPlaybackQuality("medium");
+    _player[_next].setVolume(0);
+    _player[_next].playVideo();
     log("video loaded");
 
-    var 
-      step1Timeout = Math.min(NEXTVIDEO_PRELOAD, (remainingTime(_playerPrev[_active]) - NEXTVIDEO_PRELOAD) * 1000),
-      step2Timeout = step1Timeout + 2000;
-
-    // This is when the audio for the video starts; some small
-    // time before the actual video is to transit over.
+    // The amount of time we have to transition is 
+    // The minimum of the remaining time in the video and the lead time
     //
     // By this point, we have already loaded the video with
     // enough time for a video commercial and then let that
     // play in hiding.  The video itself should have started too
     // so we should have some of it buffered already and then
     // can just seek back without a buffering issue.
+    var 
+      pivot = Math.min(PRELOAD, remainingTime(_playerPrev[_active])) * 1000,
+
+      // drop the volume of the currently playing song
+      dropPlayingVolume = pivot + 500,
+
+      // raise the volume of the next one slightly before dropping
+      // the volume of the current
+      raiseNextVolume = pivot - 1000,
+
+      // Stop the old video 1 second after the
+      // pivot transition
+      stopOldVideo = pivot + 1000,
+
+      // These will change somewhere in the 
+      // mess so we store it locally.
+      active = _player[_active],
+      next = _player[_next];
+
+    setTimeout(function(){ 
+      log("drop playing volume");
+      if(active) {
+        active.setVolume(0); 
+      }
+    }, dropPlayingVolume);
+
     setTimeout(function(){
-      log("volume changed");
-
-      var myPlayer = _player[_next];
-      myPlayer.seekTo(offset);
-
+      log("raise next volume");
+      next.seekTo(Math.max(offset, 0));
       // Crank up the volume to the computed normalization
       // level. 
       //
@@ -622,25 +650,14 @@ function transition(song) {
       // call and then the volume takes place immediately. 
       //
       // So to combat this we simply put a 100ms timeout around
-      // the volume adjusting, accounting for the possibility of
-      // this being the first video of course.
+      // the volume adjusting
       setTimeout(function(){
-        myPlayer.setVolume(song[VOLUME] * _volume);
-      }, Math.min(100, remainingTime(_playerPrev[_active])));
-
-      doTitle();
-
-    }, step1Timeout);
+        next.setVolume(song[VOLUME] * _volume);
+      }, 100);
+    }, raiseNextVolume);
 
     setTimeout(function(){
-
-      // After the PRELOAD_ms interval, then we stop the playing video
-      if(_active in _player) {
-        _playerPrev[_active].stopVideo();
-        if("index" in _player[_active]) {
-          delete _playerById[_player[_active].index];
-        }
-      }
+      log("pivot");
 
       // Toggle the player pointers
       _active = (_active + 1) % 2;
@@ -658,19 +675,43 @@ function transition(song) {
 
       _index = index;
       _playerPrev = _player;
-      //_ev.isset("yt2", Player.setQuality);
-    }, step2Timeout);
+    }, pivot);
+
+    setTimeout(function(){
+      if(active) {
+        active.stopVideo();
+        if("index" in active) {
+          delete _playerById[active.index];
+        }
+      }
+    }, stopOldVideo);
   });
 }
 
 var User = {
   loggedin: false,
+  registerShow: function(state) {
+    if(state){
+      $("#email-wrap").slideDown();
+      $("#register-button").html("Actually, I've been here");
+      $("#user-login").html("Register");
+    } else {
+      $("#email-wrap").hide();
+      $("#register-button").html("I'm new");
+      $("#user-login").html("That's me");
+    }
+  },
   Init: function(){
+    var regState = false;
     _ev.on("panel:user", function(which) {
       if(which == "show") {
-        $("#login-button").fadeOut();
+        $("#login-button").fadeOut(function(){
+          $("#input-username").focus();
+        });
+        User.registerShow(false);
       } else {
         $("#login-button").fadeIn();
+        $("#talk").focus();
       }
     });
     $("#login-button").click(function(){
@@ -678,18 +719,17 @@ var User = {
         User.logout();
       } else {
         Panel.show("user");
-        $("#input-username").focus();
       }
     });
-    $("#user-cancel").click(function(){
-      Panel.hide("user");
-      $("#talk").focus();
-    });
-    onEnter("#input-username", User.setuser);
+
+    $("#user-cancel").click(function(){ Panel.hide("user"); });
     $("#user-login").click(User.setuser);
     $("#register-button").click(function(){
-      $("#email-wrap").slideDown();
+      regState = !regState;
+      User.registerShow(regState);
     });
+
+    onEnter("#input-username", User.setuser);
   },
   setuser: function() {
     var username = $("#input-username").val();
@@ -876,21 +916,6 @@ var Song = (function(){
     },
 
     countdown: function(){
-      /*
-      $("#countdown").css('display','inline-block').html(NEXTVIDEO_PRELOAD + 1);
-      var 
-        count = NEXTVIDEO_PRELOAD + 1,
-        ival = setInterval(function(){
-          count--;
-          $("#countdown").html(count);
-          if(count == 0) {
-            $("#countdown")
-              .html("")
-              .css('display','none');
-            clearInterval(ival);
-          }
-        }, 1000); 
-        */
     },
 
     reset: function() {
@@ -1173,10 +1198,10 @@ var Chat = (function(){
       return "<p class=announce>" + data.text + "</p>";
     },
 
-    skip: function(data) {
+    _baseVideo: function(data, func) {
       var id = data.id.split(':').pop();
       return "<div class=action>" +
-        "<em>Skipped:</em>" +
+        "<em>" + func + ":</em>" +
            "<a class=title target=_blank href=http://youtube.com/watch?v=" + id + ">" + 
            "<img src=http://i3.ytimg.com/vi/" + id + "/default.jpg>" +
            "<span>" +
@@ -1186,31 +1211,18 @@ var Chat = (function(){
              "</a>" +
            "</div>";
     },
+
+    skip: function(data) {
+      return format._baseVideo(data, 'Skipped');
+    },
     delist: function(data) {
-      var id = data.id.split(':').pop();
-      return "<div class=action>" +
-          "<em>Delisted:</em>" +
-          "<a class=title target=_blank href=http://youtube.com/watch?v=" + id + ">" + 
-           "<img src=http://i3.ytimg.com/vi/" + id + "/default.jpg>" +
-           "<span>" +
-             "<b>" + data.artist + "</b>" +  
-             data.title +
-           "</span>" +
-         "</a>" +
-       "</div>";
+      return format._baseVideo(data, 'Delisted');
+    },
+    play: function(data) {
+      return format._baseVideo(data, 'Playing');
     },
     request: function(data) {
-      var id = data.id.split(':').pop();
-      return "<div class=action>" +
-          "<em>Requested:</em>" +
-          "<a class=title target=_blank href=http://youtube.com/watch?v=" + id + ">" + 
-           "<img src=http://i3.ytimg.com/vi/" + id + "/default.jpg>" +
-           "<span>" +
-             "<b>" + data.artist + "</b>" +  
-             data.title +
-           "</span>" +
-         "</a>" +
-       "</div>";
+      return format._baseVideo(data, 'Requested');
     },
     chat: function(data) {
       return data.text
@@ -1243,7 +1255,7 @@ var Chat = (function(){
 
         // If this is a new author or the first entry 
         // then we create a new entry
-        if(!_chat.lastentry || ( _chat.lastuid != row.uid )) {
+        if(!_chat.lastentry || !row.who || (_chat.lastuid != row.uid )) {
           entry = $("<div>").html(entry);
 
           // If it's a human, it will have a color

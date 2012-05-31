@@ -265,6 +265,7 @@ IO.sockets.on('connection', function (socket) {
   socket.on("video-play", function(p) {
     p.channel = _user.channel;
     p.name = _user.name;
+    p.uid = _user.uid;
     p.now = false;
     _db.lpush("request", JSON.stringify(p));
   });
@@ -272,6 +273,7 @@ IO.sockets.on('connection', function (socket) {
   socket.on("video-play-now", function(p) {
     p.channel = _user.channel;
     p.name = _user.name;
+    p.uid = _user.uid;
     p.now = true;
     _db.lpush("request", JSON.stringify(p));
   });
@@ -281,6 +283,7 @@ IO.sockets.on('connection', function (socket) {
       action: "delist",
       track: p,
       name: _user.name,
+      uid: _user.uid,
       channel: _user.channel
     }));
   });
@@ -290,6 +293,7 @@ IO.sockets.on('connection', function (socket) {
       track: p,
       action: "skip",
       name: _user.name,
+      uid: _user.uid,
       channel: _user.channel
     }));
   });

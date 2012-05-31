@@ -2,6 +2,7 @@ var redis = require('redis')
   , _db = redis.createClient()
   , Channel = require('./channel')
   , Chat = require('./chat')
+  , PRELOAD = -2
   , _last = +(new Date())
   , _state = {};
 
@@ -14,6 +15,7 @@ function build(channel) {
     name: channel,
     index: 0,
     video: {},
+    offset: 0,
     requestStack: [],
     add: false
   };
@@ -29,24 +31,26 @@ function setVideo(channel, vid, offset, cb, opts) {
     }
     _state[channel].video = {
       vid: vid,
-      len: full[0],
+      len: parseInt(full[0]),
       start: full[1],
       volume: full[2],
       artist: full[3],
       title: full[4],
       notes: full[5],
-      offset: offset || full[1]
+      offset: parseInt(offset || full[1])
     };
     if(cb) {
       cb(_state[channel].video);
     }
     if(!opts.quiet) {
-      Chat.add(data.channel, {
+  
+      Chat.add(channel, {
         type: 'play',
         artist: full[4],
         title: full[3],
-        id: data.vid
+        id: vid
       });
+   
       Chat.append(
         "lastplayed:" + channel, 
         Channel.update(channel, {
@@ -85,6 +89,9 @@ function setIndex(channel, index, offset) {
 }
 
 function loadVideo(channel, index, offset, opts) {
+  if (arguments.length == 2) {
+    offset = PRELOAD;
+  }
   console.log("Loading " + channel + " " + index);
   _db.lindex("pl:" + channel, index, function(err, vid) {
     setVideo(channel, vid, offset, function(data) {
@@ -121,17 +128,17 @@ function getNext(row) {
     // request stack we don't revisit the
     // stuff we are inserting
     row.index++;
-    setIndex(row.name, row.index, 0);
+    setIndex(row.name, row.index, PRELOAD);
   }
   if(video) {
     console.log(video);
     row.previous = row.video.vid;
-    setVideo(row.name, video.vid, 0);
+    setVideo(row.name, video.vid, PRELOAD);
     row.add = video.add;
   } else {
     row.add = false;
     _db.llen("pl:" + row.name, function(err, len) {
-      loadVideo(row.name, (row.index + 1) % len, 0);
+      loadVideo(row.name, (row.index + 1) % len);
     });
   }
 }
@@ -163,7 +170,7 @@ function delist(data) {
     // 
     if(refPoint == data.track.vid) {
       console.log("That was our current video, resetting to the new index");
-      loadVideo(channel, currentIndex, 0);
+      loadVideo(channel, currentIndex);
       return;
     }
 
@@ -200,7 +207,13 @@ function doRequest(data, doadd) {
   // Putting it in the on-disk playlist is done
   // through the stack shifting logic
   console.log("Adding to the request stack");
-  _state[data.channel].requestStack.push({
+  
+  // If the user said "play now" then this 
+  // requested video goes to the front of the stack,
+  // not the end. (2012-05-30 cjm)
+  var func = data.now ? "unshift" : "push";
+
+  _state[data.channel].requestStack[func]({
     vid: data.vid,
     name: data.name,
     add: doadd
@@ -213,6 +226,7 @@ function doRequest(data, doadd) {
     artist: data.artist,
     title: data.title,
     id: data.vid,
+    uid: data.uid,
     who: data.name
   });
 
@@ -222,109 +236,118 @@ function doRequest(data, doadd) {
   }
 }
 
-function poll() {
-  setInterval(function(){
-    var 
-      now = +(new Date()),
-      channel,
-      row,
-      delta = (now - _last) / 1000;
+function requestProcessor() {
+  _db.lrange("request", 0, -1, function(err, request) {
+    _db.del("request");
+    request.forEach(function(row) {
+      var data = JSON.parse(row);
 
-    _db.lrange("request", 0, -1, function(err, request) {
-      _db.del("request");
-      request.forEach(function(row) {
-        var data = JSON.parse(row);
+      if(data.action == 'skip') {
+        Chat.add(data.channel, {
+          type: 'skip',
+          artist: data.track.artist,
+          title: data.track.title,
+          id: data.track.vid,
+          uid: data.uid,
+          who: data.name
+        });
 
-        if(data.action == 'skip') {
-          Chat.add(data.channel, {
-            type: 'skip',
-            artist: data.track.artist,
-            title: data.track.title,
-            id: data.track.vid,
-            who: data.name
-          });
+        getNext(_state[data.channel]);
+      } else if(data.action == 'delist') {
+        console.log("Delist", data);
 
-          getNext(_state[data.channel]);
-        } else if(data.action == 'delist') {
-          console.log("Delist", data);
+        delist(data);
 
-          delist(data);
+        Chat.add(data.channel, {
+          type: 'delist',
+          artist: data.track.artist,
+          title: data.track.title,
+          id: data.track.vid,
+          uid: data.uid,
+          who: data.name
+        });
+      } else {
+        _db.lrange("pl:" + data.channel, 0, -1, function(res, list) {
+          var offset = list.indexOf(data.vid);
 
-          Chat.add(data.channel, {
-            type: 'delist',
-            artist: data.track.artist,
-            title: data.track.title,
-            id: data.track.vid,
-            who: data.name
-          });
-        } else {
-          _db.lrange("pl:" + data.channel, 0, -1, function(res, list) {
-            var offset = list.indexOf(data.vid);
+          // See if its in thie channels playlist
+          if(offset > -1) {
 
-            // See if its in thie channels playlist
-            if(offset > -1) {
+            doRequest(data, false);
+          } else {
+            addVideo(data, function(){
 
-              doRequest(data, false);
-            } else {
-              addVideo(data, function(){
-
-                if(!_state[data.channel] || !_state[data.channel].video.vid) {
-                  console.log("Building channel: " + data.channel);
-                  // This is a channel bootstrap
-                  build(data.channel);
-                  _db.lpush(
-                    "pl:" + data.channel,
-                    data.vid
-                  );
-                  loadVideo(data.channel, 0, 0);
-                } else {
-                  doRequest(data, true);
-                }
-              });
-            } 
-          });
-        }
-      });
-    });
-
-    for(channel in _state) {
-      row = _state[channel]; 
-      row.video.offset = (row.video.offset + delta);
-
-      if((row.video.offset + 3) > row.video.len) {
-        getNext(row);
+              if(!_state[data.channel] || !_state[data.channel].video.vid) {
+                console.log("Building channel: " + data.channel);
+                // This is a channel bootstrap
+                build(data.channel);
+                _db.lpush(
+                  "pl:" + data.channel,
+                  data.vid
+                );
+                loadVideo(data.channel, 0);
+              } else {
+                doRequest(data, true);
+              }
+            });
+          } 
+        });
       }
+    });
+  });
+}
 
-      // this is to survive a server crash
-      setIndex(row.name, row.index, row.video.offset);
+function channelUpdate(channelList) {
+  var 
+    now = +(new Date()),
+    delta = (now - _last) / 1000;
 
-      //console.log(row);
-      // this is for the consumer.
-      _db.hset("play", row.name, JSON.stringify(row.video));
+  requestProcessor();
+  channelList.forEach(function(channel) {
+    if(!_state[channel]) {
+      build(channel);
+      return;
+    } 
+    var row = _state[channel]; 
+    row.video.offset = row.video.offset + delta;
+
+    if((row.video.offset - PRELOAD) > row.video.len) {
+      getNext(row);
     }
 
-    _last = now;
-  }, 1000);
+    console.log(row.video.offset, row.video.len);
+    // this is to survive a server crash
+    setIndex(row.name, row.index, row.video.offset);
+
+    // this is for the consumer.
+    _db.hset("play", row.name, JSON.stringify(row.video));
+  });
+
+  _last = now;
 }
 
 _db.hgetall("tick", function(err, state) {
   for(var channel in state) {
-    if (channel == '' || channel == '[object Object]') {
-      Channel.remove(channel);
-      continue;
-    }
-    Channel.update(channel, {name: channel});
     var position = state[channel].split(',');
+    for(var ix = 0; ix < position.length; ix++){
+      position[ix] = parseInt(position[ix]);
+      if(isNaN(position[ix])) {
+        position[ix] = 0;
+      }
+    }
 
     build(channel);
 
     loadVideo(
       channel, 
-      parseInt(position[0]),
-      parseInt(position[1]),
+      position[0],
+      position[1],
       {quiet: true}
     );
   }
   console.log("Up");
-  poll();
+
+  setInterval(function(){
+    Channel.getAll(channelUpdate);
+  }, 1000);
 });
