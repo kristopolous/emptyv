@@ -2,7 +2,7 @@ var redis = require('redis')
   , _db = redis.createClient()
   , Channel = require('./channel')
   , Chat = require('./chat')
-  , PRELOAD = -2
+  , PRELOAD = -(3)
   , _last = +(new Date())
   , _state = {};
 
@@ -46,8 +46,8 @@ function setVideo(channel, vid, offset, cb, opts) {
   
       Chat.add(channel, {
         type: 'play',
-        artist: full[4],
-        title: full[3],
+        artist: full[3],
+        title: full[4],
         id: vid
       });
    
@@ -311,7 +311,7 @@ function channelUpdate(channelList) {
     var row = _state[channel]; 
     row.video.offset = row.video.offset + delta;
 
-    if((row.video.offset - PRELOAD) > row.video.len) {
+    if((2.5 + row.video.offset - PRELOAD) > row.video.len) {
       getNext(row);
     }
 

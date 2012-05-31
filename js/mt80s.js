@@ -66,7 +66,7 @@ var
   // the FLV until playVideo() or seekTo() is called.". In
   // order to combat this, we have to pre-load the video
   // by some increment, we take that to be the LOADTIME,
-  PRELOAD = 2,
+  PRELOAD = 3,
 
   LASTTITLE = "",
 
@@ -1219,7 +1219,7 @@ var Chat = (function(){
       return format._baseVideo(data, 'Delisted');
     },
     play: function(data) {
-      return format._baseVideo(data, 'Playing');
+      return format.announce({text: 'Playing <a onclick=preview("' + data.id + '")>' + data.artist + ' - ' + data.title + '</a>'});
     },
     request: function(data) {
       return format._baseVideo(data, 'Requested');
