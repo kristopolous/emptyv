@@ -51,7 +51,7 @@ var search = (function(){
           alt: 'json',
           q: query,
           orderby: 'relevance',
-          'max-results': 10,
+          'max-results': 25,
           v: 2,
           format: 5
         })
