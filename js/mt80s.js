@@ -134,8 +134,28 @@ function secondsToTime(count) {
 
   // days
   if (count > 1) {
-    stack.push(count.toFixed(0) + " days");
+    stack.push((count % 7) + " days");
+    count = Math.floor(count / 7);
   }
+
+  // weeks
+  if (count > 1) {
+    stack.push((count % 2) + " weeks");
+    count = Math.floor(count / 2);
+  }
+
+  // fortnights
+  if (count > 1) {
+    stack.push((count % 2) + " fortnights");
+    count = Math.floor(count / 2);
+  }
+
+  // Consider the classical 28 day month
+  if (count > 1) {
+    stack.push((count % 3) + " months");
+    count = Math.floor(count / 3);
+  }
+
   return stack.reverse().join(' ').replace(/^0/,'');
 }
 
