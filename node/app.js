@@ -335,6 +335,7 @@ IO.sockets.on('connection', function (socket) {
             socket.emit("user-error", {text: "Username " + p.user + " exists"});
           } else {
             User.register(p.user, p.password, p.email);
+            setuser(p.user);
           }
         });
         // Reset
