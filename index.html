@@ -5,7 +5,7 @@ a{color:#abb6d6;text-decoration:underline;cursor:pointer}
 p,h1,h2,h3,h4,h5,h6{margin:0}
 button{background:#333;border-color:#222;color:#ccd9ff;border-width:1px}
 img{border:0}
-input,#talk{display:block;box-shadow:0 0 2px 2px #444457;background:#000;color:#ccd9ff;border-width:0;font-size:0.85em;width:200px;padding:0.15em 3px;margin: 0 0 0.5em 0.5em}
+input,#talk{display:block;box-shadow:0 0 2px 2px #444457;background:#000;color:#cccfdf;border-width:0;font-size:0.85em;width:200px;padding:0.15em 3px;margin: 0 0 0.5em 0.5em}
 label{margin-bottom:0.4em;color:#525767;font-size:11px;display:block}
 
 input{width:190px;margin:0.25em 0 0.75em}
@@ -36,7 +36,7 @@ h2 b{display:block;font-size:1.5em;font-weight:normal;line-height:1em}
 
 #panels{float:left;width:20px;position:relative;height:100%;white-space:nowrap}
 #panels > span{width:0px;display:none;position:relative;height:100%;vertical-align:top;background:#18191b}
-.panel-title{color:#ccd9ff;font-size:1.2em;padding:0.5em;line-height:0.8em;white-space:nowrap}
+.panel-title{color:#dde9ff;font-size:1.2em;padding:0.5em;line-height:0.8em;white-space:nowrap}
 .panel-content{margin:0 1em;display:block;font-size:0.7em}
 .collapse{color:#ccd9ff;position:absolute;top:0.25em;right:0;z-index:12;width:20px;height:8px;background:url('css/button-bg.jpg');line-height:8px;margin-top:0}
 
@@ -67,7 +67,9 @@ h2 b{display:block;font-size:1.5em;font-weight:normal;line-height:1em}
 .title {text-decoration:none}
 .title span{display:inline-block;margin-left:6px;font-size:0.75em;color:#888;width:148px;white-space:normal}
 .title img{width:50px;vertical-align:top;height:38px}
-.title b{display:block;font-size:1.2em;color:#ccd9ff;font-weight:normal;height:1.25em;overflow:hidden}
+.title b{display:block;font-size:1.2em;color:#ccd9dd;font-weight:normal;height:1.25em;overflow:hidden}
+#channel .channel{min-height:61px}
+#channel .title span{width:130px;font-size:0.65em}
 #top{position:relative;margin-left:6px;z-index:5;background:#18191b}
 #lhs-expand{display:none}
 #lhs-expand,#lhs-collapse{padding:0.5em 0.25em;font-size:0.6em;width:1em}
@@ -107,14 +109,14 @@ position:absolute;font-size:1.4em;top:2px;left:238px
   cursor:pointer;
   vertical-align:top;
   }
-  #channel-title{color:#ccd9ff;margin-top:0}
+  #channel-title{color:#dde9ff;margin-top:0}
   #channel-stats{color:#525767;font-size:0.7em;margin-top:-0.3em}
 
 #user-control{margin:0 0.5em 0.4em 0;text-align:right;visibility:hidden}
   #display-username{margin-left:0.75em;display:inline-block;color:#525767}
   #email-wrap{display:none}
   #register-button{display:block}
-
+  #register-button,#forgot-button{margin:1em 0;color:#555}
   #app{display:none;height:100%}
 
 #videoList{width:550px;display:inline-block;text-align:left;margin-top:1em}
@@ -135,7 +137,7 @@ button.bigbtn,.channel { text-align:left;
 }
 .channel{overflow:hidden;position:relative}
 .channel .title{display:block;margin-top:5px;font-size:14px}
-.channel em {color:#e8ecf3;margin-top:-0.15em;display:inline-block;color:#ddd;font-style:normal;font-size:1.2em}
+.channel em {color:#ccd9dd;margin-top:-0.15em;display:inline-block;font-style:normal;font-size:1.2em}
 .channel small {color:#abb6d6;display:block;position:absolute;top:0.75em;right:0.75em;font-size:0.75em}
 
 .tabs {
@@ -171,6 +173,8 @@ button.bigbtn,.channel { text-align:left;
 #preview-artist{display:block}
 #song-preview{display:inline-block;text-align:center;margin-left:6px;font-size:1.4em}
 #song-preview-info{display:block;text-align:center;color:#ccd9ff;margin-bottom:1em}
+
+#user input{font-size:1.5em}
 
 #embedder{width:500px;height:400px}
 #title-edit{display:none;position:absolute;right:6px}
@@ -242,17 +246,21 @@ a#song-delist.bigbtn{float:right;font-size:0.7em;color:#525767}
       <span class="btn collapse">X</span>
       <div class=panel-title>Who u be?</div>
       <span class=panel-content>
-        <label>VJ Name</label>
-        <input id=input-username autocomplete=off>
-        <label>Secret Pasword</label>
-        <input id=input-password type=password autocomplete=off>
+        <div id=login-wrap>
+          <label>VJ Name</label>
+          <input id=input-username autocomplete=off>
+          <label>Super Secret Password<br>That Nobody Else Knows</label>
+          <input id=input-password type=password autocomplete=off>
+        </div>
         <div id=email-wrap>
           <label>Email</label>
           <input id=input-email>
         </div>
         <button id=user-cancel>Cancel</button>
         <button id=user-login>That's me</button>
+        <div id=user-error></div>
         <a id=register-button>I'm new.</a>
+        <!--<a id=forgot-button>Password Reset</a>-->
       </span>
     </span><span id=song>
       <span class="btn collapse">X</span>

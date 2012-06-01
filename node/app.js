@@ -6,6 +6,7 @@ var app = require('http').createServer(function(){})
   , QS = require('querystring')
   , Chat = require('./chat')
   , Channel = require('./channel')
+  , User = require('./user')
   , HTTP = require('http');
 
 _db.select(1);
@@ -314,16 +315,57 @@ IO.sockets.on('connection', function (socket) {
     });
   });
 
+  function setuser(name) {
+    announce(name + " logged in");
+    _user.name = name;
+    _db.hset("user", _user.uid, name);
+    socket.emit("username", name);
+  }
+
   socket.on("set-user", function(p) {
-    if(p.user) {
-      if(_user.name != "anonymous") {
-        announce(_user.name + " is now known as " + p.user);
+    // Either a registeration or a reset
+    if(p.email) {
+      // Registration
+      if(p.user) {
+        // Prevent xss
+        p.user = p.user.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+        User.exists("username", p.user, function(exist) {
+          if(exist || ["admin", "kristopolous", "anonymous"].indexOf(p.user) > 0) {
+            socket.emit("user-error", {text: "Username " + p.user + " exists"});
+          } else {
+            User.register(p.user, p.password, p.email);
+          }
+        });
+        // Reset
       } else {
-        announce(p.user + " logged in");
+        User.exists("email", p.email, function(exist) {
+          if(!exist) {
+            socket.emit("user-error", {text: p.email + " not registered"});
+          } else {
+            User.sendreset(p.email);
+            socket.emit("user-error", {text: "password reset sent to " + p.email});
+          }
+        });
       }
-      _user.name = p.user;
-      _db.hset("user", _user.uid, p.user);
-      socket.emit("username", _user.name);
+      // login
+    } else if(p.user) {
+      User.exists("username", p.user, function(exists) {
+        if(exists) {
+          User.login(p.user, p.password, function(success) {
+            if(success) {
+              setuser(p.user);
+            } else {
+              socket.emit("user-error", {text: "Login Failed, Please Try Again"});
+            }
+          });
+        } else {
+          // The user doesn't exist, and they are not
+          // trying to register it, so they get a free ride
+          setuser(p.user);
+        }
+      }); 
+      // logout
     } else {
       announce(_user.name + " logged out");
       _db.hdel("user", _user.uid);

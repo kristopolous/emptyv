@@ -697,75 +697,96 @@ function transition(song) {
   });
 }
 
-var User = {
-  loggedin: false,
-  registerShow: function(state) {
-    if(state){
-      $("#email-wrap").slideDown();
-      $("#register-button").html("Actually, I've been here");
-      $("#user-login").html("Register");
-    } else {
-      $("#email-wrap").hide();
-      $("#register-button").html("I'm new");
-      $("#user-login").html("That's me");
-    }
-  },
-  Init: function(){
-    var regState = false;
-    _ev.on("panel:user", function(which) {
-      if(which == "show") {
-        $("#login-button").fadeOut(function(){
-          $("#input-username").focus();
-        });
-        User.registerShow(false);
-      } else {
-        $("#login-button").fadeIn();
-        $("#talk").focus();
-      }
-    });
-    $("#login-button").click(function(){
-      if(User.loggedin) {
-        User.logout();
-      } else {
-        Panel.show("user");
-      }
-    });
+var User = (function(){
+  var 
+    loggedin = false,
+    reg = false,
+    forgot = false,
+    fun = ['slideUp','slideDown'];
 
-    $("#user-cancel").click(function(){ Panel.hide("user"); });
-    $("#user-login").click(User.setuser);
-    $("#register-button").click(function(){
-      regState = !regState;
-      User.registerShow(regState);
-    });
+  function gen(){
+    if(reg == true) {
+      forgot = false;
+    }
+    $("#login-wrap")[fun[+!forgot]]();
+    $("#email-wrap")[fun[+(forgot || reg)]]();
+    $("#register-button").html(["I'm new","Actually, I've been here"][+reg]);
+    $("#user-login").html(["Login", "Register", "Password Reset"][reg + forgot * 2]);
+    if(forgot) {
+      $("#input-username,#input-password").val("");
+    } else if(!reg) {
+      $("#input-email").val("");
+    }
+  }
 
-    onEnter("#input-username", User.setuser);
-  },
-  setuser: function() {
-    var username = $("#input-username").val();
-    if(username.length > 0) {
-      send("set-user", {user: username});
-      Panel.hide("user");
-    }
-  },
-  login: function(who){
-    $("#user-control").css('visibility', 'visible');
-    if(!who) {
-      if(User.loggedin) {
-        User.logout();
-      }
-    } else {
-      User.loggedin = true;
-      $("#display-username").html("You are " + who + ".");
-      $("#login-button").html("Log out");
-    }
-  },
-  logout: function(){
-    User.loggedin = false;
+  function logout(){
+    loggedin = false;
     $("#login-button").html("Log in");
     $("#display-username").html("You are anonymous.");
     send("set-user", {user: false});
   }
-};
+
+  return {
+    showError: function(obj) {
+      blink($("#user-error").html(obj.text));
+    },
+    Init: function(){
+      _ev.on("panel:user", function(which) {
+        if(which == "show") {
+          $("#login-button").fadeOut(function(){
+            $("#input-username").focus();
+          });
+          forgot=reg=false;
+          gen();
+        } else {
+          $("#login-button").fadeIn();
+          $("#talk").focus();
+        }
+      });
+      $("#forgot-button").click(function(){
+        forgot = !forgot;
+        reg=!forgot;
+        gen();
+      });
+      $("#login-button").click(function(){
+        if(loggedin) {
+          logout();
+        } else {
+          Panel.show("user");
+        }
+      });
+
+      $("#user-cancel").click(function(){ Panel.hide("user"); });
+      $("#user-login").click(User.setuser);
+      $("#register-button").click(function(){
+        reg = !reg;
+        gen();
+      });
+
+      onEnter("#input-username,#input-password,#input-email", User.setuser);
+    },
+    login: function(who){
+      $("#user-control").css('visibility', 'visible');
+      if(!who) {
+        if(loggedin) {
+          logout();
+        }
+      } else {
+        Panel.hide("user");
+        loggedin = true;
+        $("#display-username").html("You are " + who + ".");
+        $("#login-button").html("Log out");
+      }
+    },
+    setuser: function() {
+      send("set-user", {
+        user: $("#input-username").val(),
+        password: $("#input-password").val(),
+        email: $("#input-email").val()
+      });
+    }
+  };
+})();
 
 var Song = (function(){
   var 
@@ -1492,6 +1513,7 @@ when("io", function(){
   _socket.on("uid", function(d) { Store("uid", d); });
   _socket.on("channel-name", function(d){ _ev("channel", d); });
   _socket.on("username", User.login);
+  _socket.on("user-error", User.showError);
   Chat.Init();
 });
 
