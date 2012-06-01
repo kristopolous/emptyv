@@ -30,6 +30,18 @@ module.exports = {
       cb(last);
     });
   },
+  updatelen: function(name) {
+    var len = 0;
+    _db.lrange("pl:" + name, 0, -1, function(err, res) {
+      _db.hmget("vid", res, function(err, res) {
+        res.forEach(function(row) {
+          row = JSON.parse(row);
+          len += parseInt(row[0]);
+        });
+        update(name, {len: len});
+      });
+    });
+  },
   get: function(name, cb) {
     _db.hget("channel", name, function(err, chan) {
       if(!chan) {
