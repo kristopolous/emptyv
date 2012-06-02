@@ -1,6 +1,6 @@
 <!doctype html><html><head><meta name=description content="Non-stop back-to-back videos with Chat"><title>Chat With Videos</title>
 <style>
-body{display:block;overflow:hidden;position:absolute;top:0;left:0;height:100%;width:100%;background:#000;font-family:Verdana,sans-serif;margin:0;color:#abb6d6}
+body{display:block;overflow-x:hidden;position:absolute;top:0;left:0;height:100%;width:100%;background:#000;font-family:Verdana,sans-serif;margin:0;color:#abb6d6}
 a{color:#abb6d6;text-decoration:underline;cursor:pointer}
 p,h1,h2,h3,h4,h5,h6{margin:0}
 button{background:#333;border-color:#222;color:#bbcae1;border-width:1px}
@@ -40,17 +40,19 @@ h2 b{color:#364b62;display:block;font-size:1.15em;font-weight:bold;line-height:1
 ;line-height:8px;margin-top:0}
 
 #message-wrap {overflow:hidden;background:#080808;position:relative;margin:0 0.5em}
-#message{font-size:0.9em;color:#bbcae1; overflow-y:auto;position:absolute;bottom:0;width:100%}
+#message{font-size:0.9em;color:#3C4B62; overflow-y:auto;position:absolute;bottom:0;width:100%}
 #message img{max-width:195px}
 #message > div{padding:0.35em 0;overflow:hidden;white-space:normal}
 #message div.author{color:#525767;font-size:0.7em;margin:-0.1em 0 0;text-align:right;cursor:pointer}
 #message p {margin-left:0.25em;font-size:0.9em}
-#message p.announce{font-size:0.7em;color:#525767;padding:0.15 0}
-.announce > a{color:#525767}
+#message p.announce{font-size:0.7em;color:#3C4B62;padding:0.15 0}
+#message a{color:#3C4B62}
 #message .delist{float:right;color:#222}
 #message .delist:hover{color:#333}
-#message .title {margin:0.15em 0;display:block}
-#message .title img{width:40px;height:30px;padding:0.1em}
+#message .title {margin:0 4px;display:block}
+#message .title img{width:40px;height:30px;padding:1px 0 0 2px;vertical-align:bottom}
+#message .title span{width:138px;margin-left:3px}
+.request em{font-size:0.7em;font-style:normal;margin:0 0 -0.15em 0.2em;display:block}
 .play p{display:none}
 .play > :last-child{display:block}
 .play * {display:inline-block;vertical-align:middle;font-size:0.75em}

@@ -82,7 +82,7 @@ function blink(node, cb) {
         }
         clearInterval(ival);
       } else {
-        node.css("background", ["#888", "#000"][iter % 2]);
+        node.css("background", ["#79889c", "#172131"][iter % 2]);
       }
       iter--;
     }, 150);
@@ -816,9 +816,9 @@ var Song = (function(){
         });
       });
 
-      $("#song-results").css({height: $(window).height() - 128});
+      $("#song-results").css({height: $(window).height() - 138});
       $(window).resize(function(){
-        $("#song-results").css({height: $(window).height() - 128});
+        $("#song-results").css({height: $(window).height() - 138});
       });
 
       $("#song-show-history").click(function(){
