@@ -1232,7 +1232,7 @@ var Chat = (function(){
           _chat.lastentry = entry = $("<div>").addClass(row.type).html(entry);
 
           // If it's a human, it will have a color
-          if(row.color) {
+          if('color' in row) {
             entry.addClass("c" + row.color);
           }
           if(author[row.type]) {
