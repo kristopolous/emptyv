@@ -1,3 +1,31 @@
+  function processCommand(text) {
+    if(text.substr(0, 1) == '/') {
+      var 
+        tokens = text.slice(1).split(' '),
+        command = tokens.shift(),
+        arguments = tokens;
+      switch(command) {
+        case 'user':
+          var user = arguments.join('-');
+          send("set-user", {user: user});
+          Chat.addmessage("Set user to " + user);
+          break;
+
+        case 'channel':
+          send("channel", {
+            action: arguments.shift(),
+            params: arguments.shift()
+          });
+          break;
+
+        default: 
+          Chat.addmessage("Unknown command: " + command);
+          break;
+      }
+      return true;
+    }
+    return false;
+  }
   self.onDailymotionPlayerReady = function(id) { onReady("dm", id); }
 countdown:
       /*

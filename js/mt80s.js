@@ -1,3 +1,16 @@
+function when(prop, cb) {
+  if(self[prop]) {
+    return cb();
+  }
+
+  var ival = setInterval(function(){
+    if(self[prop]) {
+      cb();
+      clearInterval(ival);
+    }
+  }, 25);
+}
+
 function loadsrc(row) {
   setTimeout(function(){
     log("Loading " + row[1]);
@@ -156,63 +169,12 @@ function secondsToTime(count) {
   return stack.reverse().join(', ').replace(/^0/,'');
 }
 
-function time(_fmt, utime) {
-	// return time in a format
-	// fmt is of type
-	// 	%[Y|M|N|D|W|H|h|m|s]
-	// 		Y = year, such as 2010
-	// 		N = Named month, such as Feb
-	// 		M = month, such 2
-	// 		W = Week day, such as Tue
-	// 		D = Day, such as 24
-	// 		H = hour base 12
-	// 		h = hour
-	// 		m = minute
-	// 		s = second
-  var 
-    d = new Date(utime || 0),
-    fmt = _fmt || "%Y-%M-%D %h:%m:%s",
-    post = '',
-    t = {
-      Y: d.getFullYear(),
-      N: C.months[d.getMonth()],
-      M: (d.getMonth() + 1).padLeft(2),
-      W: C.days[d.getDay()],
-      D: d.getDate().padLeft(2),
-      H: ( ((d.getHours() + 1) % 12) - 1),
-      h: d.getHours().padLeft(2),
-      m: d.getMinutes().padLeft(2),
-      s: d.getSeconds().padLeft(2)
-    };
-
-  return fmt.replace(/%(.)/g, function (f, m) {
-    if(m == 'H') {
-      post = [' AM', ' PM'][Math.floor(t.h / 12)];
-    }
-
-    return t[m];
-  }) + post;
-}
-
 function log() {
   console.log([
     (getNow() - _start).toFixed(4),
     Array.prototype.slice.call(arguments).join(' ')
   ].join(' '));
 } 
-
-function when(prop, cb) {
-  if(self[prop]) {
-    return cb();
-  }
-
-  var ival = setInterval(function(){
-    if(self[prop]) {
-      cb();
-      clearInterval(ival);
-    }
-  }, 25);
-}
 
 // }} // Utils
 
@@ -228,7 +190,7 @@ var
   // We start at medium quality and then the skies the limit, I guess.
   _currentLevel = 1,
 
-  _unit = 15 * 60,
+  _unit = 60 * 60,
   _goal = _unit,
 
   _volume = Store("volume") || 1,
@@ -356,6 +318,8 @@ var Player = (function(){
       show(_next);
 
       when("_song", function(){
+        var ttl = _counter + (getNow() - _start);
+          _goal = (1 + Math.floor(ttl / _unit)) * _unit;
         setInterval(function (){
           var ttl = _counter + (getNow() - _start);
 
@@ -1068,10 +1032,11 @@ var Channel = {
   },
 
   display: function(obj, cb) {
-    return $("<div class=channel />").append(
-      "<em>" + obj.name + "</em>" +
-      "<small>" + (obj.count ? ( obj.count + " partying" ) : "Be the first") + "</small>"
-    ).append(Song.format(obj, 'dummy')).click(cb);
+    var base = (Song.format(obj, 'dummy'));
+    $("span", base).prepend("<em>" + obj.name + "</em>");
+    $("span", base).append("<small>" + (obj.count ? ( obj.count + " partying" ) : "Be the first") + "</small>");
+
+    return $("<div class=channel />").append(base).click(cb);
   },
 
   gen: function(res) {
@@ -1086,7 +1051,7 @@ var Channel = {
           console.log(arguments);
           Panel.hide("channel");
         });
-        Channel.set(which.name); 
+        window.location.hash = which.name;
       }).appendTo("#channel-results")
     });
   },
@@ -1136,16 +1101,15 @@ var Chat = (function(){
     });
 
     when("$", function(){
-      var inputHeight = $("#user-control").height() + $("#talk").height();
-
-      $("#message-wrap").css({height: $(window).height() - 140 - inputHeight});
-      $(window).resize(function(){
-        $("#message-wrap").css({height: $(window).height() - 140 - inputHeight});
-      });
+      function resize() {
+        $("#message-wrap").css({
+          height: $(window).height() - 140 - ($("#user-control").height() + $("#talk").height())
+        });
+      }
+      resize();
+      $(window).resize(resize);
       // There's a race condition here ... so we run this twice.
-      setTimeout(function(){
-        $("#message-wrap").css({height: $(window).height() - 140 - inputHeight});
-      }, 3000);
+      setTimeout(resize, 3000);
 
       log("Loading chat");
       $("#talk").focus();
@@ -1180,70 +1144,59 @@ var Chat = (function(){
     showmessage();
   }
 
-  function processCommand(text) {
-    if(text.substr(0, 1) == '/') {
-      var 
-        tokens = text.slice(1).split(' '),
-        command = tokens.shift(),
-        arguments = tokens;
-      switch(command) {
-        case 'user':
-          var user = arguments.join('-');
-          send("set-user", {user: user});
-          Chat.addmessage("Set user to " + user);
-          break;
+  var 
+    format = {
+      announce: function(data) {
+        return "<p class=announce>" + data.text + "</p>";
+      },
 
-        case 'channel':
-          send("channel", {
-            action: arguments.shift(),
-            params: arguments.shift()
-          });
-          break;
+      _baseVideo: function(data, func) {
+        var id = data.id.split(':').pop();
+        return "<em>" + func + ":</em>" +
+             "<a class=title target=_blank href=http://youtube.com/watch?v=" + id + ">" + 
+             "<img src=http://i3.ytimg.com/vi/" + id + "/default.jpg>" +
+             "<span>" +
+               "<b>" + data.artist + "</b>" +  
+                data.title +
+                "</span>" +
+               "</a>";
+      },
 
-        default: 
-          Chat.addmessage("Unknown command: " + command);
-          break;
+      skip: function(data) {
+        return format.announce({text: 'Skipped <a onclick=preview("' + data.id + '")>' + data.artist + ' - ' + data.title + '</a>'});
+      },
+      delist: function(data) {
+        return format._baseVideo(data, 'Delisted');
+      },
+      play: function(data) {
+        return '<p>' +
+          '<a onclick=preview("' + data.id + '")>' + data.artist + ' - ' + data.title + '</a>' +
+          '</p>';
+      },
+      request: function(data) {
+        return format._baseVideo(data, 'Requested');
+      },
+      chat: function(data) {
+        return data.text
       }
-      return true;
-    }
-    return false;
-  }
-
-  var format = {
-    announce: function(data) {
-      return "<p class=announce>" + data.text + "</p>";
     },
-
-    _baseVideo: function(data, func) {
-      var id = data.id.split(':').pop();
-      return "<div class=action>" +
-        "<em>" + func + ":</em>" +
-           "<a class=title target=_blank href=http://youtube.com/watch?v=" + id + ">" + 
-           "<img src=http://i3.ytimg.com/vi/" + id + "/default.jpg>" +
-           "<span>" +
-             "<b>" + data.artist + "</b>" +  
-              data.title +
-              "</span>" +
-             "</a>" +
-           "</div>";
-    },
-
-    skip: function(data) {
-      return format.announce({text: 'Skipped <a onclick=preview("' + data.id + '")>' + data.artist + ' - ' + data.title + '</a>'});
-    },
-    delist: function(data) {
-      return format._baseVideo(data, 'Delisted');
-    },
-    play: function(data) {
-      return format.announce({text: 'Playing <a onclick=preview("' + data.id + '")>' + data.artist + ' - ' + data.title + '</a>'});
-    },
-    request: function(data) {
-      return format._baseVideo(data, 'Requested');
-    },
-    chat: function(data) {
-      return data.text
-    }
-  };
+    author = {
+      chat: function(row, entry) {
+        $("<div/>")
+          .addClass("author")
+          .html(row.who)
+          .click(function(){
+            if(entry.expanded) {
+              return;
+            } else {
+              entry.expanded = true;
+              showContext(row);
+            }
+          }).appendTo(entry);
+      },
+      play: function(row, entry) {
+      }
+    };
     
   function showContext(){
   }
@@ -1257,37 +1210,39 @@ var Chat = (function(){
     while(_chat.data.length > lastindex) {
 
       row = _chat.data[lastindex];
-      // Only display rows that we know how to
-      // display.
-      if(format[row.type]) {
 
-        // Truncate the log after 20 containers
-        // of messages.
-        if(entryList.length > 20) {
-          entryList.shift().remove();
-        }
+      // Only display rows that we know how to
+      // display. We can collapse similar entries
+      if(format[row.type]) {
 
         entry = format[row.type](row);
 
-        // If this is a new author or the first entry 
-        // then we create a new entry
-        if(!_chat.lastentry || !row.who || (_chat.lastuid != row.uid )) {
-          entry = $("<div>").html(entry);
+        if((_chat.type == row.type) &&
+          _.indexOf(['play'], row.type) > -1
+        ) {
+          _chat.lastentry.append(entry);
+        } else if(
+            !_chat.lastentry || 
+            !row.who || 
+            (_chat.lastuid != row.uid )
+          ) {
+
+          // If this is a new author or the first entry 
+          // then we create a new entry
+          _chat.lastentry = entry = $("<div>").addClass(row.type).html(entry);
 
           // If it's a human, it will have a color
           if(row.color) {
             entry.addClass("c" + row.color);
           }
+          if(author[row.type]) {
+            author[row.type](row, entry);
+          }
 
-          if(row.who) {
-            $("<div class=author>" + row.who + ".</div>").click(function(){
-              if(entry.expanded) {
-                return;
-              } else {
-                entry.expanded = true;
-                showContext(row);
-              }
-            }).appendTo(entry);
+          // Truncate the log after some 
+          // containers of messages.
+          if(entryList.length > 40) {
+            entryList.shift().remove();
           }
 
           entryList.push(entry);
@@ -1295,9 +1250,11 @@ var Chat = (function(){
 
           // This is needed if the author says further things
           // before someone else.
-          _chat.lastentry = entry;
+          _chat.type = row.type;
         } else {
-          $(entry).insertAfter(_chat.lastentry.get(0).lastChild.previousSibling);
+          $(entry).insertAfter(
+            _chat.lastentry.get(0).lastChild.previousSibling
+          );
         }
 
         // A value of undefined here is a-ok.
@@ -1316,7 +1273,7 @@ var Chat = (function(){
     addmessage: addmessage,
     send: function(){
       var message = $("#talk").val();
-      if(message.length && !processCommand(message)) {
+      if(message.length) {
         send("chat", { 
           d: message,
           vid: _song ? _song[ID] : 0,
@@ -1347,7 +1304,7 @@ var Panel = {
     if(which != "song") {
       Panel.hide("song");
     } else {
-      _.each(["user", "channel"], function(which){
+      _.each(["channel-detail", "user", "channel"], function(which){
         Panel.hide(which, true);
       });
       width = 600;
@@ -1412,7 +1369,6 @@ var Panel = {
   }
 };
 
-
 var Volume = (function(){
   var 
     oldvolume,
@@ -1473,17 +1429,12 @@ var Volume = (function(){
         Store("volume", _volume);
       }
 
-      var volume = 100;
+      var ceiling = _song[VOLUME]
 
-      if(_player[_active]) {
-        if (_player[_active].index) {
-          volume = _song[VOLUME] * _volume;
-        }
-      }
       $("#mute-fg").css('height', (_volume * 100) + "px");
 
       if(_playerPrev && _playerPrev[_active]) {
-        _playerPrev[_active].setVolume(volume * _volume);
+        _playerPrev[_active].setVolume(ceiling * _volume);
       }
     },
 
@@ -1574,7 +1525,7 @@ when("$", function (){
         _ev('app-state', 'splash');
       }
     }
-  }, 1000);
+  }, 100);
 });
 
 // Load the first player
