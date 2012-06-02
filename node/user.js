@@ -19,7 +19,11 @@ function exists(field, username, cb) {
     "select * from users where " + field + "=?", 
     [username], 
     function(err, res, fields) {
-      cb(res.length > 0, res);
+      if(res) {
+        cb(res.length > 0, res);
+      } else {
+        cb(false, res);
+      }
     });
 };
 
