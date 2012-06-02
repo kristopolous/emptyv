@@ -21,7 +21,7 @@ function append(key, data) {
   _db.rpush( key, JSON.stringify(data) )
 
   if(Math.floor(Math.random() * 10) == 5) {
-    _db.ltrim(key, -20, -1);
+    _db.ltrim(key, -50, -1);
   }
 }
 
