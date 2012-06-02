@@ -1477,7 +1477,7 @@ when("$", function (){
       $("#videoList").empty();
       _.each(all, function(row) {
         $("#videoList").append( 
-          Channel.display(row, function(){ Channel.set(row.name); })
+          Channel.display(row, function(){ window.location.hash=row.name; })
         );
       });
     });
