@@ -195,7 +195,9 @@ var
 
   _volume = Store("volume") || 1,
 
-  _ev = EvDa(),
+  _ev = EvDa({
+    "app-state": "splash"
+  }),
 
   _index = -1,
 
@@ -1023,6 +1025,20 @@ var Channel = {
     });
   },
 
+  splashshow: function(all){
+    if(_ev("app-state") != "splash") {
+      return;
+    }
+    when("$", function(){
+      $("#videoList").empty();
+      _.each(all, function(row) {
+        $("#videoList").append( 
+          Channel.display(row, function(){ window.location.hash=row.name; })
+        );
+      });
+    });
+  },
+
   set: function(which) {
     _ev('app-state', 'channel');
     _channel = which;
@@ -1040,7 +1056,7 @@ var Channel = {
   },
 
   gen: function(res) {
-    if(_ev("app-state")== "splash") {
+    if(_ev("app-state") == "splash") {
       return;
     }
     $("#channel-results").empty();
@@ -1470,17 +1486,7 @@ when("io", function(){
 
 when("$", function (){
   when("io", function(){
-    _socket.on("channel-results", function(all) {
-      if(_ev("app-state") != "splash") {
-        return;
-      }
-      $("#videoList").empty();
-      _.each(all, function(row) {
-        $("#videoList").append( 
-          Channel.display(row, function(){ window.location.hash=row.name; })
-        );
-      });
-    });
+    _socket.on("channel-results", Channel.splashshow);
   });
   _ev("app-state", function(state) {
     if(state == "channel") {

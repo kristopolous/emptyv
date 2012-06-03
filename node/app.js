@@ -213,20 +213,10 @@ IO.sockets.on('connection', function (socket) {
   });
 
   socket.on("get-channels", function(obj) {
-    _db.hvals("channel", function(err, channelList) {
-
-      for(var ix = 0; ix < channelList.length; ix++) {
-        channelList[ix] = JSON.parse(channelList[ix]);
-      }
-
-      socket.emit("channel-results", 
-        channelList.sort(function(a, b) {
-          return (b.count || 0) - (a.count || 0);
-        })
-      );
+    Channel.generate(function(data) {
+      socket.emit("channel-results", data);
     }); 
   }); 
-
 
   socket.on("greet-response", function(p) {
     _user = p;

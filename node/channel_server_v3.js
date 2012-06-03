@@ -3,6 +3,7 @@ var redis = require('redis')
   , Channel = require('./channel')
   , Chat = require('./chat')
   , PRELOAD = -(3)
+  , fs = require('fs')
   , _last = +(new Date())
   , _state = {};
 
@@ -353,4 +354,10 @@ _db.hgetall("tick", function(err, state) {
   setInterval(function(){
     Channel.getAll(channelUpdate);
   }, 1000);
+  setInterval(function(){
+    Channel.generate(function(data) {
+      fs.writeFile("../baked/channels.js", "Channel.splashshow(" + JSON.stringify(data) + ")");
+    });
+  }, 5 * 1000);
+
 });

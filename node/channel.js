@@ -42,6 +42,18 @@ module.exports = {
       });
     });
   },
+  generate: function(cb) {
+    _db.hvals("channel", function(err, channelList) {
+
+      for(var ix = 0; ix < channelList.length; ix++) {
+        channelList[ix] = JSON.parse(channelList[ix]);
+      }
+
+      cb(channelList.sort(function(a, b) {
+        return (b.count || 0) - (a.count || 0);
+      }));
+    }); 
+  },
   get: function(name, cb) {
     _db.hget("channel", name, function(err, chan) {
       if(!chan) {
