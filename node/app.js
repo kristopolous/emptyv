@@ -62,7 +62,7 @@ var search = (function(){
         res.on('end', function(){ process(JSON.parse(results.join('')), cb); });
       });
 
-    req.on('error', function(){ cb(arguments, fale); });
+    req.on('error', function(){ cb(arguments, false); });
     req.end();
   }
 
