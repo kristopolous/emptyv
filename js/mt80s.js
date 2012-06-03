@@ -266,10 +266,10 @@ var Player = (function(){
     if(check(player)) {
       if(transition && !_letterBoxed) {
         move(player, 0, 100, function(el) {
-          el.style.top = "-100%";
+          el.style.left = "-1000%";
         });
       } else {
-        player.style.top = "-100%";
+        player.style.left = "-1000%";
       }
     }
   }
@@ -277,8 +277,12 @@ var Player = (function(){
   function show(player, transition) {
     if(check(player)) {
       if(transition && !_letterBoxed) {
-        move(player, -100, 0);
+        player.style.left = 0;
+        move(player, -100, 0, function(el) {
+          el.style.left = "-0%";
+        });
       } else {
+        player.style.left = 0;
         player.style.top = 0;
       }
     }
@@ -336,7 +340,9 @@ var Player = (function(){
         Player.load("yt", 1);
         Player.load("yt", 2); 
       });
-    } 
+    } else {
+      Player.hide(_player[id]);
+    }
   }
 
   // This sets the quality of the video along with
@@ -911,6 +917,9 @@ var Song = (function(){
     },
 
     format: function(data, type) {
+      if(!data.vid) {
+        return;
+      }
       var 
         node = $("<a class=title />")
           .append("<img src=http://i3.ytimg.com/vi/" + data.vid.split(':').pop() + "/1.jpg>");
