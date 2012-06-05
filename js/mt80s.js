@@ -265,8 +265,11 @@ var Player = (function(){
   function hide(player, transition) {
     if(check(player)) {
       if(transition && !_letterBoxed) {
+        document.body.style.overflowY = "none";
         move(player, 0, 100, function(el) {
+          document.body.style.overflowY = "auto";
           el.style.left = "-1000%";
+          el.style.top = "0";
         });
       } else {
         player.style.left = "-1000%";
@@ -786,6 +789,14 @@ var Song = (function(){
     //$("#title-edit").css('display','inline-block');
   }
 
+  self.preview = function(id,el){
+    Panel.show("song");
+    preview({
+      vid: id,
+      title: el.innerHTML,
+      artist: ""
+    });
+  }
   function panelFlash() {
     switch(_ev("song-tab")) {
       case 'Everything':
@@ -1188,14 +1199,14 @@ var Chat = (function(){
       },
 
       skip: function(data) {
-        return format.announce({text: 'Skipped <a onclick=preview("' + data.id + '")>' + data.artist + ' - ' + data.title + '</a>'});
+        return format.announce({text: 'Skipped <a onclick=preview("' + data.id + '",this)>' + data.artist + ' - ' + data.title + '</a>'});
       },
       delist: function(data) {
         return format._baseVideo(data, 'Delisted');
       },
       play: function(data) {
         return '<p>' +
-          '<a onclick=preview("' + data.id + '")>' + data.artist + ' - ' + data.title + '</a>' +
+          '<a onclick=preview("' + data.id + '",this)>' + data.artist + ' - ' + data.title + '</a>' +
           '</p>';
       },
       request: function(data) {
@@ -1428,16 +1439,16 @@ var Volume = (function(){
       });
       $("#mute-control .expanded").mousedown(function(e){
         _mousedown = true;
-        var offset = 70;
+        var offset = 160;
         if(_letterBoxed) {
-          offset += 160;
+          offset += 150;
         }
         Volume.set(1 - (e.pageY - offset) / 100);
         return false;
       }).mousemove(function(e){
-        var offset = 70;
+        var offset = 160;
         if(_letterBoxed) {
-          offset += 160;
+          offset += 150;
         }
         if(_mousedown) {
           Volume.set(1 - (e.pageY - offset) / 100);
@@ -1511,9 +1522,9 @@ when("$", function (){
     }
   });
 
-  $(".btn.collapse").click(function(){ Panel.hide(this.parentNode.id); });
+  $(".collapse").click(function(){ Panel.hide(this.parentNode.id); });
   $("#lhs-expand").click(function(){ Panel.show("chat"); });
-  $("#channel-expand").click(function(){ Panel.toggle("channel"); });
+  $("#channel-wrap").click(function(){ Panel.toggle("channel"); });
   $("#song-expand").click(function(){ Panel.show("song"); });
 
   onEnter("#talk", Chat.send);

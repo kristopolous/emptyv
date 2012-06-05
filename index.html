@@ -9,8 +9,6 @@ input,#talk{display:block;box-shadow:0 0 2px 2px #444457;background:#000;color:#
 label{margin-bottom:0.4em;color:#525767;font-size:11px;display:block}
 
 input{width:190px;margin:0.25em 0 0.75em}
-.btn{text-align:center;font-size:0.60em;padding:0.25em;margin:0.25em;cursor:pointer;border:0.25em solid #222}
-.btn:hover{border-color:#525767;color:#eee}
  
 #splash{text-align:center;background:#000;height:100%}
 #splash a{color:#90a0af}
@@ -24,20 +22,30 @@ h2 b{color:#364b62;display:block;font-size:1.15em;font-weight:bold;line-height:1
 #bottom{float:right}
 #players{margin-left:220px;position:absolute;bottom:0;height:100%;position:relative;z-index:20;background:#000}
 #players object,#players embed{position:absolute;top:0;left:0;width:100%;height:100%}
-#mute-control{position:absolute;top:25px;right:10px;background:#222}
-#mute-control .expanded{display:none;border:1px solid #525767;background:#222;width:26px;margin-left:1px;
+#mute-control{position:absolute;top:100px;right:8px;background:#18191b}
+#mute-control .expanded{display:none;border:1px solid #525767;background:#222;width:26px;margin-left:3px;
 }
 #mute-bg{background:#525767;height:100px;margin:10px;width:6px}
-#mute-fg{background:#abb6d6;height:0;position:absolute;bottom:10px;left:11px;width:8px}
-#mute{padding:0px;margin:0;width:31px;height:33px}
-#mute img{margin:-1px 0 0 -1px}
+#mute-fg{background:#abb6d6;height:0;position:absolute;bottom:10px;left:13px;width:8px}
+#mute{padding:0;margin:0}
 
 #panels{float:left;width:20px;position:relative;height:100%;white-space:nowrap}
 #panels > span{width:0px;display:none;position:relative;height:100%;vertical-align:top;background:#18191b}
 .panel-title{color:#dde9ff;font-size:1.2em;padding:0.5em;line-height:0.8em;white-space:nowrap}
 .panel-content{margin:0 7px;display:block;font-size:0.7em}
-.collapse{color:#bbcae1;position:absolute;top:0.25em;right:0;z-index:12;width:20px;height:8px;
-;line-height:8px;margin-top:0}
+
+.btn,.collapse{
+  text-align:center;
+  font-size:0.60em;
+  padding:0.25em;
+  margin:0;
+  cursor:pointer;
+  border:1px solid transparent;
+  border-width: 0 0 1px 1px;
+  color:#bbcae1;position:absolute;top:0;right:0;z-index:12;width:16px;height:7px;
+  line-height:10px}
+.collapse:hover{
+  border-color:#525767;color:#eee}
 
 #message-wrap {overflow:hidden;background:#080808;position:relative;margin:0 0.5em}
 #message{font-size:0.9em;color:#3C4B62; overflow-y:auto;position:absolute;bottom:0;width:100%}
@@ -73,25 +81,38 @@ h2 b{color:#364b62;display:block;font-size:1.15em;font-weight:bold;line-height:1
 .title img{vertical-align:baseline}
 .title b{display:block;font-size:1.2em;color:#bbcae1;font-weight:normal;height:1.25em;overflow:hidden}
 #channel .channel{min-height:61px}
-#top{position:relative;margin-left:6px;z-index:5;background:#18191b}
+#top{color:#bbcae1;font-size:0.7em;position:relative;margin-left:6px;z-index:5;background:#18191b}
 #lhs-expand{display:none}
 #lhs-expand,#lhs-collapse{padding:0.5em 0.25em;font-size:0.6em;width:1em}
 #channel{background:#222}
 #input-channel-search{font-size:1.25em}
 
-#video-current-wrapper div{display:inline-block}
+#channel-wrap>div,#video-current-wrapper>div{display:inline-block}
+#channel-wrap,
 #video-current-wrapper{
   border-radius:4px;
   border:1px solid transparent;
   width:194px;
   cursor:pointer;
-  font-size:0.7em;margin:1.5em 0 0 0;padding:0.4em 5px;height:32px;overflow:hidden}
-#video-current{
+  margin:1em 0 0 0;padding:0.4em 5px;overflow:hidden}
+#channel-current,#video-current{
   margin:2px 0 0 2px;
-  color:#bbcae1;width:153px;white-space:normal;font-size:0.85em;line-height:0.83em}
-#video-current b{color:#fff;display:block;font-size:1.3em;line-height:1em;margin-bottom:0.2em;margin-top:0.1em;white-space:nowrap}
+  width:153px;white-space:normal;font-size:0.85em;line-height:0.83em}
+#channel-title,#video-current b{color:#fff;display:block;font-size:1.3em;line-height:1em;margin:0.1em 0 0.2em;white-space:nowrap}
 #video-expand{background:url("images/next_track.png") 2px 5px no-repeat;width:43px;height:32px;vertical-align:top}
-#video-current-wrapper:hover{ border-color:#3c4b62; background:#172131 }
+#mute{
+  border-radius:4px;
+  height:32px;
+  width:32px;
+  background:url('images/mute_off_32.png') 3px 0 no-repeat;
+  border:1px solid transparent;
+}
+
+.collapse:hover,
+#mute:hover,
+#video-current-wrapper:hover,
+#channel-wrap:hover
+{border-color:#3c4b62; background-color:#172131 }
 
 #input-song-search{font-size:1.25em;margin-left:3px;width:225px}
 #song-search-label{margin-top:-.5em;margin-bottom:.5em;white-space:normal}
@@ -99,7 +120,7 @@ h2 b{color:#364b62;display:block;font-size:1.15em;font-weight:bold;line-height:1
 #song-results a{display:block;font-size:1.25em;margin:0.25em 0;padding:0.15em}
 #song-results a:hover{background:#333;color:#fff}
 #song-results a.title span{white-space:normal}
-#song-results img{width:40px;vertical-align:top}
+#song-results img{width:40px;vertical-align:top;height:30px}
 #song-preview .bigbtn{display:none;margin:0.25em 0.5em;font-size:1em}
 #song-top-buttons{
 display:block;margin-top:6px;
@@ -107,14 +128,10 @@ position:absolute;font-size:1.4em;top:2px;left:238px
 }
 
 #chatbar{z-index:0;width:220px;position:absolute;bottom:0}
-#channel-wrap{display:inline-block;padding-top:0.5em;font-size:1.2em}
-  #channel-wrap span{display:inline-block;width:150px}
-  #channel-expand{display:inline-block;background:url("images/door_open.png") 9px 6px no-repeat;width:43px;height:42px;
-  border-radius:3px; border:1px solid transparent; cursor:pointer; vertical-align:top;
+  #channel-expand{display:inline-block;background:url("images/door_open_1.png") 7px 4px no-repeat;width:39px;height:35px;
+    vertical-align:top;
   }
-  #channel-expand:hover{border-color:#3c4b62;background-color:#172131}
-  #channel-title{color:#dde9ff;margin-top:0}
-  #channel-stats{color:#525767;font-size:0.7em;margin-top:-0.3em}
+  #channel-wrap:hover{border-color:#3c4b62;background-color:#172131}
 
 #user-control{margin:0 0.5em 0.4em 0;text-align:right;visibility:hidden}
   #display-username{margin-left:0.75em;display:inline-block;color:#525767}
@@ -198,7 +215,7 @@ a#song-delist.bigbtn{float:right;font-size:0.7em;color:#525767}
 </div><div id=app>
   <div id=panels><div class=btn id=lhs-expand>&gt;</div>
     <span id=channel-detail>
-      <span class="btn collapse">X</span>
+      <span class=collapse>X</span>
       <div class=panel-title>Channel Details</div>
       <span class=panel-content>
         <label>Channel Name</label>
@@ -211,29 +228,26 @@ a#song-delist.bigbtn{float:right;font-size:0.7em;color:#525767}
         <button id=channel-create-button>Create Channel</button>
       </span>
     </span><span id=channel>
-      <span class="btn collapse">X</span>
+      <span class=collapse>X</span>
       <div class=panel-title>Party Hopper</div>
       <span class=panel-content>
         <div id=channel-results></div>
       </span>
     </span><span id=chat>
-      <span class="btn collapse">X</span>
+      <span class=collapse>X</span>
       <div id=top>
-        <span id=channel-wrap>
+        <div id=channel-wrap>
           <div id=channel-expand></div>
-          <span>
-            <div id=channel-title></div><div id=channel-stats></div>
-          </span>
-        </span>
+          <div id=channel-current>
+            <b id=channel-title></b><div id=channel-stats></div>
+          </div>
+        </div>
         <div id=mute-control>
-          <button class=bigbtn id=mute>
-            <img src=images/mute_off_32.png>
-          </button>
+          <div id=mute></div>
           <div class=expanded>
             <div id=mute-bg></div><div id=mute-fg></div>
           </div>
         </div>
-        <div id=countdown></div>
         <div id=video-current-wrapper>
           <div id=video-expand></div><div id=video-current></div>
         </div>
@@ -251,7 +265,7 @@ a#song-delist.bigbtn{float:right;font-size:0.7em;color:#525767}
         <input id=talk autocomplete=off>
       </div>
     </span><span id=user>
-      <span class="btn collapse">X</span>
+      <span class=collapse>X</span>
       <div class=panel-title>Who u be?</div>
       <span class=panel-content>
         <div id=login-wrap>
@@ -271,7 +285,7 @@ a#song-delist.bigbtn{float:right;font-size:0.7em;color:#525767}
         <!--<a id=forgot-button>Password Reset</a>-->
       </span>
     </span><span id=song>
-      <span class="btn collapse">X</span>
+      <span class=collapse>X</span>
       <div class=panel-title>Video Selection</div>
       <span class=panel-content>
         <div id=song-top-buttons>
@@ -288,7 +302,11 @@ a#song-delist.bigbtn{float:right;font-size:0.7em;color:#525767}
             <label>You Choose Next Video</label>
             <input id=input-song-search autocomplete=off>
             <div id=song-search-label></div>
-            <div id=song-results></div>
+            <div id=song-results-container>
+              <div class=buffer id=song-results-top-buffer></div>
+              <div id=song-results></div>
+              <div class=buffer id=song-results-bottom-buffer></div>
+            </div>
           </div>
           <div id=song-preview>
             <div id=song-preview-info>
