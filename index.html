@@ -82,6 +82,7 @@ h2 b{color:#364b62;display:block;font-size:1.15em;font-weight:bold;line-height:1
 .title b{display:block;font-size:1.2em;color:#bbcae1;font-weight:normal;height:1.25em;overflow:hidden}
 #channel .channel{min-height:61px}
 #top{color:#bbcae1;font-size:0.7em;position:relative;margin-left:6px;z-index:5;background:#18191b}
+#video-overlay{position:absolute;top:0;left:6px;z-index:21}
 #lhs-expand{display:none}
 #lhs-expand,#lhs-collapse{padding:0.5em 0.25em;font-size:0.6em;width:1em}
 #channel{background:#222}
@@ -234,6 +235,7 @@ a#song-delist.bigbtn{float:right;font-size:0.7em;color:#525767}
         <div id=channel-results></div>
       </span>
     </span><span id=chat>
+      <div id=video-overlay></div>
       <span class=collapse>X</span>
       <div id=top>
         <div id=channel-wrap>

@@ -50,8 +50,6 @@ var
   // to 0 as possible.
   LOADTIME_sec = 5,
 
-  LAG_THRESHHOLD = 12,
-
   // An extra player
   EXTRA = 2,
 
@@ -523,8 +521,12 @@ var Player = (function(){
         paddingTop: "6px",
         marginLeft: "6px" 
       });
+      $("#video-overlay").css({
+        height: "162px",
+        width: "216px"
+      });
       $("#top").css({
-        marginTop: "160px"
+        marginTop: "170px"
       });
     },
     hide: hide,
@@ -533,6 +535,10 @@ var Player = (function(){
     fullscreen: function(){
       if(_letterBoxed) {
         _letterBoxed = false;
+        $("#video-overlay").css({
+          height: 0,
+          width: 0
+        });
         $("#players").css({
           height: "100%",
           width: "auto",
@@ -844,7 +850,7 @@ var Song = (function(){
         _socket.emit("get-history");
       });
 
-      $("#song-cancel,#song-select-cancel").click(function(){
+      $("#video-overlay,#song-cancel,#song-select-cancel").click(function(){
         Panel.hide("song");
       });
 
@@ -1430,9 +1436,8 @@ var Volume = (function(){
         return false;
       });
 
-      $(document.body).mouseup(function(){
-        _mousedown = false;
-      });
+      $(document.body).mouseup(function(){ _mousedown = false; });
+
       $(document.body).mousedown(function(){
         _expanded = true;
         toggle();
@@ -1441,14 +1446,14 @@ var Volume = (function(){
         _mousedown = true;
         var offset = 160;
         if(_letterBoxed) {
-          offset += 150;
+          offset += 160;
         }
         Volume.set(1 - (e.pageY - offset) / 100);
         return false;
       }).mousemove(function(e){
         var offset = 160;
         if(_letterBoxed) {
-          offset += 150;
+          offset += 160;
         }
         if(_mousedown) {
           Volume.set(1 - (e.pageY - offset) / 100);
@@ -1483,10 +1488,10 @@ var Volume = (function(){
     },
 
     unmute: function(){
-      if(muted) {
+      if(muted && (_volume == 0)) {
         Volume.set(oldvolume, true);
-        muted = false
       }
+      muted = false
     }
   };
 })();
