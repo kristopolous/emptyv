@@ -1266,7 +1266,8 @@ var Chat = (function(){
         } else if(
             !_chat.lastentry || 
             !row.who || 
-            (_chat.lastuid != row.uid )
+            (_chat.lastuid != row.uid ) ||
+            ( _chat.type != row.type )
           ) {
 
           // If this is a new author or the first entry 
