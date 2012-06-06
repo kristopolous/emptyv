@@ -797,9 +797,12 @@ var Song = (function(){
 
   self.preview = function(id,el){
     Panel.show("song");
+    if('innerHTML' in el) {
+      blink($(el));
+    }
     preview({
       vid: id,
-      title: el.innerHTML,
+      title: ('innerHTML' in el ? el.innerHTML : el),
       artist: ""
     });
   }
@@ -1090,7 +1093,6 @@ var Channel = {
     _.each(res, function(which) {
       Channel.display(which, function(){
         blink($(this), function(){
-          console.log(arguments);
           Panel.hide("channel");
         });
         window.location.hash = which.name;
@@ -1192,31 +1194,28 @@ var Chat = (function(){
         return "<p class=announce>" + data.text + "</p>";
       },
 
-      _baseVideo: function(data, func) {
+      _baseVideo: function(data) {
         var id = data.id.split(':').pop();
-        return "<em>" + func + ":</em>" +
-             "<a class=title target=_blank href=http://youtube.com/watch?v=" + id + ">" + 
-             "<img src=http://i3.ytimg.com/vi/" + id + "/default.jpg>" +
-             "<span>" +
+        return "<a class=title onclick=preview('" + data.id + "',this)>" + 
                "<b>" + data.artist + "</b>" +  
                 data.title +
-                "</span>" +
                "</a>";
       },
 
       skip: function(data) {
-        return format.announce({text: 'Skipped <a onclick=preview("' + data.id + '",this)>' + data.artist + ' - ' + data.title + '</a>'});
+        return format._baseVideo(data);
       },
       delist: function(data) {
-        return format._baseVideo(data, 'Delisted');
+        return format._baseVideo(data);
       },
       play: function(data) {
+        return format._baseVideo(data);
+      },
+      request: function(data) {
+        return format._baseVideo(data, 'Delisted');
         return '<p>' +
           '<a onclick=preview("' + data.id + '",this)>' + data.artist + ' - ' + data.title + '</a>' +
           '</p>';
-      },
-      request: function(data) {
-        return format._baseVideo(data, 'Requested');
       },
       chat: function(data) {
         return data.text
@@ -1236,7 +1235,36 @@ var Chat = (function(){
             }
           }).appendTo(entry);
       },
+
+      skip: function(row, entry) {
+        $("<div/>")
+          .addClass("author")
+          .html("Skipped by " + row.who).appendTo(entry);
+      },
+
+      delist: function(row, entry) {
+        $("<div/>")
+          .addClass("author")
+          .html("Delisted by " + row.who).appendTo(entry);
+      },
+
+      request: function(row, entry) {
+        $("<div/>")
+          .addClass("author")
+          .html("requested by " + row.who).appendTo(entry);
+      },
+
       play: function(row, entry) {
+        $("<div/>")
+          .addClass("author")
+          .html("Currently Playing").appendTo(entry);
+      }
+    },
+    post = {
+      play: function(container, entry){
+        if(_chat.lastentry.get(0).childNodes.length > 2) {
+          $(_chat.lastentry.get(0).firstChild).remove();
+        }
       }
     };
     
@@ -1259,13 +1287,8 @@ var Chat = (function(){
 
         entry = format[row.type](row);
 
-        if((_chat.type == row.type) &&
-          _.indexOf(['play'], row.type) > -1
-        ) {
-          _chat.lastentry.append(entry);
-        } else if(
+        if(
             !_chat.lastentry || 
-            !row.who || 
             (_chat.lastuid != row.uid ) ||
             ( _chat.type != row.type )
           ) {
@@ -1298,6 +1321,9 @@ var Chat = (function(){
           $(entry).insertAfter(
             _chat.lastentry.get(0).lastChild.previousSibling
           );
+          if(post[row.type]) {
+            post[row.type](_chat.lastentry, entry);
+          }
         }
 
         // A value of undefined here is a-ok.
