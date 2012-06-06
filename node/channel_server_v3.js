@@ -109,6 +109,7 @@ function getNext(row) {
   // be appended to our playlist after the previous
   // video
   if(row.add) {
+    console.log(row);
     if(row.previous) {
       _db.linsert(
         "pl:" + row.name,
@@ -117,8 +118,8 @@ function getNext(row) {
         row.video.vid
       );
     } else {
-      _db.lpush(
-        "pl:" + row.channel,
+      _db.rpush(
+        "pl:" + row.name,
         row.video.vid
       );
     }

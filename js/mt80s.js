@@ -1266,6 +1266,34 @@ var Chat = (function(){
           $(_chat.lastentry.get(0).firstChild).remove();
         }
       }
+    },
+    combine = {
+      play: function(previous, current) {
+        if(previous.type == 'request' && previous.vid == current.vid) {
+          _chat.lastentry.get(0).lastChild.innerHTML = "Requested to play now by " + previous.who + ".";
+          return true;
+        }
+      },
+      delist: function(previous, current) {
+        if(previous.type == 'play' && previous.vid == current.vid) {
+          _chat.lastentry.get(0).lastChild.innerHTML = "Skipped and delisted by " + current.who + ".";
+          return true;
+        } else if(previous.type == 'skip' && previous.vid == current.vid) {
+          _chat.lastentry.get(0).lastChild.innerHTML = "Skipped and delisted by " + current.who + ".";
+          return true;
+        } 
+      },
+      skip: function(previous, current) {
+        if(previous.vid == current.vid) {
+          if(previous.type == 'delist') {
+            _chat.lastentry.get(0).lastChild.innerHTML = "Skipped and delisted by " + previous.who + ".";
+            return true;
+          } else if(previous.type == 'play') {
+            _chat.lastentry.get(0).lastChild.innerHTML = "Skipped by " + current.who + ".";
+            return true;
+          } 
+        }
+      }
     };
     
   function showContext(){
@@ -1285,44 +1313,46 @@ var Chat = (function(){
       // display. We can collapse similar entries
       if(format[row.type]) {
 
-        entry = format[row.type](row);
+        if(!_chat.lastrow || !combine[row.type] || !combine[row.type](_chat.lastrow, row)) {
+          entry = format[row.type](row);
 
-        if(
-            !_chat.lastentry || 
-            (_chat.lastuid != row.uid ) ||
-            ( _chat.type != row.type )
-          ) {
+          if(
+              !_chat.lastentry || 
+              (_chat.lastuid != row.uid ) ||
+              ( _chat.type != row.type )
+            ) {
 
-          // If this is a new author or the first entry 
-          // then we create a new entry
-          _chat.lastentry = entry = $("<div>").addClass(row.type).html(entry);
+            // If this is a new author or the first entry 
+            // then we create a new entry
+            _chat.lastentry = entry = $("<div>").addClass(row.type).html(entry);
 
-          // If it's a human, it will have a color
-          if('color' in row) {
-            entry.addClass("c" + row.color);
-          }
-          if(author[row.type]) {
-            author[row.type](row, entry);
-          }
+            // If it's a human, it will have a color
+            if('color' in row) {
+              entry.addClass("c" + row.color);
+            }
+            if(author[row.type]) {
+              author[row.type](row, entry);
+            }
 
-          // Truncate the log after some 
-          // containers of messages.
-          if(entryList.length > 40) {
-            entryList.shift().remove();
-          }
+            // Truncate the log after some 
+            // containers of messages.
+            if(entryList.length > 40) {
+              entryList.shift().remove();
+            }
 
-          entryList.push(entry);
-          $("#message").append(entry);
+            entryList.push(entry);
+            $("#message").append(entry);
 
-          // This is needed if the author says further things
-          // before someone else.
-          _chat.type = row.type;
-        } else {
-          $(entry).insertAfter(
-            _chat.lastentry.get(0).lastChild.previousSibling
-          );
-          if(post[row.type]) {
-            post[row.type](_chat.lastentry, entry);
+            // This is needed if the author says further things
+            // before someone else.
+            _chat.type = row.type;
+          } else {
+            $(entry).insertAfter(
+              _chat.lastentry.get(0).lastChild.previousSibling
+            );
+            if(post[row.type]) {
+              post[row.type](_chat.lastentry, entry);
+            }
           }
         }
 
@@ -1331,6 +1361,7 @@ var Chat = (function(){
       }
       
       $("a", entry).attr("target", "_blank");
+      _chat.lastrow = row;
        
       lastindex++;
     }
