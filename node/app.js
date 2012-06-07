@@ -220,6 +220,7 @@ IO.sockets.on('connection', function (socket) {
 
   socket.on("greet-response", function(p) {
     _user = p;
+    _user.channel = unescape(_user.channel);
     _user.name = "anonymous";
 
     if(!_user.uid) {
