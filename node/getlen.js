@@ -3,13 +3,19 @@ var redis = require('redis')
 
 _db.select(1);
 
-var len = 0;
-_db.lrange("pl:Poptastic", 0, -1, function(err, res) {
-  _db.hmget("vid", res, function(err, res) {
-    res.forEach(function(row) {
-      row = JSON.parse(row);
-      len += parseInt(row[0]);
+_db.keys("pl:*", function(err, list) {
+  list.forEach(function(which) {
+    var len = 0;
+    _db.lrange(which, 0, -1, function(err, res) {
+      _db.hmget("vid", res, function(err, res) {
+        if(res) {
+          res.forEach(function(row) {
+            row = JSON.parse(row);
+            len += parseInt(row[0]);
+          });
+          console.log((len / 60 / 60).toFixed(2), res.length, which.split(":").pop());
+        }
+      });
     });
-    console.log(len);
   });
 });
