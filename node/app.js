@@ -391,6 +391,13 @@ IO.sockets.on('connection', function (socket) {
   });
 
   socket.on("chat", function(data) {
+    // Insert images
+    data.d = data.d.replace(/[a-z]+:\/\/[^\s^<]+(jpg|png|jpeg|gif|bmp|jpeg)/g, '![]($&)');
+
+    // Insert links
+    data.d = data.d.replace(/([^(])(http[s]{0,1}:\/\/[^\s^<]+)/g, '$1[$2]($2)');
+    data.d = data.d.replace(/^http[s]{0,1}:\/\/[^\s^<]+/g, '[$&]($&)');
+
     Chat.add(_user.channel, {
       type: "chat", 
       text: _md(data.d
