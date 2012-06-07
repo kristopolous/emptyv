@@ -104,6 +104,8 @@ IO.sockets.on('connection', function (socket) {
       Channel.get(which, function(){
         _channel.leave(function(){
           Channel.join(which, _user.uid, function(){;
+            // This resets the id counter so we get a full chat
+            _user.lastid = 0;
             if(_user.loggedin) {
               if ( _user.channel && (_user.channel != which)) {
                 announce(_user.name + " left and went to <a href=#" + escape(which) + ">" + which + "</a>.");
