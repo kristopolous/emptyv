@@ -17,7 +17,6 @@ function build(channel) {
     index: 0,
     video: {},
     offset: 0,
-    requestStack: [],
     add: false
   };
 }
@@ -103,46 +102,48 @@ function loadVideo(channel, index, offset, opts) {
 }
 
 function getNext(row) {
-  var video = row.requestStack.shift();
+  _db.lpop("re:" + row.name, function(err, video){
 
-  // This means that the new video should
-  // be appended to our playlist after the previous
-  // video
-  if(row.add) {
-    console.log(row);
-    if(row.previous) {
-      _db.linsert(
-        "pl:" + row.name,
-        "AFTER",
-        row.previous,
-        row.video.vid
-      );
-    } else {
-      _db.rpush(
-        "pl:" + row.name,
-        row.video.vid
-      );
+    // This means that the new video should
+    // be appended to our playlist after the previous
+    // video
+    if(row.add) {
+      console.log(row);
+      if(row.previous) {
+        _db.linsert(
+          "pl:" + row.name,
+          "AFTER",
+          row.previous,
+          row.video.vid
+        );
+      } else {
+        _db.rpush(
+          "pl:" + row.name,
+          row.video.vid
+        );
+      }
+      row.previous = false;
+
+      // And then we move the index forward
+      // so that when we've exhausted our 
+      // request stack we don't revisit the
+      // stuff we are inserting
+      row.index++;
+      setIndex(row.name, row.index, PRELOAD);
     }
-    row.previous = false;
-
-    // And then we move the index forward
-    // so that when we've exhausted our 
-    // request stack we don't revisit the
-    // stuff we are inserting
-    row.index++;
-    setIndex(row.name, row.index, PRELOAD);
-  }
-  if(video) {
-    console.log(video);
-    row.previous = row.video.vid;
-    setVideo(row.name, video.vid, PRELOAD);
-    row.add = video.add;
-  } else {
-    row.add = false;
-    _db.llen("pl:" + row.name, function(err, len) {
-      loadVideo(row.name, (row.index + 1) % len);
-    });
-  }
+    if(video) {
+      video = JSON.parse(video);
+      console.log(video);
+      row.previous = row.video.vid;
+      setVideo(row.name, video.vid, PRELOAD);
+      row.add = video.add;
+    } else {
+      row.add = false;
+      _db.llen("pl:" + row.name, function(err, len) {
+        loadVideo(row.name, (row.index + 1) % len);
+      });
+    }
+  });
 }
 
 function delist(data) {
@@ -213,13 +214,13 @@ function doRequest(data, doadd) {
   // If the user said "play now" then this 
   // requested video goes to the front of the stack,
   // not the end. (2012-05-30 cjm)
-  var func = data.now ? "unshift" : "push";
+  var func = data.now ? "lpush" : "rpush";
 
-  _state[data.channel].requestStack[func]({
+  _db[func]("re:" + data.channel, JSON.stringify({
     vid: data.vid,
     name: data.name,
     add: doadd
-  });
+  }));
 
   updateNext(data.channel);
 
@@ -320,7 +321,6 @@ function channelUpdate(channelList) {
       getNext(row);
     }
 
-    console.log(row.video.offset, row.video.len);
     // this is to survive a server crash
     setIndex(row.name, row.index, row.video.offset);
 

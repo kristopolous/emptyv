@@ -199,7 +199,6 @@ var
 
   _index = -1,
 
-  _channel = document.location.hash.slice(1),
   _socket = false,
 
   _seekTimeout = 0,
@@ -213,6 +212,8 @@ var
 
   // How many of the YT players are loaded
   _loaded = 0,
+
+  _channel = '',
 
   // And their associated references
   _player = [],
@@ -1604,7 +1605,7 @@ when("$", function (){
     _ev.set('app-state','splash');
   }
 
-  var hash = window.location.hash;
+  var hash = "";
   setInterval(function(){
     if(window.location.hash != hash) {
       hash = window.location.hash;
