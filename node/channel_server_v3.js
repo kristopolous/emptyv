@@ -133,7 +133,6 @@ function getNext(row) {
     }
     if(video) {
       video = JSON.parse(video);
-      console.log(video);
       row.previous = row.video.vid;
       setVideo(row.name, video.vid, PRELOAD);
       row.add = video.add;
@@ -171,7 +170,7 @@ function delist(data) {
     // then all we need to do is keep the index as is, and reset the
     // offset counter, re-emitting the index, which is at the new content.
     // 
-    if(refPoint == data.track.vid) {
+    if(_state[data.channel].video.vid == data.track.vid) {
       console.log("That was our current video, resetting to the new index");
       loadVideo(channel, currentIndex);
       return;
