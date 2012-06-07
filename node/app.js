@@ -104,8 +104,10 @@ IO.sockets.on('connection', function (socket) {
       Channel.get(which, function(){
         _channel.leave(function(){
           Channel.join(which, _user.uid, function(){;
-            if(_user.loggedin && _user.channel && (_user.channel != which)) {
-              announce(_user.name + " left and went to <a href=#" + escape(which) + ">" + which + "</a>.");
+            if(_user.loggedin) {
+              if ( _user.channel && (_user.channel != which)) {
+                announce(_user.name + " left and went to <a href=#" + escape(which) + ">" + which + "</a>.");
+              }
               announce(_user.name + " joined", which);
             }
             _user.channel = which;
@@ -124,11 +126,13 @@ IO.sockets.on('connection', function (socket) {
     }
   };
 
-  function logout() {
+  function disconnect() {
+    // A disconnect isn't a logout. We don't
+    // remove the k/v connection of the UID/user
+    // from redis. That has to be done OOB.
     if(_user.name && _user.name != "anonymous") {
       announce(_user.name + " logged out");
       _user.loggedin = false;
-      _db.hdel("user", _user.uid);
       _user.name = "anonymous";
     }
   }
@@ -203,13 +207,14 @@ IO.sockets.on('connection', function (socket) {
     Chat.add(
       (channel || _user.channel), {
         type: 'announce',
-        text: message
+        text: message,
+        uid: _user.uid
       }
     );
   }
 
   socket.on("disconnect", function(){
-    logout();
+    disconnect();
     for(var which in _ival) {
       clearInterval(_ival[which]);
     };
@@ -322,9 +327,9 @@ IO.sockets.on('connection', function (socket) {
   });
 
   function login(name) {
-    announce(name + " logged in");
     _user.loggedin = true;
     _user.name = name;
+    announce(name + " logged in");
     _db.hset("user", _user.uid, name);
     socket.emit("username", name);
   }
@@ -375,7 +380,8 @@ IO.sockets.on('connection', function (socket) {
       }); 
       // logout
     } else {
-      logout();
+      disconnect();
+      _db.hdel("user", _user.uid);
     }
   });
 

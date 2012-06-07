@@ -487,6 +487,7 @@ var Player = (function(){
   }
   return {
     load: function(domain, ix) {
+      log("Loading " + domain + ":" + ix);
       swfobject.embedSWF({
           "yt": "http://www.youtube.com/apiplayer?" + [
             "version=3",
@@ -556,6 +557,7 @@ var Player = (function(){
 
 function transition(song) {
 
+  log("Loading song:", song); 
   _song = song;
   // Load the next video prior to actually switching over
   var 
@@ -1060,11 +1062,13 @@ var Channel = {
       return;
     }
     when("$", function(){
-      $("#videoList").empty();
-      _.each(all, function(row) {
-        $("#videoList").append( 
-          Channel.display(row, function(){ window.location.hash=row.name; })
-        );
+      when("_", function(){
+        $("#videoList").empty();
+        _.each(all, function(row) {
+          $("#videoList").append( 
+            Channel.display(row, function(){ window.location.hash=row.name; })
+          );
+        });
       });
     });
   },
@@ -1263,6 +1267,22 @@ var Chat = (function(){
           .html("Currently Playing").appendTo(entry);
       }
     },
+    append = {
+      announce: function(lastentry, entry, haveMore) {
+        lastentry.html(entry);
+        if(!haveMore) {
+          blink(lastentry);
+        }
+      },
+      play: function(lastentry, entry, haveMore) {
+        $(entry).insertAfter(
+          lastentry.get(0).lastChild.previousSibling
+        );
+        if(!haveMore) {
+          blink(lastentry);
+        }
+      }
+    },
     post = {
       play: function(container, entry, isFirst){
         if(isFirst) { return; }
@@ -1329,8 +1349,7 @@ var Chat = (function(){
           if(
               !_chat.lastentry || 
               ( _chat.lastuid != row.uid ) ||
-              ( _chat.type != row.type ) ||
-              ( _chat.type == "announce" )
+              ( _chat.type != row.type ) 
             ) {
 
             // If this is a new author or the first entry 
@@ -1361,9 +1380,13 @@ var Chat = (function(){
               post[row.type](_chat.lastentry, entry, true);
             }
           } else {
-            $(entry).insertAfter(
-              _chat.lastentry.get(0).lastChild.previousSibling
-            );
+            if(append[row.type]) {
+              append[row.type](_chat.lastentry, entry, _chat.data.length > (lastindex + 1));
+            } else {
+              $(entry).insertAfter(
+                _chat.lastentry.get(0).lastChild.previousSibling
+              );
+            }
             if(post[row.type]) {
               post[row.type](_chat.lastentry, entry, false);
             }
