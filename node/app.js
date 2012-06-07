@@ -13,6 +13,7 @@ _db.select(1);
 app.listen(1985);
 Chat.setDB(_db);
 Channel.setDB(_db);
+IO.set('log level', 1)
 
 function uidgen() {
   return (Math.random() * Math.pow(2,63)).toString(36);
@@ -101,17 +102,17 @@ IO.sockets.on('connection', function (socket) {
 
     join: function(which) {
       Channel.get(which, function(){
-        _channel.leave();
-        _user.channel = which;
-        socket.emit("channel-name", which);
-        if(_user.uid) {
-          Channel.join(which, _user.uid);
-        }
+        _channel.leave(function(){
+          Channel.join(which, _user.uid, function(){;
+            _user.channel = which;
+            socket.emit("channel-name", which);
+          });
+        });
       });
     },
 
-    leave: function() {
-      Channel.leave(_user.channel, _user.uid);
+    leave: function(cb) {
+      Channel.leave(_user.channel, _user.uid, cb);
     },
 
     play: function(params) {
@@ -204,7 +205,6 @@ IO.sockets.on('connection', function (socket) {
   });
 
   socket.on("channel-join", function(obj){
-    console.log(obj);
     _channel.join(unescape(obj.channel));
   });
 

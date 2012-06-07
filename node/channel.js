@@ -4,10 +4,11 @@ module.exports = {
   remove: remove,
   update: update,
   count: count,
-  join: function(name, user) {
+  join: function(name, user, cb) {
     _db.set("user:" + name + ":" + user, 1);
-    _db.expire("user:" + name + ":" + user, 10);
-    count(name);
+    _db.expire("user:" + name + ":" + user, 10, function(){
+      count(name, cb);
+    });
   },
   fix: function(name) {
     _db.exists("pl:" + name, function (err, last) {
@@ -16,10 +17,15 @@ module.exports = {
       }
     });
   },
-  leave: function(name, user) {
+  leave: function(name, user, cb) {
     if(name) {
-      _db.del("user:" + name + ":" + user);
-      count(name);
+      _db.del("user:" + name + ":" + user, function(err, last) {
+        count(name, cb);
+      });
+    } else {
+      if(cb) {
+        cb();
+      }
     }
   },
   setDB: function(which) {
@@ -64,26 +70,29 @@ module.exports = {
   }
 };
 
-function count(channel) {
+function count(channel, cb) {
   _db.keys("user:" + channel + ":*", function(err, all) {
     var count = all.length;
-    update(channel, {count: count});
+    update(channel, {count: count}, cb);
   });
 }
 
-function update(name, newData) {
+function update(name, newData, cb) {
   _db.hget('channel', name, function(err, data) {
     var oldData = JSON.parse(data) || {};
     for(var key in newData) {
       oldData[key] = newData[key];
     }
-    _db.hset('channel', name, JSON.stringify(oldData));
+    _db.hset('channel', name, JSON.stringify(oldData), function() {
+      if(cb) {
+        cb();
+      }
+    });
   });
   return newData;
 }
 
 function remove(channel) {
-  console.log("Removing " + channel);
   _db.hdel('tick', channel);
   _db.hdel('channel', channel);
 }
