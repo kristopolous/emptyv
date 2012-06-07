@@ -38,11 +38,12 @@ function append(key, data) {
    * lands on a 5.
    */
   if(Math.floor(Math.random() * 10) == 5) {
-    _db.ltrim(key, -150, -1);
+    _db.ltrim(key, -100, -1);
   }
 }
 
 function add(channel, obj) {
+  console.log(channel, obj);
   /*
    * I'd rather crash here then be quiet.
   if(!channel) {

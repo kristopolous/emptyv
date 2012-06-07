@@ -93,7 +93,7 @@ var search = (function(){
 
 IO.sockets.on('connection', function (socket) {
   var 
-    _user = {}, 
+    _user = {greeted: false}, 
     _song = {},
     _online = -1,
     _ival = {};
@@ -104,6 +104,10 @@ IO.sockets.on('connection', function (socket) {
       Channel.get(which, function(){
         _channel.leave(function(){
           Channel.join(which, _user.uid, function(){;
+            if(_user.loggedin && _user.channel && (_user.channel != which)) {
+              announce(_user.name + " left and went to <a href=#" + escape(which) + ">" + which + "</a>.");
+              announce(_user.name + " joined", which);
+            }
             _user.channel = which;
             socket.emit("channel-name", which);
           });
@@ -119,6 +123,15 @@ IO.sockets.on('connection', function (socket) {
       _db.set("request", JSON.stringify(params));
     }
   };
+
+  function logout() {
+    if(_user.name && _user.name != "anonymous") {
+      announce(_user.name + " logged out");
+      _user.loggedin = false;
+      _db.hdel("user", _user.uid);
+      _user.name = "anonymous";
+    }
+  }
 
   function song() {
     if(!_user.channel) {
@@ -186,18 +199,17 @@ IO.sockets.on('connection', function (socket) {
     });
   }
 
-  function announce(message) {
+  function announce(message, channel) {
     Chat.add(
-      _user.channel, 
-      'announce',
-      message
+      (channel || _user.channel), {
+        type: 'announce',
+        text: message
+      }
     );
   }
 
   socket.on("disconnect", function(){
-    if(_user.name && _user.name != "anonymous") {
-      announce(_user.name + " logged out");
-    }
+    logout();
     for(var which in _ival) {
       clearInterval(_ival[which]);
     };
@@ -219,6 +231,11 @@ IO.sockets.on('connection', function (socket) {
   }); 
 
   socket.on("greet-response", function(p) {
+    if(_user.greeted) {
+      return;
+    }
+    _user.greeted = true;
+    _user.loggedin = false;
     _user = p;
     _user.channel = unescape(_user.channel);
     _user.name = "anonymous";
@@ -229,9 +246,7 @@ IO.sockets.on('connection', function (socket) {
     } else {
       _db.hget("user", _user.uid, function(err, last) {
         if(last) {
-          _user.name = last;
-          socket.emit("username", _user.name);
-          announce(_user.name + " logged in");
+          login(last);
         } else {
           socket.emit("username", false);
         }
@@ -306,8 +321,9 @@ IO.sockets.on('connection', function (socket) {
     });
   });
 
-  function setuser(name) {
+  function login(name) {
     announce(name + " logged in");
+    _user.loggedin = true;
     _user.name = name;
     _db.hset("user", _user.uid, name);
     socket.emit("username", name);
@@ -326,7 +342,7 @@ IO.sockets.on('connection', function (socket) {
             socket.emit("user-error", {text: "Username " + p.user + " exists"});
           } else {
             User.register(p.user, p.password, p.email);
-            setuser(p.user);
+            login(p.user);
           }
         });
         // Reset
@@ -346,7 +362,7 @@ IO.sockets.on('connection', function (socket) {
         if(exists) {
           User.login(p.user, p.password, function(success) {
             if(success) {
-              setuser(p.user);
+              login(p.user);
             } else {
               socket.emit("user-error", {text: "Login Failed, Please Try Again"});
             }
@@ -354,14 +370,12 @@ IO.sockets.on('connection', function (socket) {
         } else {
           // The user doesn't exist, and they are not
           // trying to register it, so they get a free ride
-          setuser(p.user);
+          login(p.user);
         }
       }); 
       // logout
     } else {
-      announce(_user.name + " logged out");
-      _db.hdel("user", _user.uid);
-      _user.name = "anonymous";
+      logout();
     }
   });
 

@@ -1129,12 +1129,14 @@ var Chat = (function(){
     lastindex = 0;
     $("#message").empty();
 
-    send("greet-response", {
-      color: MYCOLOR,
-      uid: Store("uid"),
-      lastid: _chat.lastid,
-      channel: _channel
-    });
+    if(!_ev.isset("greeted")) {
+      send("greet-response", {
+        color: MYCOLOR,
+        uid: Store("uid"),
+        lastid: _chat.lastid,
+        channel: _channel
+      });
+    }
     _ev.set("greeted");
   }
 
@@ -1262,10 +1264,15 @@ var Chat = (function(){
       }
     },
     post = {
-      play: function(container, entry){
+      play: function(container, entry, isFirst){
+        if(isFirst) { return; }
+
         if(_chat.lastentry.get(0).childNodes.length > 2) {
           $(_chat.lastentry.get(0).firstChild).remove();
         }
+      },
+      chat: function(container, entry, isFirst) {
+        $("a", entry).attr("target", "_blank");
       }
     },
     combine = {
@@ -1276,13 +1283,15 @@ var Chat = (function(){
         }
       },
       delist: function(previous, current) {
-        if(previous.type == 'play' && previous.vid == current.vid) {
-          _chat.lastentry.get(0).lastChild.innerHTML = "Skipped and delisted by " + current.who + ".";
-          return true;
-        } else if(previous.type == 'skip' && previous.vid == current.vid) {
-          _chat.lastentry.get(0).lastChild.innerHTML = "Skipped and delisted by " + current.who + ".";
-          return true;
-        } 
+        if(previous.vid == current.vid) {
+          if(previous.type == 'play') {
+            _chat.lastentry.get(0).lastChild.innerHTML = "Skipped and delisted by " + current.who + ".";
+            return true;
+          } else if(previous.type == 'skip') {
+            _chat.lastentry.get(0).lastChild.innerHTML = "Skipped and delisted by " + current.who + ".";
+            return true;
+          } 
+        }
       },
       skip: function(previous, current) {
         if(previous.vid == current.vid) {
@@ -1319,8 +1328,9 @@ var Chat = (function(){
 
           if(
               !_chat.lastentry || 
-              (_chat.lastuid != row.uid ) ||
-              ( _chat.type != row.type )
+              ( _chat.lastuid != row.uid ) ||
+              ( _chat.type != row.type ) ||
+              ( _chat.type == "announce" )
             ) {
 
             // If this is a new author or the first entry 
@@ -1347,12 +1357,15 @@ var Chat = (function(){
             // This is needed if the author says further things
             // before someone else.
             _chat.type = row.type;
+            if(post[row.type]) {
+              post[row.type](_chat.lastentry, entry, true);
+            }
           } else {
             $(entry).insertAfter(
               _chat.lastentry.get(0).lastChild.previousSibling
             );
             if(post[row.type]) {
-              post[row.type](_chat.lastentry, entry);
+              post[row.type](_chat.lastentry, entry, false);
             }
           }
         }
@@ -1361,7 +1374,6 @@ var Chat = (function(){
         _chat.lastuid = row.uid;
       }
       
-      $("a", entry).attr("target", "_blank");
       _chat.lastrow = row;
        
       lastindex++;
