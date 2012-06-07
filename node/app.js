@@ -205,7 +205,7 @@ IO.sockets.on('connection', function (socket) {
 
   socket.on("channel-join", function(obj){
     console.log(obj);
-    _channel.join(obj.channel);
+    _channel.join(unescape(obj.channel));
   });
 
   socket.on("channel-create", function(obj) {
