@@ -1297,13 +1297,13 @@ var Chat = (function(){
     },
     combine = {
       play: function(previous, current) {
-        if(previous.type == 'request' && previous.vid == current.vid) {
+        if(previous.type == 'request' && previous.id == current.id) {
           _chat.lastentry.get(0).lastChild.innerHTML = "Requested to play now by " + previous.who + ".";
           return true;
         }
       },
       delist: function(previous, current) {
-        if(previous.vid == current.vid) {
+        if(previous.id == current.id) {
           if(previous.type == 'play') {
             _chat.lastentry.get(0).lastChild.innerHTML = "Skipped and delisted by " + current.who + ".";
             return true;
@@ -1314,7 +1314,7 @@ var Chat = (function(){
         }
       },
       skip: function(previous, current) {
-        if(previous.vid == current.vid) {
+        if(previous.id == current.id) {
           if(previous.type == 'delist') {
             _chat.lastentry.get(0).lastChild.innerHTML = "Skipped and delisted by " + previous.who + ".";
             return true;
