@@ -19,11 +19,50 @@ function uidgen() {
   return (Math.random() * Math.pow(2,63)).toString(36);
 }
 
-var search = (function(){
+var remote = (function(){
+  function remote_base(pre, post, cb) {
+    var 
+      path = '/feeds/api/videos' + pre + '?' + QS.stringify({
+        alt: 'json',
+        v: 2,
+        format: 5
+      }),
+      resultList = [],
+      req;
 
-  function process(data, cb) {
-    var results = [], title, artist, split;
-    if(data.feed.entry) {
+    if(post) {
+      path += '&' + QS.stringify(post);
+    }
+    req = HTTP.request({
+      host: 'gdata.youtube.com',
+      path: path
+    }, function(res) {
+      res.setEncoding('utf8');
+      res.on('data', function(data) { resultList.push(data); });
+      res.on('end', function(){ cb(JSON.parse(resultList.join(''))); });
+    });
+
+    req.on('error', function(){ cb(false); });
+    req.end();
+  }
+
+  return {
+    query: function(query, cb) {
+      remote_base("", {
+        q: query,
+        orderby: 'relevance',
+        'max-resultList': 25
+      }, cb);
+    },
+
+    degrade: function(data) {
+      var 
+        artist,
+        vid,
+        split,
+        resultList = [], 
+        title;
+
       data.feed.entry.forEach(function(result) {
         split = result.title.$t.split(' - ');
         if(split.length == 1) {
@@ -33,63 +72,52 @@ var search = (function(){
           artist = split.shift();
           title = split.join(' - ');
         }
-        results.push({
-          vid: 'yt:' + result.media$group.yt$videoid.$t,
+        vid = 'yt:' + result.media$group.yt$videoid.$t;
+        resultList.push({
+          vid: vid,
           title: title,
           artist: artist,
           len: result.media$group.yt$duration.seconds
         });
       });
+      return resultList;
+    },
+
+    related: function(ytid, cb) {
+      remote_base('/' + ytid + '/related', '', cb);
     }
-    cb(false, results);
-  }
+  };
+})();
 
-  function remote(query, cb) {
-    var 
-      results = [],
-      req = HTTP.request({
-        host: 'gdata.youtube.com',
-        path: '/feeds/api/videos?' + QS.stringify({
-          alt: 'json',
-          q: query,
-          orderby: 'relevance',
-          'max-results': 25,
-          v: 2,
-          format: 5
-        })
-      }, function(res) {
-        res.setEncoding('utf8');
-        res.on('data', function(data) { results.push(data); });
-        res.on('end', function(){ process(JSON.parse(results.join('')), cb); });
-      });
+function search(query, cb) {
+  var 
+    local = [],
+    resultList = [], 
+    idList = [];
 
-    req.on('error', function(){ cb(arguments, false); });
-    req.end();
-  }
-
-  return function(query, cb) {
-    var local = [];
-    remote(query, function(err, res) {
-      var idList = res.map(function(row) { return row.vid });
-      _db.hmget("vid", idList, function(err, data) {
-        if(data) {
-          for(var ix = data.length - 1; ix >= 0; ix--) {
-            if(data[ix]) {
-              local.push(res[ix]);
-              res.splice(ix, 1);
-            }
+  remote.query(query, function(data) {
+    if(data.feed.entry) {
+      resultList = remote.degrade(data);
+      idList = resultList.map(function(which) { return which.vid });
+    }
+      
+    _db.hmget("vid", idList, function(err, data) {
+      if(data) {
+        for(var ix = data.length - 1; ix >= 0; ix--) {
+          if(data[ix]) {
+            local.push(resultList[ix]);
+            resultList.splice(ix, 1);
           }
         }
-        cb(false, {
-          local: local,
-          remote: res,
-          total: local.length + res.length
-        });
+      }
+      cb(false, {
+        local: local,
+        remote: resultList,
+        total: local.length + resultList.length
       });
     });
-  }
-
-})();
+  });
+}
 
 IO.sockets.on('connection', function (socket) {
   var 
@@ -221,6 +249,15 @@ IO.sockets.on('connection', function (socket) {
       clearInterval(_ival[which]);
     };
     _channel.leave();
+  });
+
+  socket.on("get-related", function(obj) {
+    remote.related(obj.ytid, function(results) {
+      socket.emit("related-results", {
+        ytid: obj.ytid,
+        results: remote.degrade(results)
+      });
+    });
   });
 
   socket.on("channel-join", function(obj){
