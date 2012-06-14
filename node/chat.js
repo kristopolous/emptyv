@@ -67,5 +67,7 @@ function add(channel, obj) {
     obj._id = id;
     obj._ts = +(new Date());
     append("log:" + channel, obj);
+    obj._ch = channel;
+    append("logall", obj);
   });
 }

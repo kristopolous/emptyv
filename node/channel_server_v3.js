@@ -356,7 +356,15 @@ _db.hgetall("tick", function(err, state) {
   }, 1000);
   setInterval(function(){
     Channel.generate(function(data) {
-      fs.writeFile("../baked/channels.js", "Channel.splashshow(" + JSON.stringify(data) + ")");
+      _db.lrange("logall", 0, -1, function(err, last) {
+
+        last = last.map(function(x){ return JSON.parse(x); });
+        console.log(last);
+        fs.writeFile("../baked/channels.js", [
+          "Channel.splashshow(" + JSON.stringify(data) + ")",
+          "self._chatsplash=" + JSON.stringify(last)
+        ].join(';'));
+      });
     });
   }, 5 * 1000);
 
