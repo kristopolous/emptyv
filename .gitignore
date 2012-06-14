@@ -1,4 +1,5 @@
 volume/archive
 srv/db.php
 .*swp
+baked.js
 *~

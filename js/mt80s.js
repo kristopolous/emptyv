@@ -88,7 +88,7 @@ function blink(node, cb) {
 
 function send(func, data) {
   when("_socket", function(){
-    console.log("emitting " + func);
+    log("emitting " + func);
     _socket.emit(func, data);
   });
 }
@@ -153,15 +153,6 @@ function secondsToTime(count) {
   if (count > 0) {
     stack.push((count % 2) + plural(count, 2, " week"));
     count = Math.floor(count / 2);
-  }
-
-  if (count > 0) {
-    stack.push((count % 2) + plural(count, 2, " fortnight"));
-    count = Math.floor(count / 2);
-  }
-
-  if (count > 0) {
-    stack.push(count + plural(count, count + 1, " month"));
   }
 
   return stack.reverse().join(', ').replace(/^0/,'');
@@ -333,7 +324,7 @@ var Player = (function(){
 
           Store("ttl", ttl);
           if(ttl > _goal) {
-            Chat.addmessage("Total Time On Site " + secondsToTime(ttl));
+            Chat.addmessage("Total Time On Site: " + secondsToTime(ttl));
             _goal = (1 + Math.floor(ttl / _unit)) * _unit;
           }
           document.title = _song[ARTIST] + " - " + _song[TITLE] + " | " + secondsToTime(ttl);
@@ -528,8 +519,27 @@ var Player = (function(){
         width: "216px"
       });
       $("#top").css({
-        marginTop: "170px"
+        paddingTop: "170px"
       });
+      $("#mute-control").css({
+        top: "187px"
+      });
+    },
+    flashSwap: function(opts) {
+      var counter = 9,
+        ival = setInterval(function() {
+          if(counter % 2) {
+            Player.hide(opts.show);
+            Player.show(opts.hide);
+          } else {
+            Player.hide(opts.hide);
+            Player.show(opts.show);
+          }
+          counter --;
+          if(counter < 0) {
+            clearInterval(ival);
+          }
+        }, 100);
     },
     hide: hide,
     setQuality: setQuality,
@@ -546,8 +556,11 @@ var Player = (function(){
           width: "auto",
           paddingTop: 0
         });
+        $("#mute-control").css({
+          top: "5px"
+        });
         $("#top").css({
-          marginTop: "0"
+          paddingTop: "0"
         });
       }
     }
@@ -597,12 +610,12 @@ function transition(song) {
     var 
       pivot = Math.min(PRELOAD, remainingTime(_playerPrev[_active])) * 1000,
 
-      // drop the volume of the currently playing song
-      dropPlayingVolume = pivot + 500,
-
       // raise the volume of the next one slightly before dropping
       // the volume of the current
-      raiseNextVolume = pivot - 1000,
+      raiseNextVolume = pivot - 500,
+
+      // drop the volume of the currently playing song
+      dropPlayingVolume = pivot + 250,
 
       // Stop the old video 1 second after the
       // pivot transition
@@ -619,13 +632,6 @@ function transition(song) {
     next.playVideo();
 
     log("video loaded");
-
-    setTimeout(function(){ 
-      log("drop playing volume");
-      if(active) {
-        active.setVolume(0); 
-      }
-    }, dropPlayingVolume);
 
     setTimeout(function(){
       $("#video-current").html("<b>Loading next song ...</b>" + [_song[ARTIST], _song[TITLE]].join(' - '));
@@ -659,6 +665,12 @@ function transition(song) {
       // When you toggle the visibility, there is still an annoying spinner.
       // So to avoid this we just "move" the players off screen that aren't
       // being used.
+      /*
+      Player.flashSwap({
+        hide: active,
+        show: next
+      });
+      */
       Player.show(next, 'slide');
       Player.hide(active, 'slide');
       Player.hide(_playerPrev[EXTRA]);
@@ -670,8 +682,16 @@ function transition(song) {
       _playerPrev = _player;
     }, pivot);
 
+    setTimeout(function(){ 
+      log("drop playing volume");
+      if(active) {
+        Volume.fadeById(active);
+      }
+    }, dropPlayingVolume);
+
     setTimeout(function(){
       if(active) {
+        log("stopping old video");
         active.stopVideo();
         if("index" in active) {
           delete _playerById[active.index];
@@ -778,7 +798,12 @@ var Song = (function(){
     _lastSong = false,
     _db = {};
 
-  function preview(obj) {
+  function preview(obj,el) {
+    Panel.show("song");
+    if(el) {
+      blink($(el), function(){setTimeout(Volume.fademute, 1500);});
+    }
+
     _lastSong = obj;
 
     var 
@@ -798,17 +823,6 @@ var Song = (function(){
     //$("#title-edit").css('display','inline-block');
   }
 
-  self.preview = function(id,el){
-    Panel.show("song");
-    if('innerHTML' in el) {
-      blink($(el));
-    }
-    preview({
-      vid: id,
-      title: ('innerHTML' in el ? el.innerHTML : el),
-      artist: ""
-    });
-  }
   function panelFlash() {
     switch(_ev("song-tab")) {
       case 'Everything':
@@ -824,6 +838,7 @@ var Song = (function(){
     }
   }
   return {
+    preview: preview,
     Init: function(){
 
       _socket.on("history", Song.gen);
@@ -856,7 +871,7 @@ var Song = (function(){
         _socket.emit("get-history");
       });
 
-      $("#video-overlay,#song-cancel,#song-select-cancel").click(function(){
+      $("#video-overlay,#song-select-cancel").click(function(){
         Panel.hide("song");
       });
 
@@ -905,7 +920,6 @@ var Song = (function(){
         } else if(which == 'hide-after') {
           Song.reset();
           $("#song-preview .bigbtn").hide();
-          console.log("UNMUTED");
           Volume.unmute();
           Player.fullscreen();
           $("#input-song-search").val("");
@@ -949,8 +963,7 @@ var Song = (function(){
 
       if(type != 'dummy') {
         node.click(function(){ 
-          preview(data);
-          blink(node, Volume.mute);
+          preview(data, node);
         });
       }
 
@@ -1063,9 +1076,9 @@ var Channel = {
     }
     when("$", function(){
       when("_", function(){
-        $("#videoList").empty();
+        $("#videoList-content").empty();
         _.each(all, function(row) {
-          $("#videoList").append( 
+          $("#videoList-content").append( 
             Channel.display(row, function(){ window.location.hash=row.name; })
           );
         });
@@ -1153,7 +1166,7 @@ var Chat = (function(){
 
     when("$", function(){
       function resize() {
-        $("#message-wrap").css({
+        $("#message,#message-wrap").css({
           height: $(window).height() - 140 - ($("#user-control").height() + $("#talk").height())
         });
       }
@@ -1203,10 +1216,13 @@ var Chat = (function(){
 
       _baseVideo: function(data) {
         var id = data.id.split(':').pop();
-        return "<a class=title onclick=preview('" + data.id + "',this)>" + 
-               "<b>" + data.artist + "</b>" +  
-                data.title +
-               "</a>";
+        return $("<a class=title />").click(function(){
+            preview({
+              vid: data.id,
+              title: data.title,
+              artist: data.artist
+            }, this);
+          }).append( "<b>" + data.artist + "</b>" + data.title);
       },
 
       skip: function(data) {
@@ -1220,12 +1236,9 @@ var Chat = (function(){
       },
       request: function(data) {
         return format._baseVideo(data, 'Delisted');
-        return '<p>' +
-          '<a onclick=preview("' + data.id + '",this)>' + data.artist + ' - ' + data.title + '</a>' +
-          '</p>';
       },
       chat: function(data) {
-        return data.text
+        return data.text;
       }
     },
     author = {
@@ -1508,9 +1521,26 @@ var Panel = {
 var Volume = (function(){
   var 
     oldvolume,
+    ival,
     muted = false; 
 
   return {
+    fadeById: function(id, cb) {
+      var vol = id.getVolume();
+      ival = setInterval(function(){
+        vol -= 10;
+        if(vol < 0) {
+          id.setVolume(0);
+          clearInterval(ival);
+          if(cb) {
+            cb();
+          }
+          return;
+        }
+        log("Setting volume to " + vol);
+        id.setVolume(vol);
+      },40);
+    },
     Init: function(){
       var 
         _mousedown = false,
@@ -1538,16 +1568,16 @@ var Volume = (function(){
       });
       $("#mute-control .expanded").mousedown(function(e){
         _mousedown = true;
-        var offset = 160;
+        var offset = 65;
         if(_letterBoxed) {
-          offset += 160;
+          offset += 167;
         }
         Volume.set(1 - (e.pageY - offset) / 100);
         return false;
       }).mousemove(function(e){
-        var offset = 160;
+        var offset = 65;
         if(_letterBoxed) {
-          offset += 160;
+          offset += 167;
         }
         if(_mousedown) {
           Volume.set(1 - (e.pageY - offset) / 100);
@@ -1559,6 +1589,7 @@ var Volume = (function(){
     set: function(amount, nostore) {
       _volume = Math.max(0, amount);
       _volume = Math.min(1, _volume);
+      muted = false;
 
       if(!nostore) { 
         Store("volume", _volume);
@@ -1573,6 +1604,24 @@ var Volume = (function(){
       }
     },
 
+    fademute: function(){
+      if(!muted && _ev('panel:song') == 'show') {
+        muted = true;
+        oldvolume = _volume;
+        log("Starting the fade mute");
+        var vol = _volume;
+        ival = setInterval(function(){
+          _player[_active].setVolume(_song[VOLUME] * vol);
+          vol -= 0.03;
+          if(vol < 0) {
+            log("Done with the fade mute");
+            _player[_active].setVolume(0);
+            _volume = 0;
+            clearInterval(ival);
+          }
+        },40);
+      }
+    },
     mute: function(){
       if(!muted) {
         oldvolume = _volume;
@@ -1582,10 +1631,12 @@ var Volume = (function(){
     },
 
     unmute: function(){
-      if(muted && (_volume == 0)) {
+      if(muted) {
+        clearInterval(ival);
+        log("unmuted to " + oldvolume);
         Volume.set(oldvolume, true);
       }
-      muted = false
+      muted = false;
     }
   };
 })();
