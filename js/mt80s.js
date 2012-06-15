@@ -1077,11 +1077,14 @@ var Channel = {
     when("$", function(){
       when("_", function(){
         $("#videoList-content").empty();
-        _.each(all, function(row) {
+        _.each(all.chan, function(row) {
           $("#videoList-content").append( 
             Channel.display(row, function(){ window.location.hash=row.name; })
           );
         });
+        _chat.data = all.chat;
+        _chat.lastid = _chat.data[_chat.data.length - 1]._id;
+        Chat.showmessage("#recentList-content");
       });
     });
   },
@@ -1144,20 +1147,23 @@ var Chat = (function(){
     lastEntry = "";
     entryList = [],
     lastindex = 0;
-    $("#message").empty();
+    if(self.$ && _channel) {
+      $("#message").empty();
 
-    if(!_ev.isset("greeted")) {
-      send("greet-response", {
-        color: MYCOLOR,
-        uid: Store("uid"),
-        lastid: _chat.lastid,
-        channel: _channel
-      });
+      if(!_ev.isset("greeted")) {
+        send("greet-response", {
+          color: MYCOLOR,
+          uid: Store("uid"),
+          lastid: _chat.lastid,
+          channel: _channel
+        });
+      }
+      _ev.set("greeted");
     }
-    _ev.set("greeted");
   }
 
   function Init(){
+    reset();
     _ev.on("panel:chat", function(which) {
       if(which == "hide") {
         Player.fullscreen();
@@ -1217,7 +1223,7 @@ var Chat = (function(){
       _baseVideo: function(data) {
         var id = data.id.split(':').pop();
         return $("<a class=title />").click(function(){
-            preview({
+            Song.preview({
               vid: data.id,
               title: data.title,
               artist: data.artist
@@ -1342,12 +1348,13 @@ var Chat = (function(){
   function showContext(){
   }
 
-  function showmessage() {
+  function showmessage(container) {
     var 
       entry, 
       row,
       color;
 
+    container = container || "#message";
     while(_chat.data.length > lastindex) {
 
       row = _chat.data[lastindex];
@@ -1384,7 +1391,7 @@ var Chat = (function(){
             }
 
             entryList.push(entry);
-            $("#message").append(entry);
+            $(container).append(entry);
 
             // This is needed if the author says further things
             // before someone else.

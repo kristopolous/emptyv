@@ -234,13 +234,16 @@ IO.sockets.on('connection', function (socket) {
   }
 
   function announce(message, channel) {
-    Chat.add(
-      (channel || _user.channel), {
-        type: 'announce',
-        text: message,
-        uid: _user.uid
-      }
-    );
+    var context = (channel || _user.channel);
+    if(context) {
+      Chat.add(
+        context, {
+          type: 'announce',
+          text: message,
+          uid: _user.uid
+        }
+      );
+    }
   }
 
   socket.on("disconnect", function(){
@@ -351,7 +354,7 @@ IO.sockets.on('connection', function (socket) {
 
   socket.on("get-history", function(p) {
     var chan = _user.channel;
-    _db.lrange("lastplayed:" + chan, 0, -1, function(err, last){
+    _db.lrange("prev:" + chan, 0, -1, function(err, last){
       for(var ix = 0; ix < last.length; ix++) {
         last[ix] = JSON.parse(last[ix]);
       }

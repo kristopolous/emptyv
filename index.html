@@ -53,13 +53,18 @@ input{width:190px;margin:0.25em 0 0.75em}
 #song .panel-title{display:block;text-align:center}
 
 #message-wrap{overflow:hidden;background:#000;position:relative;margin:0 0.5em}
-#message{font-size:0.9em;color:#3C4B62;overflow-y:auto;width:212px;padding-right:15px}
-#message img{width:195px;background:#fff}
-#message > div{padding:0.35em 0;overflow:hidden;white-space:normal}
-#message div.author{color:#525767;font-size:0.65em;margin:-3px 0 0 10px;text-align:right;cursor:pointer}
-#message p {font-size:0.9em;margin-left:6px;font-size:0.87em;line-height:1.4em}
-#message p.announce{font-size:0.7em;color:#3C4B62;padding:0.15 0}
-#message a{color:#3C4B62}
+.chat{font-size:0.9em;color:#3C4B62}
+#message{overflow-y:auto;width:212px;padding-right:15px}
+.chat img{width:195px}
+.chat > div{padding:0.35em 0;overflow:hidden;white-space:normal}
+.chat div.author{color:#525767;font-size:0.65em;margin:-3px 0 0 10px;text-align:right;cursor:pointer}
+.chat p {font-size:0.9em;margin-left:6px;font-size:0.87em;line-height:1.4em}
+.chat p.announce{font-size:0.7em;color:#3C4B62;padding:0.15 0}
+.chat a{color:#3C4B62}
+.chat .title, .title span{font-size:0.65em;display:inline-block;margin-left:6px;color:#79889c;width:120px;white-space:nowrap;overflow:hidden}
+.chat .title b{color:#79889c}
+.chat .title {display:block;color:#3C4B62;width:185px;padding:3px 5px;margin:2px 0}
+
 .request em{font-size:0.7em;font-style:normal;margin:0 0 -0.15em 0.2em;display:block}
 .play p{display:none}
 .play > :last-child{display:block}
@@ -78,9 +83,6 @@ input{width:190px;margin:0.25em 0 0.75em}
 .c8,.c8 a{color:#b3b3e9}
 .c9,.c9 a{color:#83C3F0}
 .title {text-decoration:none}
-#message .title, .title span{font-size:0.65em;display:inline-block;margin-left:6px;color:#79889c;width:120px;white-space:nowrap;overflow:hidden}
-#message .title b{color:#79889c}
-#message .title {display:block;color:#3C4B62;width:185px;padding:3px 5px;margin:2px 0}
 .title img{vertical-align:baseline}
 .title b{display:block;font-size:1.2em;color:#bbcae1;font-weight:normal;height:1.25em;overflow:hidden}
 #channel .channel{min-height:61px}
@@ -145,7 +147,9 @@ input{width:190px;margin:0.25em 0 0.75em}
   #register-button,#forgot-button{margin:1em 0;color:#555}
   #app{display:none;height:100%}
 
-  #videoList{font-size:1.5em;width:300px;display:inline-block;margin:1em 0 0 1em}
+#splash-content > div {
+float:left;font-size:1.5em;display:inline-block;margin:1em 0 0 1em}
+#videoList{width:300px}
 #videoList .channel{
   font-size:20px;
   width:240px;
@@ -154,6 +158,7 @@ input{width:190px;margin:0.25em 0 0.75em}
 }
 #videoList .title span{width:131px}
 #videoList img{width:100px;height:75px;vertical-align:sub;margin-right:3px}
+
 button.bigbtn:hover{box-shadow: 0 0 5px 3px #505257;color:#fff}
 button.bigbtn,.channel { text-align:left; 
   cursor:pointer;
@@ -221,16 +226,16 @@ a#song-delist.bigbtn{float:right;font-size:0.7em;color:#525767}
       Pick a channel and be the VJ.
     </div>
   </div>
-  <div id=videoList>
-    <h3>Top Channels</h3>
-    <div id=videoList-content></div>
+  <div id=splash-content>
+    <div id=videoList>
+      <h3>Top Channels</h3>
+      <div id=videoList-content></div>
+    </div>
+    <div id=recentList>
+      <h3>Recent Activity</h3>
+      <div id=recentList-content class=chat></div>
+    </div>
   </div>
-  <!--
-  <div id=recentList>
-    <h3>Recent Activity</h3>
-    <div id=recentList-content></div>
-  </div>
-  -->
 <div id=bottom><a href=about.html target=_blank>about</a> this project.</div>
 </div><div id=app>
   <div id=panels><div class=btn id=lhs-expand>&gt;</div>
@@ -249,7 +254,7 @@ a#song-delist.bigbtn{float:right;font-size:0.7em;color:#525767}
       </span>
     </span><span id=channel>
       <span class=collapse>X</span>
-      <div class=panel-title>Party Hopper</div>
+      <div class=panel-title>Channel Changer</div>
       <span class=panel-content>
         <div id=channel-results></div>
       </span>
@@ -275,7 +280,7 @@ a#song-delist.bigbtn{float:right;font-size:0.7em;color:#525767}
       </div>
       <div id=chatbar>
         <div id=message-wrap>
-          <div id=message>
+          <div id=message class=chat>
           </div>
         </div>
         <div id=channel-description></div>

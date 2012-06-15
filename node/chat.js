@@ -27,7 +27,7 @@ module.exports = {
   }
 };
 
-function append(key, data) {
+function append(key, data, size) {
   _db.rpush( key, JSON.stringify(data) );
 
   /*
@@ -38,7 +38,7 @@ function append(key, data) {
    * lands on a 5.
    */
   if(Math.floor(Math.random() * 10) == 5) {
-    _db.ltrim(key, -100, -1);
+    _db.ltrim(key, -(size || 100), -1);
   }
 }
 
@@ -67,7 +67,10 @@ function add(channel, obj) {
     obj._id = id;
     obj._ts = +(new Date());
     append("log:" + channel, obj);
-    obj._ch = channel;
-    append("logall", obj);
+    if (["request", "chat"].indexOf(obj.type) > -1) {
+      obj.c = channel;
+      delete obj._ts;
+      append("logall", obj, 30);
+    }
   });
 }
