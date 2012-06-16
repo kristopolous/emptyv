@@ -1,4 +1,6 @@
-var _db;
+var 
+  _db,
+  _pubsub;
 
 /*
  * There's an optimization we can do here.
@@ -13,8 +15,9 @@ var _types = {};
 module.exports = {
   append: append,
   add: add,
-  setDB: function(which) {
-    _db = which;
+  setDB: function(db, pubsub) {
+    _db = db;
+    _pubsub = pubsub;
   },
   announce: function(message) {
     _db.incr("ix", function(err, id) {
@@ -28,7 +31,9 @@ module.exports = {
 };
 
 function append(key, data, size) {
-  _db.rpush( key, JSON.stringify(data) );
+  var value = JSON.stringify(data);
+  _db.rpush(key, value);
+  _pubsub.publish("pub:" + key, value);
 
   /*
    * We don't trim every time and we don't

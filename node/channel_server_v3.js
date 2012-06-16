@@ -1,5 +1,6 @@
 var redis = require('redis')
   , _db = redis.createClient()
+  , _pubsub = redis.createClient()
   , Channel = require('./channel')
   , Chat = require('./chat')
   , PRELOAD = -(3)
@@ -8,8 +9,9 @@ var redis = require('redis')
   , _state = {};
 
 _db.select(1);
-Channel.setDB(_db);
-Chat.setDB(_db);
+_pubsub.select(1);
+Channel.setDB(_db, _pubsub);
+Chat.setDB(_db, _pubsub);
 
 function build(channel) {
   _state[channel] = {
@@ -44,6 +46,7 @@ function setVideo(channel, vid, offset, opts) {
       index: _state[channel].index,
       offset: parseInt(offset || full[1])
     };
+
     if(!opts.quiet) {
   
       Chat.add(channel, {
@@ -52,16 +55,15 @@ function setVideo(channel, vid, offset, opts) {
         title: full[4],
         id: vid
       });
-   
-      Chat.append(
-        "prev:" + channel, 
-        Channel.update(channel, {
-          vid: vid,
-          title: full[4],
-          artist: full[3]
-        })
-      );
     }
+    Chat.append(
+      "prev:" + channel,
+      Channel.update(channel, {
+        vid: vid,
+        artist: full[3],
+        title: full[4]
+      })
+    );
   });
 }
 
@@ -134,9 +136,6 @@ function getNext(row) {
 }
 
 function delist(del) {
-  // Redis' api is stupid here.
-  // really crappy.
-
   // First we need a reference point, for later verification
   // when it comes to the possibility of resetting an index
   // or not.
@@ -190,9 +189,6 @@ function delist(del) {
   }
 }
 
-function updateNext(channel) {
-}
-
 function doRequest(data, doadd) {
   // Putting it in the on-disk playlist is done
   // through the stack shifting logic
@@ -209,8 +205,6 @@ function doRequest(data, doadd) {
     add: doadd
   }));
 
-  updateNext(data.channel);
-
   Chat.add(data.channel, {
     type: 'request',
     artist: data.artist,
@@ -225,6 +219,7 @@ function doRequest(data, doadd) {
     getNext(_state[data.channel]);
   }
 }
+
 
 function requestProcessor() {
   _db.lrange("request", 0, -1, function(err, request) {
@@ -286,35 +281,33 @@ function requestProcessor() {
   });
 }
 
-function channelUpdate(channelList) {
-  var 
-    now = +(new Date()),
-    delta = (now - _last) / 1000;
-
-  requestProcessor();
-  channelList.forEach(function(channel) {
-    if(!_state[channel]) {
-      build(channel);
-      return;
-    } 
-    var row = _state[channel]; 
-    row.video.offset = row.video.offset + delta;
-
-    if((2.5 + row.video.offset - PRELOAD) > row.video.len) {
-      getNext(row);
-    }
-
-    // this is for the consumer.
-    _db.hset("play", row.name, JSON.stringify(row.video));
-  });
-
-  _last = now;
-}
-
 function eventloop(){
   console.log("Up");
   setInterval(function(){
-    Channel.getAll(channelUpdate);
+    Channel.getAll(function(channelList) {
+      var 
+        now = +(new Date()),
+        delta = (now - _last) / 1000;
+
+      requestProcessor();
+      channelList.forEach(function(channel) {
+        var row = _state[channel]; 
+        if(!row) {
+          build(channel);
+          return;
+        } 
+
+        row.video.offset = row.video.offset + delta;
+
+        if((2.5 + row.video.offset - PRELOAD) > row.video.len) {
+          getNext(row);
+        }
+
+        _db.hset("play", row.name, JSON.stringify(row.video));
+      });
+
+      _last = now;
+    });
   }, 1000);
 
   setInterval(function(){
@@ -331,16 +324,13 @@ function eventloop(){
         }) + ")");
       });
     });
-  }, 5 * 1000);
-
+  }, 5000);
 }
 
 _db.hgetall("play", function(err, state) {
-  var 
-    list = Object.keys(state),
-    toLoad = 0;
+  var toLoad = 0;
 
-  list.forEach(function(channel) {
+  Object.keys(state).forEach(function(channel) {
     var position = JSON.parse(state[channel]);
 
     if ("index" in position) {

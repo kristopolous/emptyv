@@ -1,6 +1,8 @@
 var app = require('http').createServer(function(){})
   , redis = require('redis')
   , _db = redis.createClient()
+  , _pubsub = redis.createClient()
+  , _sub = redis.createClient()
   , _md = require("node-markdown").Markdown
   , IO = require('socket.io').listen(app)
   , QS = require('querystring')
@@ -10,10 +12,13 @@ var app = require('http').createServer(function(){})
   , HTTP = require('http');
 
 _db.select(1);
+_pubsub.select(1);
+_sub.select(1);
 app.listen(1985);
-Chat.setDB(_db);
+
 Channel.setDB(_db);
-IO.set('log level', 1)
+Chat.setDB(_db, _pubsub);
+//IO.set('log level', 1);
 
 function uidgen() {
   return (Math.random() * Math.pow(2,63)).toString(36);
@@ -128,6 +133,15 @@ IO.sockets.on('connection', function (socket) {
 
   var _channel = {
 
+    emitlog: function(which) {
+      _db.lrange(
+        "log:" + which, 
+        0, -1, 
+        function(err, data) {
+          socket.emit("chat", data.map(function(which) { return JSON.parse(which); }));
+        });
+    },
+
     join: function(which) {
       Channel.get(which, function(){
         _channel.leave(function(){
@@ -142,6 +156,8 @@ IO.sockets.on('connection', function (socket) {
             }
             _user.channel = which;
             socket.emit("channel-name", which);
+            _channel.emitlog(which);
+            _sub.subscribe("pub:log:" + which);
           });
         });
       });
@@ -149,6 +165,7 @@ IO.sockets.on('connection', function (socket) {
 
     leave: function(cb) {
       Channel.leave(_user.channel, _user.uid, cb);
+      _sub.unsubscribe("pub:log:" + _user.channel);
     },
 
     play: function(params) {
@@ -195,35 +212,6 @@ IO.sockets.on('connection', function (socket) {
         ]);
       }
     });
-  }
-
-  function poll() {
-    if(!_user.channel) {
-      return;
-    }
-    _db.get("ix", function(err, last) {
-
-      _db.lrange(
-        "log:" + _user.channel, 
-        0, -1, 
-        function(err, data) {
-          var 
-            row,
-            chat = [];
-
-          data.forEach(function(rowRaw) {
-            row = JSON.parse(rowRaw);
-            if(row._id > _user.lastid) {
-              _user.lastid = row._id;
-              chat.push(row);
-            }
-          })
-          if(chat.length) {
-            socket.emit("chat", chat);
-          }
-        });
-    });
-
     _db.keys("user:" + _user.channel + ":*", function(err, all) {
       var online = all.length;
       if(online != _online) {
@@ -244,6 +232,14 @@ IO.sockets.on('connection', function (socket) {
         }
       );
     }
+  }
+
+  function login(name) {
+    _user.loggedin = true;
+    _user.name = name;
+    announce(name + " logged in");
+    _db.hset("user", _user.uid, name);
+    socket.emit("username", name);
   }
 
   socket.on("disconnect", function(){
@@ -277,6 +273,14 @@ IO.sockets.on('connection', function (socket) {
     }); 
   }); 
 
+  socket.on("playlist", function(obj) {
+    var start = (+new Date());
+    Channel.getPlaylist(obj, function(list) {
+      obj.result = list;
+      socket.emit("playlist", obj);
+    });
+  });
+
   socket.on("greet-response", function(p) {
     if(_user.greeted) {
       return;
@@ -300,11 +304,14 @@ IO.sockets.on('connection', function (socket) {
       });
     }
 
-    if(!_ival.poll) {
-      _ival.poll = setInterval(poll, 50);
+    if(!_ival.song) {
       _ival.song = setInterval(song, 1000);
       song();
     }
+  });
+
+  _sub.on("message", function(channel, message) {
+    socket.emit("chat", [JSON.parse(message)]);
   });
 
   socket.on("search", function(q) {
@@ -367,14 +374,6 @@ IO.sockets.on('connection', function (socket) {
       });
     });
   });
-
-  function login(name) {
-    _user.loggedin = true;
-    _user.name = name;
-    announce(name + " logged in");
-    _db.hset("user", _user.uid, name);
-    socket.emit("username", name);
-  }
 
   socket.on("set-user", function(p) {
     // Either a registeration or a reset

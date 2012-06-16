@@ -1064,6 +1064,9 @@ var Channel = {
     });
 
     onEnter("#input-channel-search", Channel.search);
+    _socket.on("playlist", function(last) {
+      console.log(last);
+    });
 
     $("#channel-query").keyup(function(){
       Channel.search(this.value);
@@ -1084,7 +1087,7 @@ var Channel = {
         });
         _chat.data = all.chat;
         _chat.lastid = _chat.data[_chat.data.length - 1]._id;
-        Chat.showmessage("#recentList-content");
+        //Chat.showmessage("#recentList-content");
       });
     });
   },
@@ -1118,6 +1121,14 @@ var Channel = {
         });
         window.location.hash = which.name;
       }).appendTo("#channel-results")
+    });
+  },
+
+  playlist: function(start, end) {
+    send("playlist", {
+      channel: _channel,
+      begin: start || -10,
+      end: end || 10
     });
   },
 
