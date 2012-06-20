@@ -44,7 +44,8 @@ function setVideo(channel, vid, offset, opts) {
       title: full[4],
       notes: full[5],
       index: _state[channel].index,
-      offset: parseInt(offset || full[1])
+      offset: parseInt(offset || full[1]),
+      now: opts.now
     };
 
     if(!opts.quiet) {
@@ -97,7 +98,10 @@ function loadVideo(channel, index, offset, opts) {
   setVideo(channel, _state[channel].playlist[index], offset, opts);
 }
 
-function getNext(row) {
+// opts can have the play now directive.
+// it gets passed to loadVideo and setVideo
+function getNext(row, opts) {
+  opts = opts || {};
   _db.lpop("re:" + row.name, function(err, video){
 
     // This means that the new video should
@@ -126,11 +130,11 @@ function getNext(row) {
     if(video) {
       video = JSON.parse(video);
       row.previous = row.video.vid;
-      setVideo(row.name, video.vid, PRELOAD);
+      setVideo(row.name, video.vid, PRELOAD, opts);
       row.add = video.add;
     } else {
       row.add = false;
-      loadVideo(row.name, (row.index + 1) % row.playlist.length);
+      loadVideo(row.name, (row.index + 1) % row.playlist.length, PRELOAD, opts);
     }
   });
 }
@@ -180,10 +184,10 @@ function delist(del) {
   //
   // Absofuckinglutely insane.
   //
-  if(_state[channel].playlist[currentIndex] != refPoint) {
+  if(_state[channel].playlist[currentIndex - 1] == refPoint) {
     console.log("That was an earlier index, tracking back");
     _state[channel].index -= 1;
-    setIndex(channel, _state[channel].index, _state[channel].offset);
+    setVideo(channel, _state[channel].index, _state[channel].offset);
   } else {
     console.log("That was a later index, everything is gravy");
   }
@@ -216,7 +220,7 @@ function doRequest(data, doadd) {
 
   if(data.now) {
     console.log("Playing now");
-    getNext(_state[data.channel]);
+    getNext(_state[data.channel], {now: true});
   }
 }
 

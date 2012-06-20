@@ -35,15 +35,6 @@ if(!self.localStorage) {
 var
   MYCOLOR = Math.floor(Math.random() * 10),
 
-  ID = 0,
-  RUNTIME = 1,
-  START = 2,
-  STOP = 3,
-  VOLUME = 4,
-  ARTIST = 5,
-  TITLE = 6,
-  NOTES = 7,
-
   // The offset addition was after some toying around and 
   // seeint how long the player took to load. This seemed
   // to work ok; we really want the drift to be as close
@@ -116,7 +107,7 @@ function remainingTime(player) {
   if(player) {
     return Math.max(0,
       player.getDuration() - 
-      _song[STOP] - 
+      _song.stop - 
       player.getCurrentTime()
     );
   } 
@@ -287,7 +278,7 @@ var Player = (function(){
 
         // Nows our time to shine
         _playerById[_index].playVideo();
-        _playerById[_index].setVolume(_song[VOLUME] * _volume);
+        _playerById[_index].setVolume(_song.volume * _volume);
        
         // Bring the volume up of the higher quality player and mute the current
         _player[EXTRA].setVolume(0);
@@ -327,7 +318,7 @@ var Player = (function(){
             Chat.addmessage("Total Time On Site: " + secondsToTime(ttl));
             _goal = (1 + Math.floor(ttl / _unit)) * _unit;
           }
-          document.title = _song[ARTIST] + " - " + _song[TITLE] + " | " + secondsToTime(ttl);
+          document.title = _song.artist + " - " + _song.title + " | " + secondsToTime(ttl);
         }, 1000);
 
         Player.load("yt", 1);
@@ -365,7 +356,7 @@ var Player = (function(){
     // For certain EMI and Polydor muted tracks, 240p (small) works
     // ok for youtube ... we put 240p in the notes section if this is
     // the case.
-    if(_song[NOTES].search("240p") > 0) {
+    if(_song.notes.search("240p") > 0) {
       // If this is the case, then we limit ourselves to just the 
       // lowest quality video
       activeAvailable = ["small"];
@@ -420,14 +411,14 @@ var Player = (function(){
         // If we are upsampling, then do it seemlessly.
       } else if( 
         _playerById[_index].getDuration() - 
-        _song[STOP] - 
+        _song.stop - 
         _playerById[_index].getCurrentTime() > LOADTIME_sec * 2.5
       ) {
 
         // First, load the active video in the extra player,
         // setting the volume to 0
         _player[EXTRA].loadVideoById(
-          _song[ID].split(":")[1], 
+          _song.vid.split(":")[1], 
           _playerById[_index].getCurrentTime() + LOADTIME_sec
         );
 
@@ -455,7 +446,7 @@ var Player = (function(){
               show(_player[EXTRA]);
 
               // Bring the volume up of the higher quality player and mute the current
-              _player[EXTRA].setVolume(_song[VOLUME] * _volume);
+              _player[EXTRA].setVolume(_song.volume * _volume);
               myplayer.setVolume(0);
               myplayer.seekTo(_player[EXTRA].getCurrentTime() + 3.5);
               myplayer.setPlaybackQuality(newQualityWord);
@@ -574,8 +565,8 @@ function transition(song) {
   _song = song;
   // Load the next video prior to actually switching over
   var 
-    id = song[ID],
-    offset = song[START],
+    id = song.vid,
+    offset = song.start,
     index = id,
     dom = 'yt',
     uuid = id.split(':')[1];
@@ -634,7 +625,7 @@ function transition(song) {
     log("video loaded");
 
     setTimeout(function(){
-      $("#video-current").html("<b>Loading next song ...</b>" + [_song[ARTIST], _song[TITLE]].join(' - '));
+      $("#video-current").html("<b>Loading next song ...</b>" + [_song.artist, _song.title].join(' - '));
 
       log("raise next volume");
       next.seekTo(Math.max(offset, 0));
@@ -650,12 +641,12 @@ function transition(song) {
       // So to combat this we simply put a 100ms timeout around
       // the volume adjusting
       setTimeout(function(){
-        next.setVolume(song[VOLUME] * _volume);
+        next.setVolume(song.volume * _volume);
       }, 100);
     }, raiseNextVolume);
 
     setTimeout(function(){
-      $("#video-current").html("<b>" + _song[ARTIST] + "</b>" +  _song[TITLE]);
+      $("#video-current").html("<b>" + _song.artist + "</b>" +  _song.title);
       log("pivot");
 
       // Toggle the player pointers
@@ -902,7 +893,7 @@ var Song = (function(){
 
       $("#song-skip").click(function(){
         Panel.hide("song");
-        _socket.emit("skip", _song[ID]);
+        _socket.emit("skip", _song.vid);
       });
 
       onEnter("#input-song-search", Song.search);
@@ -1443,8 +1434,8 @@ var Chat = (function(){
       if(message.length) {
         send("chat", { 
           d: message,
-          vid: _song ? _song[ID] : 0,
-          offset: _song ? _playerById[_song[ID]].getCurrentTime() : 0
+          vid: _song ? _song.vid : 0,
+          offset: _song ? _playerById[_song.vid].getCurrentTime() : 0
         });
       }
       $("#talk").val("");
@@ -1613,7 +1604,7 @@ var Volume = (function(){
         Store("volume", _volume);
       }
 
-      var ceiling = _song[VOLUME]
+      var ceiling = _song.volume;
 
       $("#mute-fg").css('height', (_volume * 100) + "px");
 
@@ -1629,7 +1620,7 @@ var Volume = (function(){
         log("Starting the fade mute");
         var vol = _volume;
         ival = setInterval(function(){
-          _player[_active].setVolume(_song[VOLUME] * vol);
+          _player[_active].setVolume(_song.volume * vol);
           vol -= 0.03;
           if(vol < 0) {
             log("Done with the fade mute");

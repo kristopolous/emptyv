@@ -170,63 +170,78 @@ function getplaylist(data, cb) {
 
     console.log("request queue: ", next);
 
-    next.forEach(function(row) {
-      list[index] = JSON.parse(row);
-      index++;
+    next = next.map(function(row) { 
+      return JSON.parse(row).vid;
     });
 
-    // Our beginning pointer should be shifted 
-    // BACKWARD by our request count size.
-    var newstart = data.begin - next.length;
-
-    // Similarly, the end pointer should also
-    // be shifted back too
-    var newend = data.end - next.length;
-
-    // If the newend is negative, that is to say,
-    // there is nothing more to get, then we
-    // can stop here.
-    if(newend <= 0) {
-      if(--runs == 0) {
-        cb(list);
+    _db.hmget("vid", next, function(err, res) {
+      for(var ix = 0; ix < res.length; ix++) {
+        var entry = JSON.parse(res[ix]);
+        list[ix + 1] = {
+          vid: next[ix],
+          artist: entry[3],
+          title: entry[4]
+        };
       }
-      return;
-    }
+      console.log(list);
 
-    // Otherwise, we find the index that we are currently at
-    _db.hget("play", data.channel, function(err, last) {
-      var currentState = JSON.parse(last);
+      // Our beginning pointer should be shifted 
+      // BACKWARD by our request count size.
+      var newstart = Math.max(data.begin, 0) - next.length;
 
-      // Get the last synchronized playlist
-      _db.get("p:" + data.channel, function(err, last) {
+      // Similarly, the end pointer should also
+      // be shifted back too
+      var newend = data.end - next.length;
 
-        // And form an ROI, which is offset from
-        // our newstart to our newend
-        var entryList = JSON.parse(last).slice(
-          currentState.index + newstart,
-          currentState.index + newend
-        );
+      // If the newend is negative, that is to say,
+      // there is nothing more to get, then we
+      // can stop here.
+      if(newend <= 0) {
+        if(--runs == 0) {
+          cb(list);
+        }
+        return;
+      }
 
-        // Since the playlist is strictly id based, we
-        // need to go off and get the entries in the DB.
-        _db.hmget("vid", entryList, function(err, res) {
+      // Otherwise, we find the index that we are currently at
+      _db.hget("play", data.channel, function(err, last) {
+        var currentState = JSON.parse(last);
 
-          // The starting index is just our old start
-          for( 
-            var ix = 0, index = data.begin;
-            ix < res.length; 
-            index++, ix++) {
-              var entry = JSON.parse(res[ix]);
-              list[index] = {
-                vid: entryList[ix],
-                artist: entry[3],
-                title: entry[4]
-              };
+        // Get the last synchronized playlist
+        _db.get("p:" + data.channel, function(err, last) {
+
+          // And form an ROI, which is offset from
+          // our newstart to our newend
+          var entryList = JSON.parse(last).slice(
+            currentState.index + newstart,
+            currentState.index + newend
+          );
+          console.log(
+            currentState.index + newstart,
+            currentState.index + newend
+          );
+
+          // Since the playlist is strictly id based, we
+          // need to go off and get the entries in the DB.
+          _db.hmget("vid", entryList, function(err, res) {
+
+            for( 
+              var ix = 0, index = Math.max(next.length, data.begin);
+              ix < res.length; 
+              index++, ix++) {
+                console.log(index);
+                var entry = JSON.parse(res[ix]);
+                list[index] = {
+                  vid: entryList[ix],
+                  artist: entry[3],
+                  title: entry[4]
+                };
+              }
+
+            if(--runs == 0) {
+              cb(list);
             }
-
-          if(--runs == 0) {
-            cb(list);
-          }
+          });
         });
       });
     });

@@ -200,16 +200,7 @@ IO.sockets.on('connection', function (socket) {
         return;
       } else {
         _song = song;
-        socket.emit("song", [
-          song.vid,
-          song.len,
-          song.offset !== null ? song.offset.toFixed(3) : 0,
-          song.start,
-          song.volume,
-          song.artist,
-          song.title,
-          song.notes
-        ]);
+        socket.emit("song", song);
       }
     });
     _db.keys("user:" + _user.channel + ":*", function(err, all) {
