@@ -134,6 +134,17 @@ input{width:190px;margin:0.25em 0 0.75em}
 #song-preview .bigbtn{display:none;margin:0.25em 0.5em;font-size:1em}
 #song-top-buttons{font-size:1.4em;display:inline-block}
 
+#song-timeline {width:790px;overflow:hidden;padding:6px;background:#000;position:fixed;bottom:6px}
+#song-timeline h3{display:inline}
+#song-timeline .title{height:90px;width:80px;vertical-align:top;padding:6px 5px;display:inline-block;overflow:hidden;margin-right:2px
+;border:1px solid transparent;border-radius:3px;
+}
+#song-timeline .title:hover{border-color:#3c4b62;background-color:#172131}
+
+#song-timeline .title span{overflow:visible;width:auto;white-space:normal}
+#song-timeline img{margin:0 10px;width:60px;vertical-align:top;height:45px}
+#song-timeline span{display:block;padding-top:6px;margin-left:3px}
+
 #chatbar{z-index:0;width:220px;position:absolute;bottom:0}
   #channel-expand{display:inline-block;background:url("images/door_open_1.png") 7px 4px no-repeat;width:39px;height:35px;
     vertical-align:top;
@@ -205,7 +216,6 @@ button.bigbtn,.channel { text-align:left;
   z-index:10;
   position:relative;
 }
-#preview-artist{display:block}
 #song-preview{display:inline-block;text-align:center;margin-left:6px;font-size:1.4em}
 #song-preview-info{display:block;text-align:center;color:#bbcae1;margin-bottom:1em}
 
@@ -317,14 +327,16 @@ a#song-delist.bigbtn{float:right;font-size:0.7em;color:#525767}
         <button class=bigbtn id=song-skip>Skip This Video</button>
       </div>
       -->
-      <div class=panel-title>Video Control Panel</div>
       <span class=panel-content>
         <div id=song-timeline>
+          <button id=song-skip>Skip</button>
+          <h3>Current Playlist</h3>
+          <div id=timeline-scroll-left></div>
+          <div id=timeline-content></div>
+          <div id=timeline-scroll-right></div>
         </div>
         <div id=song-lhs>
           <div id=song-next></div>
-
-          <div id=song-sorter></div>
           <input id=input-song-search autocomplete=off>
           <div id=song-search-label></div>
           <div id=song-results-container>
@@ -336,7 +348,6 @@ a#song-delist.bigbtn{float:right;font-size:0.7em;color:#525767}
         <div id=song-preview>
           <div id=song-preview-info>
             <button id=title-edit><img src=css/edit_24.png></button>
-            <b id=preview-artist>Video Preview</b>
             <span id=preview-title></span>
           </div>
           <div id=embedder></div>

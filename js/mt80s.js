@@ -24,6 +24,7 @@ function loadsrc(row) {
 
 loadsrc([10, 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js']);
 loadsrc([2000, 'js/db.min.js']);
+loadsrc([5000, 'js/jquery-ui-1.8.20.custom.min.js']);
 
 if(!self.console) {
   self.console = {log:function(){}};
@@ -208,6 +209,7 @@ var
 
 // }} // Globals
 
+_ev.sniff();
 
 function Store(key, value) {
   if(arguments.length == 2) {
@@ -535,6 +537,33 @@ var Player = (function(){
     hide: hide,
     setQuality: setQuality,
     show: show,
+    safeLoad: function(el, id, offset) {
+      var og_size = {
+        left: $(el).position().left,
+        top: $(el).position().top,
+        width: $(el).width(),
+        height: $(el).height()
+      };
+
+      if(_letterBoxed) {
+        el.style.width = og_size.width + 800 + "px";
+        el.style.left = "-800px";
+        el.style.height = og_size.height + 600 + "px";
+        el.style.top = "-600px";
+
+        setTimeout(function(){
+          console.log(og_size);
+          el.style.top = og_size.top + "px";
+          el.style.left = og_size.left + "px";
+          el.style.width = "100%";
+          el.style.height = "100%";
+        },500);
+      }
+
+      if (id) {
+        el.loadVideoById(id, offset);
+      }
+    },
     fullscreen: function(){
       if(_letterBoxed) {
         _letterBoxed = false;
@@ -558,7 +587,6 @@ var Player = (function(){
   }
 })();
 
-
 function transition(song) {
 
   log("Loading song:", song); 
@@ -566,7 +594,7 @@ function transition(song) {
   // Load the next video prior to actually switching over
   var 
     id = song.vid,
-    offset = song.start,
+    offset = song.offset,
     index = id,
     dom = 'yt',
     uuid = id.split(':')[1];
@@ -617,7 +645,8 @@ function transition(song) {
       active = _player[_active],
       next = _player[_next];
 
-    next.loadVideoById(uuid, Math.max(offset, 0));
+    Player.safeLoad(next, uuid, Math.max(offset, 0));
+
     next.setPlaybackQuality("medium");
     next.setVolume(0);
     next.playVideo();
@@ -818,7 +847,7 @@ var Song = (function(){
     switch(_ev("song-tab")) {
       case 'Everything':
         if(!_db[_channel]) {
-          _socket.emit("get-all-videos");
+          _socket.emit("get-all-videos", 0, 10000);
         } else {
           Song.search();
         }
@@ -1009,15 +1038,16 @@ var Song = (function(){
     gen: function(data) {
       var 
         type,
+        container,
         titles = {
           local: "Existing",
           remote: "New",
           history: ""
         };
 
-      $("#song-results").empty();
       if(data.query) {
         type = 'search';
+        container = "#song-results";
         if(data.results.total) {
           $("#song-search-label").html("Showing results for <b>" + data.query + "</b>");
         } else {
@@ -1025,8 +1055,10 @@ var Song = (function(){
         }
       } else {
         type = 'history';
-        $("#song-search-label").html("Last played videos on " + data.channel + "</b>");
+        container = "#timeline-content";
       }
+
+      $(container).empty();
 
       _.each(_.keys(titles), function(which) {
         if(data.results[which] && data.results[which].length) {
@@ -1034,7 +1066,7 @@ var Song = (function(){
             $("<h3>" + titles[which] + "</h3>").appendTo("#song-results");
           }
           _.each(data.results[which], function(row) {
-            Song.format(row, type).appendTo("#song-results");
+            Song.format(row, type).appendTo(container);
           });
         }
       });
@@ -1044,23 +1076,25 @@ var Song = (function(){
 
 var Channel = {
   Init: function(){
-    _ev("channel", function(name) {
-      $("#channel-title").html(name);
-    });
+    when("_socket", function(){
+      _ev("channel", function(name) {
+        $("#channel-title").html(name);
+      });
 
-    _ev("panel:channel", function(which){
-      if(which == "show") {
-        send("get-channels", {query: false});
-      }
-    });
+      _ev("panel:channel", function(which){
+        if(which == "show") {
+          send("get-channels", {query: false});
+        }
+      });
 
-    onEnter("#input-channel-search", Channel.search);
-    _socket.on("playlist", function(last) {
-      console.log(last);
-    });
+      onEnter("#input-channel-search", Channel.search);
+      _socket.on("playlist", function(last) {
+        console.log(last);
+      });
 
-    $("#channel-query").keyup(function(){
-      Channel.search(this.value);
+      $("#channel-query").keyup(function(){
+        Channel.search(this.value);
+      });
     });
   },
 

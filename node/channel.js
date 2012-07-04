@@ -6,17 +6,30 @@ module.exports = {
   update: update,
   count: count,
   getPlaylist: getplaylist,
+  setDB: function(which) { _db = which; },
+  getLibrary: function(channel, start, count, cb) {
+    if(!channel) {
+      return;
+    }
+    _db.get("p:" + channel, function(err, res) {
+      if(res) {
+        res = JSON.parse(res);
+      } else {
+        // This means an empty channel, it's probably an error
+        // and we should probably handle it better than this.
+        // But at least we aren't crashing.
+        res = [];
+      }
+      cb({
+        len: res.length,
+        data: res.slice(start, start + count)
+      });
+    });
+  },
   join: function(name, user, cb) {
     _db.set("user:" + name + ":" + user, 1);
     _db.expire("user:" + name + ":" + user, 10, function(){
       count(name, cb);
-    });
-  },
-  fix: function(name) {
-    _db.exists("pl:" + name, function (err, last) {
-      if(!last) {
-        remove(name);
-      }
     });
   },
   leave: function(name, user, cb) {
@@ -30,9 +43,6 @@ module.exports = {
       }
     }
   },
-  setDB: function(which) {
-    _db = which;
-  },
   getAll: function(cb) {
     _db.hkeys("channel", function(err, last) {
       cb(last);
@@ -40,8 +50,8 @@ module.exports = {
   },
   updatelen: function(name) {
     var len = 0;
-    _db.lrange("pl:" + name, 0, -1, function(err, res) {
-      _db.hmget("vid", res, function(err, res) {
+    _db.get("p:" + name, function(err, res) {
+      _db.hmget("vid", res.split(','), function(err, res) {
         res.forEach(function(row) {
           row = JSON.parse(row);
           len += parseInt(row[0]);
@@ -175,13 +185,15 @@ function getplaylist(data, cb) {
     });
 
     _db.hmget("vid", next, function(err, res) {
-      for(var ix = 0; ix < res.length; ix++) {
-        var entry = JSON.parse(res[ix]);
-        list[ix + 1] = {
-          vid: next[ix],
-          artist: entry[3],
-          title: entry[4]
-        };
+      if(res) {
+        for(var ix = 0; ix < res.length; ix++) {
+          var entry = JSON.parse(res[ix]);
+          list[ix + 1] = {
+            vid: next[ix],
+            artist: entry[3],
+            title: entry[4]
+          };
+        }
       }
       console.log(list);
 
