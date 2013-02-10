@@ -491,11 +491,11 @@ var Player = (function(){
         "300",      // height
         "9",        // version
         null,       // express install swf url (we assume you have the flash player)
-        null,       // flash vars 
+        { wmode: "transparent" },       // flash vars 
 
         { allowScriptAccess: "always" }, // params
 
-        { id: 'player-' + ix } // attributes
+        { id: 'player-' + ix, wmode: "transparent" } // attributes
       );
     },
 
@@ -828,18 +828,22 @@ var Song = (function(){
 
     var 
       id = obj.vid.split(':').pop(),
-      width = 500,
+      width = 300,
       height = width * 3 / 4;
     
+
+    $("#preview-controls").slideDown();
+    $("#song-preview").animate({height: "225px"});
+
     $("#embedder").html('<object width=' + width + ' height=' + height + '>' +
       '<param name="movie" value="http://www.youtube.com/v/' + id + '?version=3&amp;hl=en_GB&amp;autoplay=1"></param>' + 
       '<param name="allowscriptaccess" value="always"></param>' + 
       '<embed src="http://www.youtube.com/v/' + id + '?version=3&amp;hl=en_GB&amp;autoplay=1" type="application/x-shockwave-flash" width=' + width + ' height=' + height + ' allowscriptaccess="always"></embed>' +
       '</object>');
-    $("#song-preview .bigbtn").show();
 
     $("#preview-artist").html(obj.artist);
     $("#preview-title").html(obj.title);
+    blink("#song-preview-info"); 
     //$("#title-edit").css('display','inline-block');
   }
 
@@ -944,7 +948,7 @@ var Song = (function(){
           Player.fullscreen();
           $("#input-song-search").val("");
           $("#song-results").empty();
-          $("#song-search-label").html("");
+          $("#song-search-label-container").css('display','none');
         }
       });
 
@@ -969,8 +973,8 @@ var Song = (function(){
 
     reset: function() {
       $("#embedder").empty();
-      $("#preview-artist").html("Video Preview");
-      $("#preview-title").empty();
+      $("#preview-controls").slideUp();
+      $("#song-preview").css("height", 0);
     },
 
     format: function(data, type) {
@@ -1033,6 +1037,7 @@ var Song = (function(){
         $("#song-search-label").html("Searching...");
         _socket.emit("search", qstr);
       }
+      $("#song-search-label-container").fadeIn();
     },
 
     gen: function(data) {
@@ -1049,7 +1054,7 @@ var Song = (function(){
         type = 'search';
         container = "#song-results";
         if(data.results.total) {
-          $("#song-search-label").html("Showing results for <b>" + data.query + "</b>");
+          $("#song-search-label").html("Searched for <b>" + data.query + "</b>");
         } else {
           $("#song-search-label").html("Nothing found for <b>" + data.query + "</b> :-(");
         }
@@ -1062,9 +1067,6 @@ var Song = (function(){
 
       _.each(_.keys(titles), function(which) {
         if(data.results[which] && data.results[which].length) {
-          if(titles[which]) {
-            $("<h3>" + titles[which] + "</h3>").appendTo("#song-results");
-          }
           _.each(data.results[which], function(row) {
             Song.format(row, type).appendTo(container);
           });
@@ -1748,4 +1750,4 @@ when("$", function (){
 });
 
 // Load the first player
-Player.load("yt", 0);
+//Player.load("yt", 0);

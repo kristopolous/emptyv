@@ -120,17 +120,17 @@ input{width:190px;margin:0.25em 0 0.75em}
 #message .title:hover,
 .collapse:hover,
 #mute:hover,
+#song-results a:hover,
 #video-current-wrapper:hover,
 #channel-wrap:hover
 {border-color:#3c4b62; background-color:#172131 }
 
 #input-song-search{font-size:1.25em;margin-left:3px;width:225px}
-#song-search-label{margin-top:-.5em;margin-bottom:.5em;white-space:normal}
-#song-results {overflow:auto}
-#song-results a{display:block;font-size:1.25em;margin:0.25em 0;padding:0.15em}
-#song-results a:hover{background:#333;color:#fff}
+#song-search-label-container{display:none;margin-top:-.5em;margin-bottom:.5em;white-space:normal}
+#song-results {overflow:auto;display:block;white-space:normal}
+#song-results a{overflow:hidden;display:inline-block;height:40px;width:180px;font-size:1.25em;margin:3px;padding:6px;border:1px solid transparent;border-radius:3px;vertical-align:top}
 #song-results a.title span{white-space:normal}
-#song-results img{width:40px;vertical-align:top;height:30px}
+#song-results img{width:48px;vertical-align:top;height:36px}
 #song-preview .bigbtn{display:none;margin:0.25em 0.5em;font-size:1em}
 #song-top-buttons{font-size:1.4em;display:inline-block}
 
@@ -158,8 +158,7 @@ input{width:190px;margin:0.25em 0 0.75em}
   #register-button,#forgot-button{margin:1em 0;color:#555}
   #app{display:none;height:100%}
 
-#splash-content > div {
-float:left;font-size:1.5em;display:inline-block;margin:1em 0 0 1em}
+#splash-content > div {float:left;font-size:1.5em;display:inline-block;margin:1em 0 0 1em}
 #videoList{width:300px}
 #videoList .channel{
   font-size:20px;
@@ -179,52 +178,27 @@ button.bigbtn,.channel { text-align:left;
   vertical-align:top;
   background:#202228;
 }
-.channel{ border-radius:3px; overflow:hidden;position:relative;background:none;font-size:16px;border:1px solid transparent}
+.channel{border-radius:3px; overflow:hidden;position:relative;background:none;font-size:16px;border:1px solid transparent}
 .channel:hover{border-color:#3c4b62;background:#172131}
 .channel .title{display:block;margin-top:5px}
 .channel img{height:49px}
 .channel em {color:#fff;margin-top:-0.15em;display:block;font-style:normal;font-size:1.2em;font-weight:bold}
 .channel small {color:#3c4b62;display:block;font-size:0.85em}
 
-.tabs {
-  height:24px;
-  border-bottom:1px solid #444;
-  margin:0;padding:0 0 0 6px}
-.tabs li {
-  list-style:none;
-  display:inline-block;
-  color:#fff;
-  width:85px;
-  height:24px;
-  padding-left:6px;
-  margin-right:9px;
-  border:2px solid #333;
-  z-index:9;
-  position:relative;
-  font-size:14px;
-  cursor:pointer;
-  border-bottom:0;
-}
-.tabs li.selected{
-  height:25px;
-  box-shadow: 0 0 2px 2px #999;
-  background:#222;
-}
-.tab-content{
-  padding:6px;
-  background:#222;
-  z-index:10;
-  position:relative;
-}
-#song-preview{display:inline-block;text-align:center;margin-left:6px;font-size:1.4em}
-#song-preview-info{display:block;text-align:center;color:#bbcae1;margin-bottom:1em}
-
 #user input{font-size:1.5em}
 
-#embedder{width:500px;height:400px}
+#embedder{width:300px;height:200px}
 #title-edit{display:none;position:absolute;right:6px}
-#song-lhs{display:inline-block;overflow:hidden;width:240px;vertical-align:top}
-a#song-delist.bigbtn{float:right;font-size:0.7em;color:#525767}
+#preview-controls{height:135px;overflow:hidden;text-align:right;display:none}
+#song-lhs h4{margin-top:1em}
+#song-lhs{display:inline-block;white-space:normal;overflow:hidden;width:240px;vertical-align:top}
+#song-preview{display:inline-block;height:0}
+#song-preview-info{font-size:1.25em;display:block;color:#bbcae1;margin:0.5em}
+#song-operations {width:150px}
+#preview-artist{font-weight:bold}
+#song-browse-all,#import-playlist{float:right;font-size:0.5em;font-weight:normal;margin-right:9px;margin-top:3px}
+
+#song-browse-all{margin:0 9px 3px 0}
 </style>
 <!--[if IE]><link rel=stylesheet href=css/ie.css><![endif]-->
 </head>
@@ -336,25 +310,34 @@ a#song-delist.bigbtn{float:right;font-size:0.7em;color:#525767}
           <div id=timeline-scroll-right></div>
         </div>
         <div id=song-lhs>
-          <div id=song-next></div>
+          <div id=preview-controls>
+            <div id=song-preview-info>
+              <button id=title-edit><img src=css/edit_24.png></button>
+              <div id=preview-artist></div>
+              <div id=preview-title></div>
+            </div>
+            <span id=song-operations>
+              <button id=song-select-next>Play Next</button>
+              <button id=song-select-now>Play Now!</button>
+              <button id=show-related>Show Related Videos</button>
+            </span>
+          </div>
+          <h4>Search For a Video
+            <a id=import-playlist>Import a playlist</a>
+          </h4>
           <input id=input-song-search autocomplete=off>
-          <div id=song-search-label></div>
-          <div id=song-results-container>
-            <div class=buffer id=song-results-top-buffer></div>
-            <div id=song-results></div>
-            <div class=buffer id=song-results-bottom-buffer></div>
+          <div id=song-search-label-container>
+            <span id=song-search-label></span>
+            <a id=song-browse-all>Show All Videos</a>
           </div>
         </div>
         <div id=song-preview>
-          <div id=song-preview-info>
-            <button id=title-edit><img src=css/edit_24.png></button>
-            <span id=preview-title></span>
-          </div>
           <div id=embedder></div>
-          <a class=bigbtn id=song-delist>delist</a>
-          <button class=bigbtn id=song-select-cancel>Cancel</button>
-          <button class=bigbtn id=song-select-next>Play Next</button>
-          <button class=bigbtn id=song-select-now>Play Now!</button>
+        </div>
+        <div id=song-results-container>
+          <div class=buffer id=song-results-top-buffer></div>
+          <div id=song-results></div>
+          <div class=buffer id=song-results-bottom-buffer></div>
         </div>
       </span>
     </span></div><div id=players><div id=p2></div><div id=p1></div><div id=p0></div></div></div></body>
