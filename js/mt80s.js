@@ -22,8 +22,11 @@ function loadsrc(row) {
   }, row[0]);
 }
 
-loadsrc([10, 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js']);
-loadsrc([2000, 'js/db.min.js']);
+_.map([
+  [10, 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js'],
+  [2000, 'js/db.min.js'],
+  [5000, 'js/jquery-ui-1.8.20.custom.min.js']
+] ,loadsrc);
 
 if(!self.console) {
   self.console = {log:function(){}};
@@ -33,19 +36,12 @@ if(!self.localStorage) {
 }
 
 var
+
+// {{ // Constants
   MYCOLOR = Math.floor(Math.random() * 10),
 
-  ID = 0,
-  RUNTIME = 1,
-  START = 2,
-  STOP = 3,
-  VOLUME = 4,
-  ARTIST = 5,
-  TITLE = 6,
-  NOTES = 7,
-
   // The offset addition was after some toying around and 
-  // seeint how long the player took to load. This seemed
+  // seeing how long the (flash) player took to load. This seemed
   // to work ok; we really want the drift to be as close
   // to 0 as possible.
   LOADTIME_sec = 5,
@@ -88,7 +84,7 @@ function blink(node, cb) {
 
 function send(func, data) {
   when("_socket", function(){
-    console.log("emitting " + func);
+    log("emitting " + func);
     _socket.emit(func, data);
   });
 }
@@ -116,7 +112,7 @@ function remainingTime(player) {
   if(player) {
     return Math.max(0,
       player.getDuration() - 
-      _song[STOP] - 
+      _song.stop - 
       player.getCurrentTime()
     );
   } 
@@ -124,8 +120,7 @@ function remainingTime(player) {
 }
 
 function plural(num, mod, base) {
-  if(num % mod != 1) { return base + "s"; }
-  return base;
+  return base + (num % mod != 1) ? "s" : ""; 
 }
 
 function secondsToTime(count) {
@@ -137,11 +132,22 @@ function secondsToTime(count) {
 
   if (count > 0) {
     stack[0] = (count % 60) + plural(count, 60, " minute") + " and " + stack[0];
-    count = Math.floor(count / 60);;
+    count = Math.floor(count / 60);
   }
 
   if (count > 0) {
-    stack.push(count + plural(count, count + 1, " hour"));
+    stack.push((count % 24) + plural(count, 24, " hour"));
+    count = Math.floor(count / 24);
+  }
+
+  if (count > 0) {
+    stack.push((count % 7) + plural(count, 7, " day"));
+    count = Math.floor(count / 7);
+  }
+
+  if (count > 0) {
+    stack.push((count % 2) + plural(count, 2, " week"));
+    count = Math.floor(count / 2);
   }
 
   return stack.reverse().join(', ').replace(/^0/,'');
@@ -206,6 +212,7 @@ var
 
 // }} // Globals
 
+_ev.sniff();
 
 function Store(key, value) {
   if(arguments.length == 2) {
@@ -276,7 +283,7 @@ var Player = (function(){
 
         // Nows our time to shine
         _playerById[_index].playVideo();
-        _playerById[_index].setVolume(_song[VOLUME] * _volume);
+        _playerById[_index].setVolume(_song.volume * _volume);
        
         // Bring the volume up of the higher quality player and mute the current
         _player[EXTRA].setVolume(0);
@@ -313,10 +320,10 @@ var Player = (function(){
 
           Store("ttl", ttl);
           if(ttl > _goal) {
-            Chat.addmessage("Total Time On Site " + secondsToTime(ttl));
+            Chat.addmessage("Total Time On Site: " + secondsToTime(ttl));
             _goal = (1 + Math.floor(ttl / _unit)) * _unit;
           }
-          document.title = _song[ARTIST] + " - " + _song[TITLE] + " | " + secondsToTime(ttl);
+          document.title = _song.artist + " - " + _song.title + " | " + secondsToTime(ttl);
         }, 1000);
 
         Player.load("yt", 1);
@@ -354,7 +361,7 @@ var Player = (function(){
     // For certain EMI and Polydor muted tracks, 240p (small) works
     // ok for youtube ... we put 240p in the notes section if this is
     // the case.
-    if(_song[NOTES].search("240p") > 0) {
+    if(_song.notes.search("240p") > 0) {
       // If this is the case, then we limit ourselves to just the 
       // lowest quality video
       activeAvailable = ["small"];
@@ -409,14 +416,14 @@ var Player = (function(){
         // If we are upsampling, then do it seemlessly.
       } else if( 
         _playerById[_index].getDuration() - 
-        _song[STOP] - 
+        _song.stop - 
         _playerById[_index].getCurrentTime() > LOADTIME_sec * 2.5
       ) {
 
         // First, load the active video in the extra player,
         // setting the volume to 0
         _player[EXTRA].loadVideoById(
-          _song[ID].split(":")[1], 
+          _song.vid.split(":")[1], 
           _playerById[_index].getCurrentTime() + LOADTIME_sec
         );
 
@@ -444,7 +451,7 @@ var Player = (function(){
               show(_player[EXTRA]);
 
               // Bring the volume up of the higher quality player and mute the current
-              _player[EXTRA].setVolume(_song[VOLUME] * _volume);
+              _player[EXTRA].setVolume(_song.volume * _volume);
               myplayer.setVolume(0);
               myplayer.seekTo(_player[EXTRA].getCurrentTime() + 3.5);
               myplayer.setPlaybackQuality(newQualityWord);
@@ -494,11 +501,11 @@ var Player = (function(){
         "300",      // height
         "9",        // version
         null,       // express install swf url (we assume you have the flash player)
-        null,       // flash vars 
+        { wmode: "transparent" },       // flash vars 
 
         { allowScriptAccess: "always" }, // params
 
-        attribs
+        { id: 'player-' + ix, wmode: "transparent" } // attributes
       );
     },
 
@@ -515,12 +522,58 @@ var Player = (function(){
         width: "216px"
       });
       $("#top").css({
-        marginTop: "170px"
+        paddingTop: "170px"
       });
+      $("#mute-control").css({
+        top: "187px"
+      });
+    },
+    flashSwap: function(opts) {
+      var counter = 9,
+        ival = setInterval(function() {
+          if(counter % 2) {
+            Player.hide(opts.show);
+            Player.show(opts.hide);
+          } else {
+            Player.hide(opts.hide);
+            Player.show(opts.show);
+          }
+          counter --;
+          if(counter < 0) {
+            clearInterval(ival);
+          }
+        }, 100);
     },
     hide: hide,
     setQuality: setQuality,
     show: show,
+    safeLoad: function(el, id, offset) {
+      var og_size = {
+        left: $(el).position().left,
+        top: $(el).position().top,
+        width: $(el).width(),
+        height: $(el).height()
+      };
+
+      if(_letterBoxed) {
+        el.style.width = og_size.width + 800 + "px";
+        el.style.left = "-800px";
+        el.style.height = og_size.height + 600 + "px";
+        el.style.top = "-600px";
+
+        setTimeout(function(){
+          console.log(og_size);
+          el.style.top = og_size.top + "px";
+          el.style.left = og_size.left + "px";
+          el.style.width = "100%";
+          el.style.height = "100%";
+        },500);
+      }
+
+      if (id) {
+        el.loadVideoById(id, offset);
+      }
+    },
     fullscreen: function(){
       if(_letterBoxed) {
         _letterBoxed = false;
@@ -533,14 +586,16 @@ var Player = (function(){
           width: "auto",
           paddingTop: 0
         });
+        $("#mute-control").css({
+          top: "5px"
+        });
         $("#top").css({
-          marginTop: "0"
+          paddingTop: "0"
         });
       }
     }
   }
 })();
-
 
 function transition(song) {
 
@@ -548,8 +603,8 @@ function transition(song) {
   _song = song;
   // Load the next video prior to actually switching over
   var 
-    id = song[ID],
-    offset = song[START],
+    id = song.vid,
+    offset = song.offset,
     index = id,
     dom = 'yt',
     uuid = id.split(':')[1];
@@ -584,12 +639,12 @@ function transition(song) {
     var 
       pivot = Math.min(PRELOAD, remainingTime(_playerPrev[_active])) * 1000,
 
-      // drop the volume of the currently playing song
-      dropPlayingVolume = pivot + 500,
-
       // raise the volume of the next one slightly before dropping
       // the volume of the current
-      raiseNextVolume = pivot - 1000,
+      raiseNextVolume = pivot - 500,
+
+      // drop the volume of the currently playing song
+      dropPlayingVolume = pivot + 250,
 
       // Stop the old video 1 second after the
       // pivot transition
@@ -600,22 +655,16 @@ function transition(song) {
       active = _player[_active],
       next = _player[_next];
 
-    next.loadVideoById(uuid, Math.max(offset, 0));
+    Player.safeLoad(next, uuid, Math.max(offset, 0));
+
     next.setPlaybackQuality("medium");
     next.setVolume(0);
     next.playVideo();
 
     log("video loaded");
 
-    setTimeout(function(){ 
-      log("drop playing volume");
-      if(active) {
-        active.setVolume(0); 
-      }
-    }, dropPlayingVolume);
-
     setTimeout(function(){
-      $("#video-current").html("<b>Loading next song ...</b>" + [_song[ARTIST], _song[TITLE]].join(' - '));
+      $("#video-current").html("<b>Loading next song ...</b>" + [_song.artist, _song.title].join(' - '));
 
       log("raise next volume");
       next.seekTo(Math.max(offset, 0));
@@ -631,12 +680,12 @@ function transition(song) {
       // So to combat this we simply put a 100ms timeout around
       // the volume adjusting
       setTimeout(function(){
-        next.setVolume(song[VOLUME] * _volume);
+        next.setVolume(song.volume * _volume);
       }, 100);
     }, raiseNextVolume);
 
     setTimeout(function(){
-      $("#video-current").html("<b>" + _song[ARTIST] + "</b>" +  _song[TITLE]);
+      $("#video-current").html("<b>" + _song.artist + "</b>" +  _song.title);
       log("pivot");
 
       // Toggle the player pointers
@@ -646,6 +695,12 @@ function transition(song) {
       // When you toggle the visibility, there is still an annoying spinner.
       // So to avoid this we just "move" the players off screen that aren't
       // being used.
+      /*
+      Player.flashSwap({
+        hide: active,
+        show: next
+      });
+      */
       Player.show(next, 'slide');
       Player.hide(active, 'slide');
       Player.hide(_playerPrev[EXTRA]);
@@ -657,8 +712,16 @@ function transition(song) {
       _playerPrev = _player;
     }, pivot);
 
+    setTimeout(function(){ 
+      log("drop playing volume");
+      if(active) {
+        Volume.fadeById(active);
+      }
+    }, dropPlayingVolume);
+
     setTimeout(function(){
       if(active) {
+        log("stopping old video");
         active.stopVideo();
         if("index" in active) {
           delete _playerById[active.index];
@@ -765,42 +828,40 @@ var Song = (function(){
     _lastSong = false,
     _db = {};
 
-  function preview(obj) {
+  function preview(obj,el) {
+    Panel.show("song");
+    if(el) {
+      blink($(el), function(){setTimeout(Volume.fademute, 1500);});
+    }
+
     _lastSong = obj;
 
     var 
       id = obj.vid.split(':').pop(),
-      width = 500,
+      width = 300,
       height = width * 3 / 4;
     
+
+    $("#preview-controls").slideDown();
+    $("#song-preview").animate({height: "225px"});
+
     $("#embedder").html('<object width=' + width + ' height=' + height + '>' +
       '<param name="movie" value="http://www.youtube.com/v/' + id + '?version=3&amp;hl=en_GB&amp;autoplay=1"></param>' + 
       '<param name="allowscriptaccess" value="always"></param>' + 
       '<embed src="http://www.youtube.com/v/' + id + '?version=3&amp;hl=en_GB&amp;autoplay=1" type="application/x-shockwave-flash" width=' + width + ' height=' + height + ' allowscriptaccess="always"></embed>' +
       '</object>');
-    $("#song-preview .bigbtn").show();
 
     $("#preview-artist").html(obj.artist);
     $("#preview-title").html(obj.title);
+    blink("#song-preview-info"); 
     //$("#title-edit").css('display','inline-block');
   }
 
-  self.preview = function(id,el){
-    Panel.show("song");
-    if('innerHTML' in el) {
-      blink($(el));
-    }
-    preview({
-      vid: id,
-      title: ('innerHTML' in el ? el.innerHTML : el),
-      artist: ""
-    });
-  }
   function panelFlash() {
     switch(_ev("song-tab")) {
       case 'Everything':
         if(!_db[_channel]) {
-          _socket.emit("get-all-videos");
+          _socket.emit("get-all-videos", 0, 10000);
         } else {
           Song.search();
         }
@@ -811,6 +872,7 @@ var Song = (function(){
     }
   }
   return {
+    preview: preview,
     Init: function(){
 
       _socket.on("history", Song.gen);
@@ -843,7 +905,7 @@ var Song = (function(){
         _socket.emit("get-history");
       });
 
-      $("#video-overlay,#song-cancel,#song-select-cancel").click(function(){
+      $("#video-overlay,#song-select-cancel").click(function(){
         Panel.hide("song");
       });
 
@@ -874,7 +936,7 @@ var Song = (function(){
 
       $("#song-skip").click(function(){
         Panel.hide("song");
-        _socket.emit("skip", _song[ID]);
+        _socket.emit("skip", _song.vid);
       });
 
       onEnter("#input-song-search", Song.search);
@@ -892,12 +954,11 @@ var Song = (function(){
         } else if(which == 'hide-after') {
           Song.reset();
           $("#song-preview .bigbtn").hide();
-          console.log("UNMUTED");
           Volume.unmute();
           Player.fullscreen();
           $("#input-song-search").val("");
           $("#song-results").empty();
-          $("#song-search-label").html("");
+          $("#song-search-label-container").css('display','none');
         }
       });
 
@@ -922,8 +983,8 @@ var Song = (function(){
 
     reset: function() {
       $("#embedder").empty();
-      $("#preview-artist").html("Video Preview");
-      $("#preview-title").empty();
+      $("#preview-controls").slideUp();
+      $("#song-preview").css("height", 0);
     },
 
     format: function(data, type) {
@@ -936,8 +997,7 @@ var Song = (function(){
 
       if(type != 'dummy') {
         node.click(function(){ 
-          preview(data);
-          blink(node, Volume.mute);
+          preview(data, node);
         });
       }
 
@@ -987,37 +1047,38 @@ var Song = (function(){
         $("#song-search-label").html("Searching...");
         _socket.emit("search", qstr);
       }
+      $("#song-search-label-container").fadeIn();
     },
 
     gen: function(data) {
       var 
         type,
+        container,
         titles = {
           local: "Existing",
           remote: "New",
           history: ""
         };
 
-      $("#song-results").empty();
       if(data.query) {
         type = 'search';
+        container = "#song-results";
         if(data.results.total) {
-          $("#song-search-label").html("Showing results for <b>" + data.query + "</b>");
+          $("#song-search-label").html("Searched for <b>" + data.query + "</b>");
         } else {
           $("#song-search-label").html("Nothing found for <b>" + data.query + "</b> :-(");
         }
       } else {
         type = 'history';
-        $("#song-search-label").html("Last played videos on " + data.channel + "</b>");
+        container = "#timeline-content";
       }
+
+      $(container).empty();
 
       _.each(_.keys(titles), function(which) {
         if(data.results[which] && data.results[which].length) {
-          if(titles[which]) {
-            $("<h3>" + titles[which] + "</h3>").appendTo("#song-results");
-          }
           _.each(data.results[which], function(row) {
-            Song.format(row, type).appendTo("#song-results");
+            Song.format(row, type).appendTo(container);
           });
         }
       });
@@ -1027,20 +1088,25 @@ var Song = (function(){
 
 var Channel = {
   Init: function(){
-    _ev("channel", function(name) {
-      $("#channel-title").html(name);
-    });
+    when("_socket", function(){
+      _ev("channel", function(name) {
+        $("#channel-title").html(name);
+      });
 
-    _ev("panel:channel", function(which){
-      if(which == "show") {
-        send("get-channels", {query: false});
-      }
-    });
+      _ev("panel:channel", function(which){
+        if(which == "show") {
+          send("get-channels", {query: false});
+        }
+      });
 
-    onEnter("#input-channel-search", Channel.search);
+      onEnter("#input-channel-search", Channel.search);
+      _socket.on("playlist", function(last) {
+        console.log(last);
+      });
 
-    $("#channel-query").keyup(function(){
-      Channel.search(this.value);
+      $("#channel-query").keyup(function(){
+        Channel.search(this.value);
+      });
     });
   },
 
@@ -1050,12 +1116,15 @@ var Channel = {
     }
     when("$", function(){
       when("_", function(){
-        $("#videoList").empty();
-        _.each(all, function(row) {
-          $("#videoList").append( 
+        $("#videoList-content").empty();
+        _.each(all.chan, function(row) {
+          $("#videoList-content").append( 
             Channel.display(row, function(){ window.location.hash=row.name; })
           );
         });
+        _chat.data = all.chat;
+        _chat.lastid = _chat.data[_chat.data.length - 1]._id;
+        //Chat.showmessage("#recentList-content");
       });
     });
   },
@@ -1092,6 +1161,14 @@ var Channel = {
     });
   },
 
+  playlist: function(start, end) {
+    send("playlist", {
+      channel: _channel,
+      begin: start || -10,
+      end: end || 10
+    });
+  },
+
   search: function(q) {
     send(
       "get-channels",
@@ -1118,20 +1195,23 @@ var Chat = (function(){
     lastEntry = "";
     entryList = [],
     lastindex = 0;
-    $("#message").empty();
+    if(self.$ && _channel) {
+      $("#message").empty();
 
-    if(!_ev.isset("greeted")) {
-      send("greet-response", {
-        color: MYCOLOR,
-        uid: Store("uid"),
-        lastid: _chat.lastid,
-        channel: _channel
-      });
+      if(!_ev.isset("greeted")) {
+        send("greet-response", {
+          color: MYCOLOR,
+          uid: Store("uid"),
+          lastid: _chat.lastid,
+          channel: _channel
+        });
+      }
+      _ev.set("greeted");
     }
-    _ev.set("greeted");
   }
 
   function Init(){
+    reset();
     _ev.on("panel:chat", function(which) {
       if(which == "hide") {
         Player.fullscreen();
@@ -1140,7 +1220,7 @@ var Chat = (function(){
 
     when("$", function(){
       function resize() {
-        $("#message-wrap").css({
+        $("#message,#message-wrap").css({
           height: $(window).height() - 140 - ($("#user-control").height() + $("#talk").height())
         });
       }
@@ -1190,10 +1270,13 @@ var Chat = (function(){
 
       _baseVideo: function(data) {
         var id = data.id.split(':').pop();
-        return "<a class=title onclick=preview('" + data.id + "',this)>" + 
-               "<b>" + data.artist + "</b>" +  
-                data.title +
-               "</a>";
+        return $("<a class=title />").click(function(){
+            Song.preview({
+              vid: data.id,
+              title: data.title,
+              artist: data.artist
+            }, this);
+          }).append( "<b>" + data.artist + "</b>" + data.title);
       },
 
       skip: function(data) {
@@ -1207,12 +1290,9 @@ var Chat = (function(){
       },
       request: function(data) {
         return format._baseVideo(data, 'Delisted');
-        return '<p>' +
-          '<a onclick=preview("' + data.id + '",this)>' + data.artist + ' - ' + data.title + '</a>' +
-          '</p>';
       },
       chat: function(data) {
-        return data.text
+        return data.text;
       }
     },
     author = {
@@ -1316,12 +1396,13 @@ var Chat = (function(){
   function showContext(){
   }
 
-  function showmessage() {
+  function showmessage(container) {
     var 
       entry, 
       row,
       color;
 
+    container = container || "#message";
     while(_chat.data.length > lastindex) {
 
       row = _chat.data[lastindex];
@@ -1358,7 +1439,7 @@ var Chat = (function(){
             }
 
             entryList.push(entry);
-            $("#message").append(entry);
+            $(container).append(entry);
 
             // This is needed if the author says further things
             // before someone else.
@@ -1399,8 +1480,8 @@ var Chat = (function(){
       if(message.length) {
         send("chat", { 
           d: message,
-          vid: _song ? _song[ID] : 0,
-          offset: _song ? _playerById[_song[ID]].getCurrentTime() : 0
+          vid: _song ? _song.vid : 0,
+          offset: _song ? _playerById[_song.vid].getCurrentTime() : 0
         });
       }
       $("#talk").val("");
@@ -1495,9 +1576,26 @@ var Panel = {
 var Volume = (function(){
   var 
     oldvolume,
+    ival,
     muted = false; 
 
   return {
+    fadeById: function(id, cb) {
+      var vol = id.getVolume();
+      ival = setInterval(function(){
+        vol -= 10;
+        if(vol < 0) {
+          id.setVolume(0);
+          clearInterval(ival);
+          if(cb) {
+            cb();
+          }
+          return;
+        }
+        log("Setting volume to " + vol);
+        id.setVolume(vol);
+      },40);
+    },
     Init: function(){
       var 
         _mousedown = false,
@@ -1525,16 +1623,16 @@ var Volume = (function(){
       });
       $("#mute-control .expanded").mousedown(function(e){
         _mousedown = true;
-        var offset = 160;
+        var offset = 65;
         if(_letterBoxed) {
-          offset += 160;
+          offset += 167;
         }
         Volume.set(1 - (e.pageY - offset) / 100);
         return false;
       }).mousemove(function(e){
-        var offset = 160;
+        var offset = 65;
         if(_letterBoxed) {
-          offset += 160;
+          offset += 167;
         }
         if(_mousedown) {
           Volume.set(1 - (e.pageY - offset) / 100);
@@ -1546,12 +1644,13 @@ var Volume = (function(){
     set: function(amount, nostore) {
       _volume = Math.max(0, amount);
       _volume = Math.min(1, _volume);
+      muted = false;
 
       if(!nostore) { 
         Store("volume", _volume);
       }
 
-      var ceiling = _song[VOLUME]
+      var ceiling = _song.volume;
 
       $("#mute-fg").css('height', (_volume * 100) + "px");
 
@@ -1560,6 +1659,24 @@ var Volume = (function(){
       }
     },
 
+    fademute: function(){
+      if(!muted && _ev('panel:song') == 'show') {
+        muted = true;
+        oldvolume = _volume;
+        log("Starting the fade mute");
+        var vol = _volume;
+        ival = setInterval(function(){
+          _player[_active].setVolume(_song.volume * vol);
+          vol -= 0.03;
+          if(vol < 0) {
+            log("Done with the fade mute");
+            _player[_active].setVolume(0);
+            _volume = 0;
+            clearInterval(ival);
+          }
+        },40);
+      }
+    },
     mute: function(){
       if(!muted) {
         oldvolume = _volume;
@@ -1569,10 +1686,12 @@ var Volume = (function(){
     },
 
     unmute: function(){
-      if(muted && (_volume == 0)) {
+      if(muted) {
+        clearInterval(ival);
+        log("unmuted to " + oldvolume);
         Volume.set(oldvolume, true);
       }
-      muted = false
+      muted = false;
     }
   };
 })();
@@ -1641,4 +1760,4 @@ when("$", function (){
 });
 
 // Load the first player
-Player.load("yt", 0);
+//Player.load("yt", 0);

@@ -1,3 +1,4 @@
+cat swfobject.js evda.js > deps.js
 in=deps.js
 out=deps.min.js
 

@@ -1,4 +1,6 @@
-var _db;
+var 
+  _db,
+  _pubsub;
 
 /*
  * There's an optimization we can do here.
@@ -13,8 +15,9 @@ var _types = {};
 module.exports = {
   append: append,
   add: add,
-  setDB: function(which) {
-    _db = which;
+  setDB: function(db, pubsub) {
+    _db = db;
+    _pubsub = pubsub;
   },
   announce: function(message) {
     _db.incr("ix", function(err, id) {
@@ -27,8 +30,10 @@ module.exports = {
   }
 };
 
-function append(key, data) {
-  _db.rpush( key, JSON.stringify(data) );
+function append(key, data, size) {
+  var value = JSON.stringify(data);
+  _db.rpush(key, value);
+  _pubsub.publish("pub:" + key, value);
 
   /*
    * We don't trim every time and we don't
@@ -38,7 +43,7 @@ function append(key, data) {
    * lands on a 5.
    */
   if(Math.floor(Math.random() * 10) == 5) {
-    _db.ltrim(key, -100, -1);
+    _db.ltrim(key, -(size || 100), -1);
   }
 }
 
@@ -67,7 +72,10 @@ function add(channel, obj) {
     obj._id = id;
     obj._ts = +(new Date());
     append("log:" + channel, obj);
-    obj._ch = channel;
-    append("logall", obj);
+    if (["request", "chat"].indexOf(obj.type) > -1) {
+      obj.c = channel;
+      delete obj._ts;
+      append("logall", obj, 30);
+    }
   });
 }
