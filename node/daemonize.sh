@@ -1,5 +1,5 @@
 #!/bin/bash
 
 while true; do
-  node app.js
+  nodejs app.js
 done

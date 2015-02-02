@@ -1,4 +1,8 @@
-This is the code for [mt80s.com](http://mt80s.com).
+Recently resurrected from an old drive on an old server, everything is awesome and up again.
+
+There's a lot of new bugs though that need to be addressed due to code rot.  Anyway, the old readme follows:
+
+This is the code for [80smtv.com](http://80smtv.com).
 
 Thanks to (alphabetically listed):
 

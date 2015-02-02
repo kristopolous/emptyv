@@ -3,8 +3,8 @@ var
   mysql = require('mysql'),
   hash = require("jshashes"),
   _mysql = mysql.createClient({
-    user: 'php',
-    password: 'fixy2k'
+    user: 'root',
+    password: 'norm1066'
   }),
   fs = require('fs');
 
@@ -31,6 +31,7 @@ module.exports = {
   register: function (username, password, email) {
     _mysql.query("insert into users(username, password, email) values(?, ?, ?)",
         [username, crypt(password), email], function(err, last) {
+      console.log(err,last);
       doMail(email, "welcome");
     });
   },

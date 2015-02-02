@@ -107,7 +107,7 @@ function getNext(row) {
     // This means that the new video should
     // be appended to our playlist after the previous
     // video
-    if(row.add) {
+    if(row.add || (video && video.add)) {
       console.log(row);
       if(row.previous) {
         _db.linsert(

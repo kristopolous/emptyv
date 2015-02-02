@@ -141,27 +141,7 @@ function secondsToTime(count) {
   }
 
   if (count > 0) {
-    stack.push((count % 24) + plural(count, 24, " hour"));
-    count = Math.floor(count / 24);
-  }
-
-  if (count > 0) {
-    stack.push((count % 7) + plural(count, 7, " day"));
-    count = Math.floor(count / 7);
-  }
-
-  if (count > 0) {
-    stack.push((count % 2) + plural(count, 2, " week"));
-    count = Math.floor(count / 2);
-  }
-
-  if (count > 0) {
-    stack.push((count % 2) + plural(count, 2, " fortnight"));
-    count = Math.floor(count / 2);
-  }
-
-  if (count > 0) {
-    stack.push(count + plural(count, count + 1, " month"));
+    stack.push(count + plural(count, count + 1, " hour"));
   }
 
   return stack.reverse().join(', ').replace(/^0/,'');
@@ -487,6 +467,13 @@ var Player = (function(){
   }
   return {
     load: function(domain, ix) {
+      var attribs = { id: 'player-' + ix };
+
+      // Linux video drivers can be funky...
+      //if (navigator.platform.search(/linux/i) != -1) {
+       // attribs.wmode = 'transparent';
+      //}
+
       log("Loading " + domain + ":" + ix);
       swfobject.embedSWF({
           "yt": "http://www.youtube.com/apiplayer?" + [
@@ -511,7 +498,7 @@ var Player = (function(){
 
         { allowScriptAccess: "always" }, // params
 
-        { id: 'player-' + ix } // attributes
+        attribs
       );
     },
 

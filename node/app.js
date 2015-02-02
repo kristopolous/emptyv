@@ -374,13 +374,14 @@ IO.sockets.on('connection', function (socket) {
   }
 
   socket.on("set-user", function(p) {
+    if(p.user) {
+      // Prevent xss
+      p.user = p.user.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
     // Either a registeration or a reset
     if(p.email) {
       // Registration
       if(p.user) {
-        // Prevent xss
-        p.user = p.user.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
         User.exists("username", p.user, function(exist) {
           if(exist || ["admin", "kristopolous", "anonymous"].indexOf(p.user) > 0) {
             socket.emit("user-error", {text: "Username " + p.user + " exists"});
