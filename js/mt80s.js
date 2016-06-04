@@ -486,13 +486,8 @@ var Player = (function(){
             "version=3",
             "enablejsapi=1",
             "playerapiid=player-" + ix
-          ].join('&'),
+          ].join('&')
 
-          "dm": "http://www.dailymotion.com/swf?" + [
-            "chromeless=1",
-            "enableApi=1",
-            "playerapiid=player-" + ix
-          ].join('&'),
         }[domain],
 
         "p" + ix,   // id
