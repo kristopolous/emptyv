@@ -23,7 +23,7 @@ function loadsrc(row) {
 }
 
 _.map([
-  [10, 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js'],
+  [10, 'js/deps/jquery-1.12.4.min.js'],
   [2000, 'js/deps/db.min.js'],
 ] ,loadsrc);
 
