@@ -1,4 +1,5 @@
-Recently resurrected from an old drive on an old server, everything is awesome and up again.
+Recently resurrected from an old drive on an old server, everything is awesome and up again. (2015-02)
+Updating the code to work in the new world (2016-06)
 
 There's a lot of new bugs though that need to be addressed due to code rot.  Anyway, the old readme follows:
 
