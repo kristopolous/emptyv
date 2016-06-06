@@ -1,0 +1,23 @@
+{
+  "name": "80smtv",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "jshashes": "^1.0.3",
+    "hiredis": "^0.1.15",
+    "mysql": "^2.0.0-alpha8",
+    "nodemailer": "^0.4.4",
+    "redis": "^0.8.3",
+    "socket.io": "^0.9.14",
+    "ws": "^0.4.15"
+  },
+  "devDependencies": {
+    "node-markdown": "^0.1.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Chris McKenzie <kristopolous@yahoo.com> (http://9ol.es)",
+  "license": "ISC"
+}
