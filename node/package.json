@@ -1,7 +1,7 @@
 {
   "name": "80smtv",
   "version": "1.0.0",
-  "description": "",
+  "description": "backend for 80smtv.com",
   "main": "app.js",
   "dependencies": {
     "jshashes": "^1.0.3",
@@ -13,7 +13,11 @@
     "ws": "^0.4.15"
   },
   "devDependencies": {
-    "node-markdown": "^0.1.1"
+    "jshashes": "^1.0.5",
+    "mysql": "^2.10.2",
+    "node-markdown": "^0.1.1",
+    "nodemailer": "^0.4.4",
+    "socket.io": "^0.9.17"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
