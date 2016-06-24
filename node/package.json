@@ -5,14 +5,14 @@
   "main": "app.js",
   "repository": "https://github.com/kristopolous/emptyv.git",
   "dependencies": {
-    "hiredis": "^0.1.15",
+    "hiredis": "^0.5.0",
     "jshashes": "^1.0.5",
     "mysql": "^2.11.1",
     "node-markdown": "^0.1.1",
     "nodemailer": "^0.4.4",
-    "redis": "^0.8.6",
-    "socket.io": "^0.9.17",
-    "ws": "^0.4.15"
+    "redis": "^2.6.2",
+    "socket.io": "^1.4.7",
+    "ws": "^1.1.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
