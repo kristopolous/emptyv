@@ -489,6 +489,21 @@ var Player = (function(){
         events: {
           onReady: function() {
             onReady('yt', ix, player);
+          },
+          onStateChange: function(what) {
+            // nope you can't pause ... that's
+            // not what this site is. lol
+            if(what.data === 2) {
+              player.playVideo();
+            }
+          },
+          onError: function(what) {
+            // delisted video ... we skip
+            if(what.data >= 100) {
+              _socket.emit("delist", _song.vid);
+              //_socket.emit("skip", _song.vid);
+            }
+            console.log('error', what);
           }
         },
         // see https://developers.google.com/youtube/player_parameters?playerVersion=HTML5#Parameters

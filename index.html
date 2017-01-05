@@ -25,7 +25,7 @@ input{width:190px;margin:0.25em 0 0.75em}
   font-size:0.9em;margin-left:0.75em}
 
 #players{margin-left:220px;position:absolute;bottom:0;height:100%;position:relative;z-index:20;background:#000}
-#players iframe{position:absolute;top:0;left:0;width:100%;height:100%}
+#ui-blocker, #players iframe{position:absolute;top:0;left:0;width:100%;height:100%}
 #mute-control{position:absolute;top:5px;right:8px}
 #mute-control .expanded{display:none;border:1px solid #525767;background:#222;width:26px;margin-left:3px}
 #mute-bg{background:#525767;height:100px;margin:10px;width:6px}
@@ -339,7 +339,7 @@ button.bigbtn,.channel { text-align:left;
           <div class=buffer id=song-results-bottom-buffer></div>
         </div>
       </span>
-    </span></div><div id=players><div id=p2></div><div id=p1></div><div id=p0></div></div></div></body>
+    </span></div><div id=players><div id=ui-blocker></div><div id=p2></div><div id=p1></div><div id=p0></div></div></div></body>
 <script src='https://www.youtube.com/player_api'></script>
 <script src='https://code.jquery.com/jquery-3.1.1.min.js'></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js'></script>
