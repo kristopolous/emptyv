@@ -1127,10 +1127,15 @@ var Channel = {
 
   display: function(obj, cb) {
     var base = (Song.format(obj, 'dummy'));
-    $("span", base).prepend("<em>" + obj.name + "</em>");
-    $("span", base).append("<small>" + (obj.count ? ( obj.count + " partying" ) : "Be the first") + "</small>");
+    // some channels are new and empty and return empty
+    // results. We can't just then do this operation over
+    // everything...
+    if(base) {
+      $("span", base).prepend("<em>" + obj.name + "</em>");
+      $("span", base).append("<small>" + (obj.count ? ( obj.count + " partying" ) : "Be the first") + "</small>");
 
-    return $("<div class=channel />").append(base).click(cb);
+      return $("<div class=channel />").append(base).click(cb);
+    }
   },
 
   gen: function(res) {
