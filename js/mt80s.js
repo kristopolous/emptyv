@@ -243,6 +243,9 @@ var Player = (function(){
   }
 
   function hide(player, transition) {
+    if(player.dom) {
+      player = player.dom;
+    }
     if(check(player)) {
       if(transition && !_letterBoxed) {
         document.body.style.overflowY = "none";
@@ -258,6 +261,9 @@ var Player = (function(){
   }
 
   function show(player, transition) {
+    if(player.dom) {
+      player = player.dom;
+    }
     if(check(player)) {
       if(transition && !_letterBoxed) {
         player.style.left = 0;
@@ -677,15 +683,6 @@ function transition(song) {
       _active = (_active + 1) % 2;
       _next = (_active + 1) % 2;
 
-      // When you toggle the visibility, there is still an annoying spinner.
-      // So to avoid this we just "move" the players off screen that aren't
-      // being used.
-      /*
-      Player.flashSwap({
-        hide: active,
-        show: next
-      });
-      */
       Player.show(next, 'slide');
       Player.hide(active, 'slide');
       Player.hide(_playerPrev[EXTRA]);

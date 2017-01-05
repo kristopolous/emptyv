@@ -295,7 +295,7 @@ function eventloop(){
         now = +(new Date()),
         delta = (now - _last) / 1000;
 
-      //requestProcessor();
+      requestProcessor();
       channelList.forEach(function(channel) {
         // don't process empty channels for now (this should
         // eventualy be addressed)

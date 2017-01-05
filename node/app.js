@@ -145,7 +145,7 @@ IO.sockets.on('connection', function (socket) {
     join: function(which) {
       Channel.get(which, function(){
         _channel.leave(function(){
-          Channel.join(which, _user.uid, function(){;
+          Channel.join(which, _user.uid, function(){
             // This resets the id counter so we get a full chat
             _user.lastid = 0;
             if(_user.loggedin) {
