@@ -17,18 +17,19 @@ function build(channel) {
   _state[channel] = {
     name: channel,
     index: 0,
-    video: {},
+    video: {offset: 0},
     offset: 0,
     add: false
   };
 }
 
 function sync(who){
-  _db.set("p:" + who, JSON.stringify(_state[who].playlist));
+  _db.set("pl:" + who, JSON.stringify(_state[who].playlist));
 }
 
 function setVideo(channel, vid, offset, opts) {
   opts = opts || {};
+  console.log("  >>>", channel, vid);
   _db.hget("vid", vid, function(err, raw) {
     var full = JSON.parse(raw);
     if(!full) {
@@ -92,7 +93,7 @@ function loadVideo(channel, index, offset, opts) {
   if (arguments.length == 2) {
     offset = PRELOAD;
   }
-  console.log("Loading " + channel + " " + index);
+  console.log("Loading " + channel + " " + index, _state[channel].playlist.length);
 
   _state[channel].index = index;
   setVideo(channel, _state[channel].playlist[index], offset, opts);
@@ -102,6 +103,7 @@ function loadVideo(channel, index, offset, opts) {
 // it gets passed to loadVideo and setVideo
 function getNext(row, opts) {
   opts = opts || {};
+  row.playlist = _state[row.name].playlist;
   _db.lpop("re:" + row.name, function(err, video){
 
     // This means that the new video should
@@ -293,8 +295,13 @@ function eventloop(){
         now = +(new Date()),
         delta = (now - _last) / 1000;
 
-      requestProcessor();
+      //requestProcessor();
       channelList.forEach(function(channel) {
+        // don't process empty channels for now (this should
+        // eventualy be addressed)
+        if(!(channel in _state)) {
+          return;
+        }
         var row = _state[channel]; 
         if(!row) {
           build(channel);
@@ -302,8 +309,7 @@ function eventloop(){
         } 
 
         row.video.offset = row.video.offset + delta;
-
-        if((2.5 + row.video.offset - PRELOAD) > row.video.len) {
+        if(!row.video.len || ((2.5 + row.video.offset - PRELOAD) > row.video.len)) {
           getNext(row);
         }
 
@@ -337,26 +343,29 @@ _db.hgetall("play", function(err, state) {
   Object.keys(state).forEach(function(channel) {
     var position = JSON.parse(state[channel]);
 
-    if ("index" in position) {
-      toLoad++;
-    }
+    console.log(channel, position);
+    toLoad++;
+    // We use this to make sure we've loaded everything
+    // before starting off our eventloop.
 
-    if ("index" in position) {
-      _db.get("p:" + channel, function(err, last) {
-        build(channel);
-        _state[channel].playlist = JSON.parse(last);
+    _db.lrange("pl:" + channel, 0, -1, function(err, playlist) {
+      build(channel);
+      if(playlist.length) {
+        _state[channel].playlist = playlist;
 
         loadVideo(
           channel, 
-          position.index,
-          position.offset,
+          position.index || 0,
+          position.offset || 0,
           {quiet: true}
         );
-        toLoad--;
-        if(toLoad == 0) {
-          eventloop();
-        }
-      });
-    }
+      } else {
+        delete _state[channel];
+      }
+      toLoad--;
+      if(toLoad == 0) {
+        eventloop();
+      }
+    });
   });
 });

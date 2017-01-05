@@ -11,7 +11,7 @@ module.exports = {
     if(!channel) {
       return;
     }
-    _db.get("p:" + channel, function(err, res) {
+    _db.get("pl:" + channel, function(err, res) {
       if(res) {
         res = JSON.parse(res);
       } else {
@@ -50,7 +50,7 @@ module.exports = {
   },
   updatelen: function(name) {
     var len = 0;
-    _db.get("p:" + name, function(err, res) {
+    _db.get("pl:" + name, function(err, res) {
       _db.hmget("vid", res.split(','), function(err, res) {
         res.forEach(function(row) {
           row = JSON.parse(row);
@@ -73,6 +73,7 @@ module.exports = {
     }); 
   },
   get: function(name, cb) {
+    console.log("__<channel", name);
     _db.hget("channel", name, function(err, chan) {
       if(!chan) {
         create(name);
@@ -90,6 +91,7 @@ function count(channel, cb) {
 }
 
 function update(name, newData, cb) {
+  console.log("__<channel", name);
   _db.hget('channel', name, function(err, data) {
     var oldData = JSON.parse(data) || {};
     for(var key in newData) {
@@ -216,11 +218,12 @@ function getplaylist(data, cb) {
       }
 
       // Otherwise, we find the index that we are currently at
+      console.log("*channel", name);
       _db.hget("play", data.channel, function(err, last) {
         var currentState = JSON.parse(last);
 
         // Get the last synchronized playlist
-        _db.get("p:" + data.channel, function(err, last) {
+        _db.get("pl:" + data.channel, function(err, last) {
 
           // And form an ROI, which is offset from
           // our newstart to our newend
