@@ -2,13 +2,13 @@ var
   _email = require("nodemailer"),
   mysql = require('mysql'),
   hash = require("jshashes"),
-  _mysql = mysql.createClient({
+  _mysql = mysql.createConnection({
     user: 'php',
+    database: 'mt80s',
+    host: 'localhost',
     password: 'fixy2k'
   }),
   fs = require('fs');
-
-_mysql.query("USE mt80s");
 
 function crypt(txt) {
   return hash.MD5().hex(txt);
@@ -31,6 +31,7 @@ module.exports = {
   register: function (username, password, email) {
     _mysql.query("insert into users(username, password, email) values(?, ?, ?)",
         [username, crypt(password), email], function(err, last) {
+      console.log(err,last);
       doMail(email, "welcome");
     });
   },

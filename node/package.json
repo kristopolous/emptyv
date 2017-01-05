@@ -1,0 +1,22 @@
+{
+  "name": "80smtv",
+  "version": "1.0.0",
+  "description": "backend for 80smtv.com",
+  "main": "app.js",
+  "repository": "https://github.com/kristopolous/emptyv.git",
+  "dependencies": {
+    "hiredis": "^0.5.0",
+    "jshashes": "^1.0.5",
+    "mysql": "^2.11.1",
+    "node-markdown": "^0.1.1",
+    "nodemailer": "^0.4.4",
+    "redis": "^2.6.2",
+    "socket.io": "^1.4.7",
+    "ws": "^1.1.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Chris McKenzie <kristopolous@yahoo.com> (http://9ol.es)",
+  "license": "ISC"
+}

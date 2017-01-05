@@ -1,5 +1,6 @@
 var redis = require('redis')
   , total = 0
+  , count = 0
   , _db = redis.createClient();
 
 _db.select(1);
@@ -15,7 +16,8 @@ _db.keys("pl:*", function(err, list) {
             len += parseInt(row[0]);
           });
           total += len;
-          console.log(total / 60 / 60);
+          count += res.length;
+          console.log(total / 60 / 60, count);
           console.log((len / 60 / 60).toFixed(2), res.length, which.split(":").pop());
         }
       });

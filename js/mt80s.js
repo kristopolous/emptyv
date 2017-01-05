@@ -22,9 +22,10 @@ function loadsrc(row) {
   }, row[0]);
 }
 
-loadsrc([10, 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js']);
-loadsrc([2000, 'js/db.min.js']);
-loadsrc([5000, 'js/jquery-ui-1.8.20.custom.min.js']);
+_.map([
+  [10, 'js/deps/jquery-1.12.4.min.js'],
+  [2000, 'js/deps/db.min.js'],
+] ,loadsrc);
 
 if(!self.console) {
   self.console = {log:function(){}};
@@ -34,10 +35,12 @@ if(!self.localStorage) {
 }
 
 var
+
+// {{ // Constants
   MYCOLOR = Math.floor(Math.random() * 10),
 
   // The offset addition was after some toying around and 
-  // seeint how long the player took to load. This seemed
+  // seeing how long the (flash) player took to load. This seemed
   // to work ok; we really want the drift to be as close
   // to 0 as possible.
   LOADTIME_sec = 5,
@@ -116,8 +119,7 @@ function remainingTime(player) {
 }
 
 function plural(num, mod, base) {
-  if(num % mod != 1) { return base + "s"; }
-  return base;
+  return base + (num % mod != 1) ? "s" : ""; 
 }
 
 function secondsToTime(count) {
@@ -129,7 +131,7 @@ function secondsToTime(count) {
 
   if (count > 0) {
     stack[0] = (count % 60) + plural(count, 60, " minute") + " and " + stack[0];
-    count = Math.floor(count / 60);;
+    count = Math.floor(count / 60);
   }
 
   if (count > 0) {
@@ -471,19 +473,21 @@ var Player = (function(){
   }
   return {
     load: function(domain, ix) {
+      var attribs = { id: 'player-' + ix };
+
+      // Linux video drivers can be funky...
+      //if (navigator.platform.search(/linux/i) != -1) {
+       // attribs.wmode = 'transparent';
+      //}
+
       log("Loading " + domain + ":" + ix);
       swfobject.embedSWF({
           "yt": "http://www.youtube.com/apiplayer?" + [
             "version=3",
             "enablejsapi=1",
             "playerapiid=player-" + ix
-          ].join('&'),
+          ].join('&')
 
-          "dm": "http://www.dailymotion.com/swf?" + [
-            "chromeless=1",
-            "enableApi=1",
-            "playerapiid=player-" + ix
-          ].join('&'),
         }[domain],
 
         "p" + ix,   // id
