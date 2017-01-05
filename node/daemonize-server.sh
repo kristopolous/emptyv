@@ -1,5 +1,5 @@
 #!/bin/bash
 
 while true; do
-  nodejs channel_server_v3.js
+  nodejs channel_server.js
 done
