@@ -675,7 +675,7 @@ _channel.get("80smtv", function(c) {
   });
   console.log("Built playlist");
 });
-return(0);
+process.exit(0);
 //_channel.search("s m0");
 /*
 _channel.create("a80s mtv", "Music videos from the 1980s", function(){

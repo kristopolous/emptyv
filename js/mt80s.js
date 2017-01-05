@@ -11,6 +11,7 @@ function when(prop, cb) {
   }, 25);
 }
 
+/*
 function loadsrc(row) {
   setTimeout(function(){
     log("Loading " + row[1]);
@@ -26,6 +27,7 @@ _.map([
   [10, 'js/deps/jquery-1.12.4.min.js'],
   [2000, 'js/deps/db.min.js'],
 ] ,loadsrc);
+*/
 
 if(!self.console) {
   self.console = {log:function(){}};
@@ -1108,19 +1110,15 @@ var Channel = {
     if(_ev("app-state") != "splash") {
       return;
     }
-    when("$", function(){
-      when("_", function(){
-        $("#videoList-content").empty();
-        _.each(all.chan, function(row) {
-          $("#videoList-content").append( 
-            Channel.display(row, function(){ window.location.hash=row.name; })
-          );
-        });
-        _chat.data = all.chat;
-        _chat.lastid = _chat.data ? _chat.data[_chat.data.length - 1]._id : 0;
-        //Chat.showmessage("#recentList-content");
-      });
+    $("#videoList-content").empty();
+    _.each(all.chan, function(row) {
+      $("#videoList-content").append( 
+        Channel.display(row, function(){ window.location.hash=row.name; })
+      );
     });
+    _chat.data = all.chat;
+    _chat.lastid = _chat.data ? _chat.data[_chat.data.length - 1]._id : 0;
+    //Chat.showmessage("#recentList-content");
   },
 
   set: function(which) {
@@ -1703,7 +1701,7 @@ when("io", function(){
   Chat.Init();
 });
 
-when("$", function (){
+$(function(){
   when("io", function(){
     _socket.on("channel-results", Channel.splashshow);
     _ev('app-state', 'channel');
