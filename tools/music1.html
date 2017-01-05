@@ -4,10 +4,9 @@
 <div id=contact><a href=mailto:chris+music@qaa.ath.cx>email author</a></div>
 <div id=vidCon>
 <div id=nav><a class=disabled id=prev>&#8592;</a><a class=disabled id=next>&#8594;</a><input id=title value=""><div id=rem><a id=up class=disabled onclick=go_up()>&#8593;</a><a id=down class=disabled onclick=go_down()>&#8595;</a><a id=del class=disabled onclick=remove()>x</a></div></div>
-<div id=vidWrap>
-<div id=vid0></div>
-<div id=vid1></div>
-</div>
+  <div id=vidWrap>
+    <div id=vid0></div>
+  </div>
 <div id=list></div></div>
 <span id=links></span>
 <div style=text-align:right;display:inline-block;width:500px>
@@ -32,6 +31,7 @@ Boney M - Ma Baker
 </div>
 <script src=../js/jquery-1.7.1.min.js></script>
 <script src=../js/swfobject.js></script>
+<script src='https://www.youtube.com/player_api'></script>
 <script>
 var   
   index = 0,
@@ -48,9 +48,6 @@ var
     /* current: 0 */
     /* id: undefined */
   },
-  /*
-  player = [],
-  */
   player,
   first = true,
   visited = {},
@@ -58,6 +55,7 @@ var
   next,
   input,
   ul;
+
 function playlistGen(){
   var   addon = '',
     o = [];
@@ -83,12 +81,13 @@ function playlistGen(){
 
 function transition(id, opts) {
   player.stopVideo();
-  player.loadVideoById(id + "&ap=%2526fmt%3D18");
+  player.loadVideoById(id);
   player.playVideo();
 }
 
 
 function updateytplayer(){
+  /*
   if(player.getCurrentTime() > 0) {
     if(player.getDuration() - player.getCurrentTime() < 10) {
       if(play.nextFlag == true) {
@@ -97,19 +96,25 @@ function updateytplayer(){
       }
     }
   }
+  */
 }
+
+/*
 function onYouTubePlayerReady(playerId) {
+  console.log(arguments);
   player = document.getElementById(playerId);
   setInterval(updateytplayer, 250);
   player.playVideo();
 }
+*/
 
 function loader(obj,el) {
   $(el).addClass('played');
   if(typeof (player) == 'undefined') {
-    var params = { allowScriptAccess: "always" };
-    var atts = { id: "ytplayer0"/*, wmode: 'transparent' */};
-    swfobject.embedSWF("http://www.youtube.com/v/" + obj[0] + "?enablejsapi=1&playerapiid=ytplayer0&ap=%2526fmt%3D18", "vid0", "425", "356", "8", null, null, params, atts);
+ 	  player = new YT.Player('vid0', {
+      height: '270',
+      width: '480',
+    });
   } else {
     transition(obj[0]);
   }  
@@ -275,7 +280,7 @@ viewer.list = function(id){
       if(visited[play.list[id].url[ix][0]]) {
         played = " played"; 
       }
-      o.push('<a class=del onclick=removevid(' + id + ',' + ix + ')>X</a> <a target=_blank class=link  href=http://www.youtube.com/watch?v=' + play.list[id].url[ix][0] + '><img src=link.gif></a>' + play.list[id].url[ix][0] + '<a yt=' + play.list[id].url[ix][0] + ' class="clickable' + played + '" onclick=\'loader(["' + play.list[id].url[ix][0] + '","' + escape(play.list[id].url[ix][1]) + '"],this)\'>'+ play.list[id].url[ix][1].substr(0,50) + '</a><br>');
+      o.push('<a class=del onclick=removevid(' + id + ',' + ix + ')>X</a> <a target=_blank class=link  href=http://www.youtube.com/watch?v=' + play.list[id].url[ix][0] + '></a>' + play.list[id].url[ix][0] + ' <a yt=' + play.list[id].url[ix][0] + ' class="clickable' + played + '" onclick=\'loader(["' + play.list[id].url[ix][0] + '","' + escape(play.list[id].url[ix][1]) + '"],this)\'>'+ play.list[id].url[ix][1].substr(0,50) + '</a><br>');
       played = "";
     }
   }
@@ -546,7 +551,7 @@ function parse(){
 
 
 function transition_stillbuggy(id, opts) {
-  player[play.next].loadVideoById(id + "&ap=%2526fmt%3D18");
+  player[play.next].loadVideoById(id);
   $("#ytplayer" + play.active).css('visibility', 'hidden');
   $("#ytplayer" + play.next).css('visibility', 'visible');
   player[play.active].stopVideo();
