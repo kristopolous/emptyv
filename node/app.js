@@ -418,6 +418,10 @@ IO.sockets.on('connection', function (socket) {
     }
   });
 
+  socket.on('ping', function() {
+    console.log('pong');
+  });
+
   socket.on("get-all-videos", function(start, end) {
     Channel.getLibrary(_user.channel, start, end, function(obj) {
       console.log(obj);
