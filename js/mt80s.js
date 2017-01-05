@@ -491,7 +491,17 @@ var Player = (function(){
             onReady('yt', ix, player);
           }
         },
-        playerVars: { 'controls': 0, 'showinfo': 0 }
+        // see https://developers.google.com/youtube/player_parameters?playerVersion=HTML5#Parameters
+        playerVars: { 
+          disablekb: 1,
+          enablejsapi: 1,
+          fs: 0,
+          iv_load_policy: 3,
+          modestbranding: 1,
+          rel: 0,
+          controls: 0, 
+          showinfo: 0 
+        }
       });
       player.dom = document.getElementById("p" + ix);
     },
