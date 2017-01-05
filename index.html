@@ -1,0 +1,353 @@
+<!doctype html><html><head><meta name=description content="Non-stop back-to-back videos with Chat"><title>80smtv</title>
+<style>
+body{display:block;overflow-x:hidden;position:absolute;top:0;left:0;height:100%;width:100%;background:#000;font-family:Verdana,sans-serif;margin:0;color:#abb6d6}
+a{color:#abb6d6;text-decoration:underline;cursor:pointer}
+p,h1,h2,h3,h4,h5,h6{margin:0}
+button{background:#333;border-color:#222;color:#bbcae1;border-width:1px}
+img{border:0}
+input,#talk{display:block;box-shadow:0 0 2px 2px #444457;background:#000;color:#cccfdf;border-width:0;font-size:0.85em;width:200px;padding:0.15em 3px;margin: 0 0 0.5em 0.5em}
+label{margin-bottom:0.4em;color:#525767;font-size:11px;display:block}
+
+input{width:190px;margin:0.25em 0 0.75em}
+#bottom{text-align:center;color:#79889C;font-size:0.75em}
+ 
+#splash{height:100%}
+#splash-header{background:#18191b;
+  height:2.25em;
+  color:#79889c;
+  font-size:1.5em;padding:0.5em 0 0.5em 1em}
+#splash-header b{color:#364b62;font-size:1.15em;font-weight:bold;margin-right:0.25em}
+#splash-header h2{float:left}
+#blurb{float:right;font-size:0.75em;width:20em}
+
+#splash h3{
+  color:#bbcae1;
+  font-size:0.9em;margin-left:0.75em}
+
+#players{margin-left:220px;position:absolute;bottom:0;height:100%;position:relative;z-index:20;background:#000}
+#players object,#players embed{position:absolute;top:0;left:0;width:100%;height:100%}
+#mute-control{position:absolute;top:5px;right:8px}
+#mute-control .expanded{display:none;border:1px solid #525767;background:#222;width:26px;margin-left:3px}
+#mute-bg{background:#525767;height:100px;margin:10px;width:6px}
+#mute-fg{background:#abb6d6;height:0;position:absolute;bottom:10px;left:13px;width:8px}
+#mute{padding:0;margin:0}
+
+#panels{float:left;width:20px;position:relative;height:100%;white-space:nowrap}
+#panels > span{width:0px;display:none;position:relative;height:100%;vertical-align:top;background:#18191b}
+.panel-title{color:#dde9ff;font-size:1.2em;padding:0.5em;line-height:0.8em;white-space:nowrap}
+.panel-content{margin:0 7px;display:block;font-size:0.7em}
+
+.btn,.collapse{
+  text-align:center;
+  font-size:0.60em;
+  padding:0.25em;
+  margin:0;
+  cursor:pointer;
+  border:1px solid transparent;
+  border-width: 0 0 1px 1px;
+  color:#bbcae1;position:absolute;top:0;right:0;z-index:12;width:16px;height:7px;
+  line-height:10px}
+.collapse:hover{
+  border-color:#525767;color:#eee}
+#song .collapse{width:32px;height:14px;font-size:1.2em}
+#song .panel-title{display:block;text-align:center}
+
+#message-wrap{overflow:hidden;background:#000;position:relative;margin:0 0.5em}
+.chat{font-size:0.9em;color:#3C4B62}
+#message{overflow-y:auto;width:212px;padding-right:15px}
+.chat img{width:195px}
+.chat > div{padding:0.35em 0;overflow:hidden;white-space:normal}
+.chat div.author{color:#525767;font-size:0.65em;margin:-3px 0 0 10px;text-align:right;cursor:pointer}
+.chat p {font-size:0.9em;margin-left:6px;font-size:0.87em;line-height:1.4em}
+.chat p.announce{font-size:0.7em;color:#3C4B62;padding:0.15 0}
+.chat a{color:#3C4B62}
+.chat .title, .title span{font-size:0.65em;display:inline-block;margin-left:6px;color:#79889c;width:120px;white-space:nowrap;overflow:hidden}
+.chat .title b{color:#79889c}
+.chat .title {display:block;color:#3C4B62;width:185px;padding:3px 5px;margin:2px 0}
+
+.request em{font-size:0.7em;font-style:normal;margin:0 0 -0.15em 0.2em;display:block}
+.play p{display:none}
+.play > :last-child{display:block}
+.play * {display:inline-block;vertical-align:middle;font-size:0.75em}
+
+.action em{font-size:0.6em;font-style:normal;color:#525767;font-size:11px;margin-left:0.2em}
+.c, .c a{color:#bbcae1}
+.c0,.c0 a{color:#FFFF90}
+.c1,.c1 a{color:#DAD0FF}
+.c2,.c2 a{color:#CC605F}
+.c3,.c3 a{color:#FFD7B6}
+.c4,.c4 a{color:#cfd58b}
+.c5,.c5 a{color:#F4E557}
+.c6,.c6 a{color:#b86db0}
+.c7,.c7 a{color:#c0ffab}
+.c8,.c8 a{color:#b3b3e9}
+.c9,.c9 a{color:#83C3F0}
+.title {text-decoration:none}
+.title img{vertical-align:baseline}
+.title b{display:block;font-size:1.2em;color:#bbcae1;font-weight:normal;height:1.25em;overflow:hidden}
+#channel .channel{min-height:61px}
+#top{color:#bbcae1;font-size:0.7em;position:relative;margin-left:6px;z-index:5;background:#18191b}
+#video-overlay{position:absolute;top:0;left:6px;z-index:21}
+#lhs-expand{display:none}
+#lhs-expand,#lhs-collapse{padding:0.5em 0.25em;font-size:0.6em;width:1em}
+#channel{background:#222}
+#channel .title img{width:65px}
+#input-channel-search{font-size:1.25em}
+
+#channel-wrap>div,#video-current-wrapper>div{display:inline-block}
+#channel-wrap,
+#video-current-wrapper{
+  border-radius:4px;
+  border:1px solid transparent;
+  width:194px;
+  cursor:pointer;
+  margin:1em 0 0 0;padding:0.4em 5px;overflow:hidden}
+#channel-current,#video-current{
+  margin:2px 0 0 2px;
+  width:153px;white-space:normal;font-size:0.85em;line-height:0.83em}
+#channel-title,#video-current b{color:#fff;display:block;font-size:1.3em;line-height:1em;margin:0.1em 0 0.2em;white-space:nowrap}
+#video-expand{background:url("images/next_track.png") 2px 5px no-repeat;width:43px;height:32px;vertical-align:top}
+#mute{
+  height:32px;
+  width:32px;
+  background:url('images/mute_off_32.png') 3px 0 no-repeat;
+}
+#mute,#message .title{
+  border-radius:4px;
+  border:1px solid transparent;
+}
+
+#message .title:hover,
+.collapse:hover,
+#mute:hover,
+#song-results a:hover,
+#video-current-wrapper:hover,
+#channel-wrap:hover
+{border-color:#3c4b62; background-color:#172131 }
+
+#input-song-search{font-size:1.25em;margin-left:3px;width:225px}
+#song-search-label-container{display:none;margin-top:-.5em;margin-bottom:.5em;white-space:normal}
+#song-results {overflow:auto;display:block;white-space:normal}
+#song-results a{overflow:hidden;display:inline-block;height:40px;width:180px;font-size:1.25em;margin:3px;padding:6px;border:1px solid transparent;border-radius:3px;vertical-align:top}
+#song-results a.title span{white-space:normal}
+#song-results img{width:48px;vertical-align:top;height:36px}
+#song-preview .bigbtn{display:none;margin:0.25em 0.5em;font-size:1em}
+#song-top-buttons{font-size:1.4em;display:inline-block}
+
+#song-timeline {width:790px;overflow:hidden;padding:6px;background:#000;position:fixed;bottom:6px}
+#song-timeline h3{display:inline}
+#song-timeline .title{height:90px;width:80px;vertical-align:top;padding:6px 5px;display:inline-block;overflow:hidden;margin-right:2px
+;border:1px solid transparent;border-radius:3px;
+}
+#song-timeline .title:hover{border-color:#3c4b62;background-color:#172131}
+
+#song-timeline .title span{overflow:visible;width:auto;white-space:normal}
+#song-timeline img{margin:0 10px;width:60px;vertical-align:top;height:45px}
+#song-timeline span{display:block;padding-top:6px;margin-left:3px}
+
+#chatbar{z-index:0;width:220px;position:absolute;bottom:0}
+  #channel-expand{display:inline-block;background:url("images/door_open_1.png") 7px 4px no-repeat;width:39px;height:35px;
+    vertical-align:top;
+  }
+  #channel-wrap:hover{border-color:#3c4b62;background-color:#172131}
+
+#user-control{margin:0 0.5em 0.4em 0;text-align:right;visibility:hidden}
+  #display-username{margin-left:0.75em;display:inline-block;color:#525767}
+  #email-wrap{display:none}
+  #register-button{display:block}
+  #register-button,#forgot-button{margin:1em 0;color:#555}
+  #app{display:none;height:100%}
+
+#splash-content > div {float:left;font-size:1.5em;display:inline-block;margin:1em 0 0 1em}
+#videoList{width:300px}
+#videoList .channel{
+  font-size:20px;
+  width:240px;
+  height:83px;
+  display:inline-block;padding:0.5em;margin:0.5em
+}
+#videoList .title span{width:131px}
+#videoList img{width:100px;height:75px;vertical-align:sub;margin-right:3px}
+
+button.bigbtn:hover{box-shadow: 0 0 5px 3px #505257;color:#fff}
+button.bigbtn,.channel { text-align:left; 
+  cursor:pointer;
+  padding:3px 6px;
+  margin:15px 0;
+  color:#ddd;
+  vertical-align:top;
+  background:#202228;
+}
+.channel{border-radius:3px; overflow:hidden;position:relative;background:none;font-size:16px;border:1px solid transparent}
+.channel:hover{border-color:#3c4b62;background:#172131}
+.channel .title{display:block;margin-top:5px}
+.channel img{height:49px}
+.channel em {color:#fff;margin-top:-0.15em;display:block;font-style:normal;font-size:1.2em;font-weight:bold}
+.channel small {color:#3c4b62;display:block;font-size:0.85em}
+
+#user input{font-size:1.5em}
+
+#embedder{width:300px;height:200px}
+#title-edit{display:none;position:absolute;right:6px}
+#preview-controls{height:135px;overflow:hidden;text-align:right;display:none}
+#song-lhs h4{margin-top:1em}
+#song-lhs{display:inline-block;white-space:normal;overflow:hidden;width:240px;vertical-align:top}
+#song-preview{display:inline-block;height:0}
+#song-preview-info{font-size:1.25em;display:block;color:#bbcae1;margin:0.5em}
+#song-operations {width:150px}
+#preview-artist{font-weight:bold}
+#song-browse-all,#import-playlist{float:right;font-size:0.5em;font-weight:normal;margin-right:9px;margin-top:3px}
+
+#song-browse-all{margin:0 9px 3px 0}
+</style>
+<!--[if IE]><link rel=stylesheet href=css/ie.css><![endif]-->
+</head>
+<body><div id=splash>
+  <div id=splash-header>
+    <h2><b>davuda</b>Be The VJ</h2>
+    <div id=blurb>
+      Everyone's watching you in control.
+      Pick a channel and be the VJ.
+    </div>
+  </div>
+  <div id=splash-content>
+    <div id=videoList>
+      <h3>Top Channels</h3>
+      <div id=videoList-content></div>
+    </div>
+    <div id=recentList>
+      <h3>Recent Activity</h3>
+      <div id=recentList-content class=chat></div>
+    </div>
+  </div>
+</div><div id=app>
+  <div id=panels><div class=btn id=lhs-expand>&gt;</div>
+    <span id=channel-detail>
+      <span class=collapse>X</span>
+      <div class=panel-title>Channel Details</div>
+      <span class=panel-content>
+        <label>Channel Name</label>
+        <input id=input-channel-name autocomplete=off>
+        <label>Description</label>
+        <textarea id=input-channel-description></textarea>
+        <input type=radio><label>Publically List The Channel</label>
+        <input type=radio><label>This Channel is Private. Do Not List it</label>
+        <button id=channel-create-cancell>Cancel</button>
+        <button id=channel-create-button>Create Channel</button>
+      </span>
+    </span><span id=channel>
+      <span class=collapse>X</span>
+      <div class=panel-title>Channel Changer</div>
+      <span class=panel-content>
+        <div id=channel-results></div>
+      </span>
+    </span><span id=chat>
+      <div id=video-overlay></div>
+      <span class=collapse>X</span>
+      <div id=top>
+        <div id=channel-wrap>
+          <div id=channel-expand></div>
+          <div id=channel-current>
+            <b id=channel-title></b><div id=channel-stats></div>
+          </div>
+        </div>
+        <div id=mute-control>
+          <div id=mute></div>
+          <div class=expanded>
+            <div id=mute-bg></div><div id=mute-fg></div>
+          </div>
+        </div>
+        <div id=video-current-wrapper>
+          <div id=video-expand></div><div id=video-current></div>
+        </div>
+      </div>
+      <div id=chatbar>
+        <div id=message-wrap>
+          <div id=message class=chat>
+          </div>
+        </div>
+        <div id=channel-description></div>
+        <label id=user-control>
+          <div id=display-username>You are anonymous.</div>
+          <a id=login-button>Log in</a>
+        </label>
+        <input id=talk autocomplete=off>
+      </div>
+    </span><span id=user>
+      <span class=collapse>X</span>
+      <div class=panel-title>Who u be?</div>
+      <span class=panel-content>
+        <div id=login-wrap>
+          <label>VJ Name</label>
+          <input id=input-username autocomplete=off>
+          <label>Super Secret Password<br>That Nobody Else Knows</label>
+          <input id=input-password type=password autocomplete=off>
+        </div>
+        <div id=email-wrap>
+          <label>Email</label>
+          <input id=input-email>
+        </div>
+        <button id=user-cancel>Cancel</button>
+        <button id=user-login>That's me</button>
+        <div id=user-error></div>
+        <a id=register-button>I'm new.</a>
+        <!--<a id=forgot-button>Password Reset</a>-->
+      </span>
+    </span><span id=song>
+      <span class=collapse>X</span>
+      <!--
+      <div id=song-top-buttons>
+        <button class=bigbtn id=song-skip>Skip This Video</button>
+      </div>
+      -->
+      <span class=panel-content>
+        <div id=song-timeline>
+          <button id=song-skip>Skip</button>
+          <h3>Current Playlist</h3>
+          <div id=timeline-scroll-left></div>
+          <div id=timeline-content></div>
+          <div id=timeline-scroll-right></div>
+        </div>
+        <div id=song-lhs>
+          <div id=preview-controls>
+            <div id=song-preview-info>
+              <button id=title-edit><img src=css/edit_24.png></button>
+              <div id=preview-artist></div>
+              <div id=preview-title></div>
+            </div>
+            <span id=song-operations>
+              <button id=song-select-next>Play Next</button>
+              <button id=song-select-now>Play Now!</button>
+              <button id=show-related>Show Related Videos</button>
+            </span>
+          </div>
+          <h4>Search For a Video
+            <a id=import-playlist>Import a playlist</a>
+          </h4>
+          <input id=input-song-search autocomplete=off>
+          <div id=song-search-label-container>
+            <span id=song-search-label></span>
+            <a id=song-browse-all>Show All Videos</a>
+          </div>
+        </div>
+        <div id=song-preview>
+          <div id=embedder></div>
+        </div>
+        <div id=song-results-container>
+          <div class=buffer id=song-results-top-buffer></div>
+          <div id=song-results></div>
+          <div class=buffer id=song-results-bottom-buffer></div>
+        </div>
+      </span>
+    </span></div><div id=players><div id=p2></div><div id=p1></div><div id=p0></div></div></div></body>
+<script>
+var _gaq=[['_setAccount','UA-28399789-1'],['_trackPageview']];
+(function(){
+ga=document.createElement('script');
+ga.type='text/javascript';
+ga.async=true;
+ga.src='http://www.google-analytics.com/ga.js';
+s=document.getElementsByTagName('script')[0];
+s.parentNode.insertBefore(ga,s);
+})();
+</script><script src=js/deps.min.js></script><script src=js/mt80s.js></script><script src=baked/channels.js></script><script src=js/socket.io.min.js></script><script src=js/underscore-min.js></script></html>
