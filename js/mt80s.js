@@ -11,7 +11,6 @@ function when(prop, cb) {
   }, 25);
 }
 
-/*
 function loadsrc(row) {
   setTimeout(function(){
     log("Loading " + row[1]);
@@ -23,11 +22,6 @@ function loadsrc(row) {
   }, row[0]);
 }
 
-_.map([
-  [10, 'js/deps/jquery-1.12.4.min.js'],
-  [2000, 'js/deps/db.min.js'],
-] ,loadsrc);
-*/
 
 if(!self.console) {
   self.console = {log:function(){}};
@@ -67,6 +61,7 @@ function getNow(offset) {
 }
 
 function blink(node, cb) {
+  return true;
   var 
     iter = 5,
     ival = setInterval(function(){
@@ -299,9 +294,8 @@ var Player = (function(){
   }
 
   function onReady(domain, id, el) {
-    var 
-      id = parseInt(id.split('-')[1]),
-      key = domain + _playerByDom[domain].length;
+    console.log(arguments);
+    var key = domain + _playerByDom[domain].length;
 
     _playerByDom[domain].push( el );
     log(key + " ready");
@@ -485,9 +479,15 @@ var Player = (function(){
       log("Loading " + domain + ":" + ix);
       player = new YT.Player('p' + ix, {
         height: '300',
-        width: '400'
+        width: '400',
+        events: {
+          onReady: function() {
+            onReady('yt', ix, player);
+          }
+        },
+        playerVars: { 'controls': 0, 'showinfo': 0 }
       });
-      onReady('yt', ix, player);
+      player.dom = document.getElementById("p" + ix);
     },
 
     letterbox: function() {
@@ -528,7 +528,10 @@ var Player = (function(){
     hide: hide,
     setQuality: setQuality,
     show: show,
-    safeLoad: function(el, id, offset) {
+    safeLoad: function(player, id, offset) {
+      var control = player,
+          el = player.dom;
+
       var og_size = {
         left: $(el).position().left,
         top: $(el).position().top,
@@ -552,7 +555,7 @@ var Player = (function(){
       }
 
       if (id) {
-        el.loadVideoById(id, offset);
+        control.loadVideoById(id, offset);
       }
     },
     fullscreen: function(){
@@ -580,7 +583,7 @@ var Player = (function(){
 
 function transition(song) {
 
-  log("Loading song:", song); 
+  console.log("Loading song:", song);
   _song = song;
   // Load the next video prior to actually switching over
   var 
@@ -636,6 +639,7 @@ function transition(song) {
       active = _player[_active],
       next = _player[_next];
 
+    console.log(_next);
     Player.safeLoad(next, uuid, Math.max(offset, 0));
 
     next.setPlaybackQuality("medium");
@@ -1211,7 +1215,9 @@ var Chat = (function(){
 
       _socket.on("chat", function(d) {
         _chat.data = _chat.data.concat(d);
-        _chat.lastid = _chat.data[_chat.data.length - 1]._id;
+        if(_chat.data.length) {
+          _chat.lastid = _chat.data[_chat.data.length - 1]._id;
+        }
         showmessage();
       });
 
@@ -1739,4 +1745,9 @@ $(function(){
 });
 
 // Load the first player
-//Player.load("yt", 0);
+Player.load("yt", 0);
+self.onYouTubeIframeAPIReady = function() {
+  alert("HI");
+  console.log('>>>> loaded', arguments);
+}
+
