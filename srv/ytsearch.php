@@ -1,20 +1,63 @@
 <?
+function yt_authkey() {
+  if(file_exists('../secrets/authkey')) {
+    return file_get_contents('../secrets/authkey');
+  } 
+  return null;
+}
+
+function dolog($str, $res = true, $path = 'sql.log') {
+  // it's ok if this fails, I still want valid JSON output
+  @file_put_contents(__dir__ . '/../logs/' . $path, 
+    implode(' | ', [
+      date('c'),
+      $res ? '1' : '0',
+      substr($str, 0, 200)
+    ]) . "\n", FILE_APPEND);
+}
+
+function yt_query($opts = []) {
+  $ep = 'search';
+  if(isset($opts['ep'])) {
+    $ep = $opts['ep'];
+    unset($opts['ep']);
+  }
+
+  if( !($auth_key = yt_authkey()) ) {
+    return false;
+  }
+
+  $opts['key'] = $auth_key;
+
+  $params = http_build_query($opts);
+  $url = "https://www.googleapis.com/youtube/v3/$ep?$params";
+
+  $raw = file_get_contents($url);
+
+  if ( !($res = @json_decode($raw, true)) ) {
+    $res = false;
+  }
+
+  dolog($url, $res, 'curl.log');
+
+  return $res;
+}
+
 echo $_GET['ix']."\n";
-usleep(rand(500000,2000000));
 
 $query = preg_replace('/%u\d{4}/','', utf8_decode($_GET['q']));
 $query = preg_replace('/%u\d{4}/','', urldecode($query));
 $query = preg_replace('/\(.*/','', urldecode($query));
-$results = file_get_contents('http://gdata.youtube.com/feeds/api/videos?alt=json&q='.urlencode($query).'&orderby=relevance&max-results=10&v=2&format=5');
-$results = json_decode($results, true);
-$videoList = $results['feed']['entry'];
+$res = yt_query([
+  'part' => 'snippet',
+  'q' => $query
+]);
+$videoList = $res['items'];
 
-$out = Array();
+$out = [];
 foreach($videoList as $video){
-  $title = $video['title']['$t'];
-  $ytid = $video['id']['$t'];
-  $parts = explode(':', $ytid);
-  $ytid = array_pop($parts);
+  $title = $video['snippet']['title'];
+  $ytid = $video['id']['videoId'];
   $out[] = $ytid."\t".substr($title, 0, 80);
 }
 
