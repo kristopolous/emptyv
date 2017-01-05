@@ -131,6 +131,7 @@ function go_next(){
   play.current = -1;
   go_next();
 }
+
 function plupdate(){
   if(play.id) {
     $("#playSave").html('Update Playlist');
@@ -138,6 +139,7 @@ function plupdate(){
     $("#playSave").html('Save Playlist');
   }
 }
+
 function move(amount) {
   if(amount > 0) {
     amount = get_next();
@@ -306,7 +308,6 @@ $(document).ready(function() {
         play.current = 0;
         index = 0;
         first = true;
-        input.value = ttls;
         parse();
         $("#playSave").html('');
       });
@@ -324,12 +325,6 @@ $(document).ready(function() {
     index = 0;
     first = true;
     $("#playSave").html('');
-    /*
-    $.get('/srv/disco_search.php?' + query, function(res) {
-      input.value = res;
-      parse();
-    });
-    */
     $.get('/srv/lastfm_search.php?' + query, function(res) {
       input.value = res;
       parse();
@@ -479,7 +474,7 @@ function strip(str, level, id) {
 }
 function parse(){
   val = input.value;
-  input.value = '';
+  //input.value = '';
 
   val = val.replace(/[\'*+,"]/g, '');
   // white space stripping
@@ -503,7 +498,6 @@ function parse(){
   plupdate();
 
   var prefix = $("#prefix").val();
-  $("#prefix").val('');
 
   for(ix = 0; ix < len; ix++) {
     // ~'s & -'s
@@ -527,7 +521,7 @@ function parse(){
     // times go bye bye
     els[ix] = els[ix].replace(/\(*[0-9]+:[0-9]+\)*/, '');
 
-    input.value += els[ix];
+    //input.value += els[ix];
     [artist, song] = els[ix].split('-');
     if(song) {
       artist = artist.replace(/\s+$/, '');
@@ -550,81 +544,6 @@ function parse(){
 
 
 
-function transition_stillbuggy(id, opts) {
-  player[play.next].loadVideoById(id);
-  $("#ytplayer" + play.active).css('visibility', 'hidden');
-  $("#ytplayer" + play.next).css('visibility', 'visible');
-  player[play.active].stopVideo();
-  player[play.next].playVideo();
-
-  play.active++;
-  play.next++;
-  play.active %= 2;
-  play.next %= 2;
-  play.nextFlag = true;
-}
-
-function transition_buggy(id, opts) {
-  if(play.intransit == true) {
-    // do a hard next
-    next();
-    play.intransit = false;
-  }
-  var 
-    time = 1000,
-    divisions = 10,
-    step = time / divisions,
-    current = time,
-    percent,
-    
-    vols = {
-      active: player[play.active].getVolume(),
-      next: player[play.next].getVolume()
-    };
-
-  $("#ytplayer" + play.next).css('visibility', 'visible');
-  $("#ytplayer" + play.next).css('opacity', 0);
-
-  player[play.next].setVolume(0);
-  player[play.next].loadVideoById(id + "&ap=%2526fmt%3D18");
-
-  play.intransit = true;
-  function next() {
-    $("#ytplayer" + play.active).css('visibility','hidden');
-    player[play.active].stopVideo();
-    player[play.active].setVolume(vols.active);
-
-    play.active++;
-    play.next++;
-    play.active %= 2;
-    play.next %= 2;
-    play.nextFlag = true;
-    $("#ytplayer" + play.active).css('opacity',1);
-  }
-
-  function transit() {
-    if(play.intransit == false) {
-      return;
-    }
-    if(current == time) {
-      player[play.next].playVideo();
-    }
-    current -= step;
-    percent = current / time;
-    $("#ytplayer" + play.active).css('opacity', percent);
-    $("#ytplayer" + play.next).css('opacity', 1 - percent);
-
-    player[play.active].setVolume(percent / 2 * vols.active);
-    player[play.next].setVolume((1 - percent) * vols.next);
-    if(current > 0) {
-      setTimeout(arguments.callee, step);
-    } else {
-      play.intransit = false;
-      next();
-    }
-  }
-  setTimeout(transit,2000);
-}
 </script>
 
 

@@ -30,8 +30,6 @@ button{background:#000;color:#686;border-color:#242;float:right;border-width:1px
 #links input{background:black;color:#8f8;width:20em;border-width:1px;border-style:solid;border-color:#226}
 #vidCon{position:fixed;top:0;right:0;width:425px;overflow:hidden}
 #contact{position:fixed;right:0;bottom:0}
-#vidWrap *{position:absolute;top:0;left:0}
-#vidWrap{position:relative;height:356px}
 #toggle{position:fixed;bottom:0;left:0;background:#001;padding:0.25em 0.75em}
 #toggle a{cursor:pointer}
 #q,#hint{width:10em}
