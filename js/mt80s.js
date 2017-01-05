@@ -1117,7 +1117,7 @@ var Channel = {
           );
         });
         _chat.data = all.chat;
-        _chat.lastid = _chat.data[_chat.data.length - 1]._id;
+        _chat.lastid = _chat.data ? _chat.data[_chat.data.length - 1]._id : 0;
         //Chat.showmessage("#recentList-content");
       });
     });
@@ -1706,6 +1706,8 @@ when("io", function(){
 when("$", function (){
   when("io", function(){
     _socket.on("channel-results", Channel.splashshow);
+    _ev('app-state', 'channel');
+    //_socket.on("channel-results", Channel.splashshow);
   });
   _ev("app-state", function(state) {
     if(state == "channel") {
