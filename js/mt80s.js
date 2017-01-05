@@ -224,8 +224,6 @@ function Store(key, value) {
 
 var Player = (function(){
 
-  self.onYouTubePlayerReady = function(id) { onReady("yt", id); }
-
   function check(player) {
     return (player && player.style);
   }
@@ -300,12 +298,12 @@ var Player = (function(){
     }, 10);
   }
 
-  function onReady(domain, id) {
+  function onReady(domain, id, el) {
     var 
       id = parseInt(id.split('-')[1]),
       key = domain + _playerByDom[domain].length;
 
-    _playerByDom[domain].push( document.getElementById("player-" + id) );
+    _playerByDom[domain].push( el );
     log(key + " ready");
 
     _ev.set(key);
@@ -475,7 +473,9 @@ var Player = (function(){
   }
   return {
     load: function(domain, ix) {
-      var attribs = { id: 'player-' + ix };
+      var 
+        player,
+        attribs = { id: 'player-' + ix };
 
       // Linux video drivers can be funky...
       //if (navigator.platform.search(/linux/i) != -1) {
@@ -483,26 +483,11 @@ var Player = (function(){
       //}
 
       log("Loading " + domain + ":" + ix);
-      swfobject.embedSWF({
-          "yt": "http://www.youtube.com/apiplayer?" + [
-            "version=3",
-            "enablejsapi=1",
-            "playerapiid=player-" + ix
-          ].join('&')
-
-        }[domain],
-
-        "p" + ix,   // id
-        "400",      // width
-        "300",      // height
-        "9",        // version
-        null,       // express install swf url (we assume you have the flash player)
-        { wmode: "transparent" },       // flash vars 
-
-        { allowScriptAccess: "always" }, // params
-
-        { id: 'player-' + ix, wmode: "transparent" } // attributes
-      );
+      player = new YT.Player('p' + ix, {
+        height: '300',
+        width: '400'
+      });
+      onReady('yt', ix, player);
     },
 
     letterbox: function() {
