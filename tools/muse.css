@@ -28,8 +28,8 @@ button{background:#000;color:#686;border-color:#242;float:right;border-width:1px
 #links a{line-height:20px}
 #links .child a{line-height:16px}
 #links input{background:black;color:#8f8;width:20em;border-width:1px;border-style:solid;border-color:#226}
-#vidCon{position:fixed;top:0;right:0;width:425px;overflow:hidden}
-#contact{position:fixed;right:0;bottom:0}
+
+#control, #vidCon { float: left }
 #toggle{position:fixed;bottom:0;left:0;background:#001;padding:0.25em 0.75em}
 #toggle a{cursor:pointer}
 #q,#hint{width:10em}
@@ -49,8 +49,7 @@ button{background:#000;color:#686;border-color:#242;float:right;border-width:1px
 #nav a.disabled:hover{color:#555;border-color:#555}
 #nav H2{display:inline-block;margin:0;font-size:15px;color:#448}
 #nav a:hover{text-decoration:none;color:#44f;border-color:#44f}
-#rem #up,#rem #down{font-size:0.9em;vertical-align:top;font-weight:bold}
-#rem{position:absolute;top:0;right:0}
+#up,#down{font-size:0.9em;vertical-align:top;font-weight:bold}
 p{margin:0.25em 0}
 .emp{color:#55d;cursor:pointer}
 #list a{white-space:nowrap;}

@@ -1,36 +1,27 @@
 <!DOCTYPE HTML PUBLIC "http://www.w3.org/TR/html4/loose.dtd">
 <link rel=stylesheet href=muse.css>
 <img id=tnail>
-<div id=contact><a href=mailto:chris+music@qaa.ath.cx>email author</a></div>
 <div id=vidCon>
-<div id=nav><a class=disabled id=prev>&#8592;</a><a class=disabled id=next>&#8594;</a><input id=title value=""><div id=rem><a id=up class=disabled onclick=go_up()>&#8593;</a><a id=down class=disabled onclick=go_down()>&#8595;</a><a id=del class=disabled onclick=remove()>x</a></div></div>
+  <div id=nav>
+    <a class=disabled id=prev>&#8592;</a><a class=disabled id=next>&#8594;</a>
+    <a id=up class=disabled onclick=go_up()>&#8593;</a><a id=down class=disabled onclick=go_down()>&#8595;</a><a id=del class=disabled onclick=remove()>x</a>
+    <input id=title value="">
+  </div>
   <div id=vidWrap>
     <div id=vid0></div>
   </div>
-<div id=list></div></div>
-<span id=links></span>
-<div style=text-align:right;display:inline-block;width:500px>
-<a class=emp id=playSave onclick=playlistGen()></a>
-<textarea rows=7 id=n></textarea>
-<input style=float:left alt="Prefix" title="Prefix" id=prefix value="">
-<button onclick=parse()>Add Tunes</button>
+  <div id=list></div>
 </div>
-<div id=directions>
-<h4 style=color:#232;display:inline>Youtube Jukebox</h4><h4 style=display:inline-block;margin:0;margin-left:1em><a style="text-decoration:none;border-bottom:1px solid #22a" target=_blank href=http://qaa.ath.cx/watch.html#url=demo.flv>Watch The Demo (&lt;45s)</a></h4>
-<blockquote>
-<p>Copy/Paste playlists in the box above, one tune per line.<br>Try copying the list below and pasting it in the box to see how it works.</p>
-<tt>
-Incredible Bongo Band - Apache<br>
-The Salsoul Orchestra - Getaway<br>
-The Brothers - Under The Skin<br>
-Boney M - Ma Baker
-</tt>
-<p>You have to click "Add Tunes" when you are done of course. :-)</p>
-<p>You can even generate playlists like this: <a href=http://qaa.ath.cx/music.html#21>http://qaa.ath.cx/music.html#21</a></p>
-</blockquote>
+<div id=control>
+  <span id=links></span>
+  <div style=width:500px>
+    <a class=emp id=playSave onclick=playlistGen()></a>
+    <textarea rows=7 id=n></textarea>
+    <input style=float:left alt="Prefix" title="Prefix" id=prefix value="">
+    <button onclick=parse()>Add Tunes</button>
+  </div>
 </div>
-<script src=../js/jquery-1.7.1.min.js></script>
-<script src=../js/swfobject.js></script>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script src='https://www.youtube.com/player_api'></script>
 <script>
 var   
@@ -472,6 +463,7 @@ function strip(str, level, id) {
   }
   return false;
 }
+
 function parse(){
   val = input.value;
   //input.value = '';
@@ -480,7 +472,7 @@ function parse(){
   // white space stripping
   val = val.replace(/^\ *(.*)\ *$/, '$1');
   // extra newlines
-  val = val.replace(/[\n\r]+/, '\n');
+  val = val.replace(/[\n\r]+/, '\n').trim();
   
   els = val.split('\n');
 
@@ -488,10 +480,6 @@ function parse(){
     lastVid,
     chld,
     ix;
-  $("#directions").fadeOut(3000, "linear", function(){
-    this.innerHTML = '';
-    this.style.display="block";
-  });
 
   play.length += els.length;
 
@@ -541,8 +529,6 @@ function parse(){
     }
   }
 }
-
-
 
 </script>
 
